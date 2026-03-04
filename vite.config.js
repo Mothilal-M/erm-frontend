@@ -6,6 +6,13 @@ import path from "path"
 export default defineConfig({
   plugins: [react(), tailwindcss()],
 
+  optimizeDeps: {
+    // @blocknote/mantine ships its own nested @mantine/core.
+    // Excluding these prevents esbuild from trying to pre-bundle them,
+    // which would fail because @mantine/core is not a direct dependency.
+    exclude: ['@blocknote/core', '@blocknote/mantine', '@blocknote/react'],
+  },
+
   // -----------------------------------------
   // SERVER CONFIG
   // -----------------------------------------
@@ -71,17 +78,6 @@ export default defineConfig({
         },
       },
     },
-  },
-
-  // -----------------------------------------
-  // DEPENDENCY OPTIMIZE FIXES
-  // -----------------------------------------
-  optimizeDeps: {
-    exclude: [
-      // Only exclude if they are real deps causing errors
-      "chunk-OTGHKIF7.js",
-      "chunk-PNA5RXMB.js",
-    ],
   },
 
   // -----------------------------------------

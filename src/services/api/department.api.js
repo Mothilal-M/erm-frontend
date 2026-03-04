@@ -32,7 +32,7 @@ export const postDepartment = async (payload) => {
  */
 export const patchDepartment = async (id, payload) => {
   return api.patch(
-    `${ct.api.employeeManagement.departmentDetail}/${id}/`,
+    `${ct.api.employeeManagement.departmentDetail}/${id}`,
     payload
   )
 }
@@ -44,5 +44,5 @@ export const patchDepartment = async (id, payload) => {
  * @returns {Promise} API response
  */
 export const deleteDepartment = async (id) => {
-  return api.delete(`${ct.api.employeeManagement.departmentDetail}/${id}/`)
+  return api.delete(`${ct.api.employeeManagement.departmentDetail}/${id}`)
 }

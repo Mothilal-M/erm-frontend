@@ -91,6 +91,11 @@ instance.interceptors.request.use(
     // Example: request.headers.Authorization = `Bearer ${token}`
     // See src/docs/AUTHENTICATION_PATTERNS.md for Firebase and JWT examples
 
+    // ERM: Set current employee ID for dev mode
+    if (config.isDevelopment) {
+      request.headers["X-Employee-Id"] = "1"
+    }
+
     return request
   },
   (error) => {

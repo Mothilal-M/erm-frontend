@@ -127,7 +127,7 @@ export const getAdminAttendanceLogs = async ({
  * @returns {Promise} The response from the API
  */
 export const patchAdminAttendanceEntry = async (id, data) => {
-  return api.patch(`${ct.api.attendance.adminLogDetail}/${id}/`, data)
+  return api.patch(`${ct.api.attendance.adminLogDetail}/${id}`, data)
 }
 
 /**
@@ -140,7 +140,7 @@ export const patchAdminAttendanceEntry = async (id, data) => {
  * @returns {Promise} The response from the API
  */
 export const patchAdminFlagEntry = async (id, data) => {
-  return api.patch(`${ct.api.attendance.adminLogFlag}/${id}/flag/`, data)
+  return api.patch(`${ct.api.attendance.adminLogFlag}/${id}/flag`, data)
 }
 
 /**
