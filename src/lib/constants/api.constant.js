@@ -27,6 +27,7 @@ const apiConstant = {
     departments: EMPLOYEE_MANAGEMENT_DEPARTMENTS,
     departmentDetail: EMPLOYEE_MANAGEMENT_DEPARTMENTS, // /departments/:id/
     performance: "employee/performance/",
+    profile360: `${EMPLOYEE_MANAGEMENT}profile`, // /employee-management/profile/:id/
   },
   attendance: {
     clockIn: "attendance/clock-in/",

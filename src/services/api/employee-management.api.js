@@ -95,3 +95,18 @@ export const deleteEmployee = async (id) => {
 export const postInviteUser = async (payload) => {
   return api.post(ct.api.employeeManagement.invite, payload)
 }
+
+/**
+ * Fetches the complete 360° profile for an employee.
+ * Aggregates personal info, attendance, leave, performance, assets, documents, timeline.
+ * @async
+ * @function
+ * @param {string|number} id - Employee ID
+ * @param {object} options - Request options
+ * @param {object} [options.signal] - AbortSignal for request cancellation
+ * @returns {Promise} The response from the API containing the full 360 profile
+ */
+export const getEmployee360Profile = async (id, { signal } = {}) => {
+  const config = { headers: { "Content-Type": "application/json" }, signal }
+  return api.get(`${ct.api.employeeManagement.profile360}/${id}/`, config)
+}

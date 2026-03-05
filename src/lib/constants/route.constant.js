@@ -19,6 +19,7 @@ const routes = {
     EDIT: "/employee-management/edit/:id",
     INVITE: "/employee-management/invite",
     DEPARTMENTS: "/employee-management/departments",
+    PROFILE_360: "/employee-management/profile/:id",
   },
   attendance: {
     EMPLOYEE_CLOCK: "/attendance",
@@ -37,9 +38,6 @@ const routes = {
   },
   profile: {
     MY_PROFILE: "/profile",
-  },
-  settings: {
-    INDEX: "/settings",
   },
   policy: {
     INDEX: "/policy",

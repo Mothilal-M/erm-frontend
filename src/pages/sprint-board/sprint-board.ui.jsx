@@ -113,7 +113,7 @@ const COLUMN_CONFIG = {
  */
 const TaskCard = ({ task, onClick, parentTitle }) => {
   const isSubtask = task.type === "subtask" || !!task.parentId
-  const colConfig = COLUMN_CONFIG[task.status] || COLUMN_CONFIG["Todo"]
+  const colConfig = COLUMN_CONFIG[task.status] || COLUMN_CONFIG.Todo
 
   // Mock AI insights for demonstration
   const hasRisk = task.priority === "High" && !task.assignee
@@ -175,7 +175,11 @@ const TaskCard = ({ task, onClick, parentTitle }) => {
               variant="outline"
               className="text-[10px] px-1.5 py-0 text-orange-600 border-orange-200 bg-orange-50 dark:bg-orange-900/20 dark:text-orange-400"
             >
-              Due {new Date(task.endDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+              Due{" "}
+              {new Date(task.endDate).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              })}
             </Badge>
           )}
           {aiEstimate && (
@@ -184,8 +188,7 @@ const TaskCard = ({ task, onClick, parentTitle }) => {
               className="text-[10px] px-1.5 py-0 border-amber-200 bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 flex items-center gap-0.5"
               title="AI Suggested Estimate"
             >
-              <Sparkles className="h-2.5 w-2.5" />
-              ~{aiEstimate}h
+              <Sparkles className="h-2.5 w-2.5" />~{aiEstimate}h
             </Badge>
           )}
         </div>
@@ -224,7 +227,8 @@ const TaskCard = ({ task, onClick, parentTitle }) => {
             {task.subtasks && task.subtasks.length > 0 && (
               <span className="flex items-center gap-0.5">
                 <CheckCircle2 className="h-3 w-3" />
-                {task.subtasks.filter((s) => s.completed).length}/{task.subtasks.length}
+                {task.subtasks.filter((s) => s.completed).length}/
+                {task.subtasks.length}
               </span>
             )}
             {task.estimatedHours && (
@@ -267,7 +271,14 @@ TaskCard.defaultProps = {
 /**
  * KanbanColumn - Reusable kanban column with drop support.
  */
-const KanbanColumn = ({ title, tasks, allTasks, columnId, onTaskClick, onAddTask }) => {
+const KanbanColumn = ({
+  title,
+  tasks,
+  allTasks,
+  columnId,
+  onTaskClick,
+  onAddTask,
+}) => {
   const config = COLUMN_CONFIG[columnId] || {}
   const totalPoints = tasks.reduce((sum, t) => sum + (t.points || 0), 0)
   const totalHours = tasks.reduce((sum, t) => sum + (t.estimatedHours || 0), 0)
@@ -285,10 +296,14 @@ const KanbanColumn = ({ title, tasks, allTasks, columnId, onTaskClick, onAddTask
           {...provided.droppableProps}
         >
           {/* Column Header */}
-          <div className={`rounded-t-xl px-3 py-2.5 ${config.bgHeader} border-b ${config.border}`}>
+          <div
+            className={`rounded-t-xl px-3 py-2.5 ${config.bgHeader} border-b ${config.border}`}
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className={`h-2.5 w-2.5 rounded-full shrink-0 ${config.dotColor}`} />
+                <span
+                  className={`h-2.5 w-2.5 rounded-full shrink-0 ${config.dotColor}`}
+                />
                 <h3 className={`font-bold text-sm ${config.color}`}>{title}</h3>
                 <Badge
                   variant="secondary"
@@ -328,7 +343,9 @@ const KanbanColumn = ({ title, tasks, allTasks, columnId, onTaskClick, onAddTask
           {/* Tasks */}
           <div className="flex-1 space-y-2 p-2.5 overflow-y-auto py-2 custom-scrollbar">
             {tasks.length === 0 ? (
-              <div className={`flex h-36 flex-col items-center justify-center rounded-lg border-2 border-dashed ${config.emptyBg} transition-colors`}>
+              <div
+                className={`flex h-36 flex-col items-center justify-center rounded-lg border-2 border-dashed ${config.emptyBg} transition-colors`}
+              >
                 <CircleDashed className="h-6 w-6 text-muted-foreground/30 mb-2" />
                 <p className="text-center text-xs text-muted-foreground/60 font-medium">
                   No tasks here
@@ -737,10 +754,10 @@ const DEFAULT_FILTERS = { type: "all", priority: "all", assignee: "all" }
 const SprintProgressBar = ({ tasksByStatus, totalTasks }) => {
   if (totalTasks === 0) return null
 
-  const doneTasks = tasksByStatus["Done"]?.length || 0
+  const doneTasks = tasksByStatus.Done?.length || 0
   const inProgressTasks = tasksByStatus["In Progress"]?.length || 0
   const inReviewTasks = tasksByStatus["In Review"]?.length || 0
-  const todoTasks = tasksByStatus["Todo"]?.length || 0
+  const todoTasks = tasksByStatus.Todo?.length || 0
 
   const donePercent = Math.round((doneTasks / totalTasks) * 100)
   const inProgressPercent = Math.round((inProgressTasks / totalTasks) * 100)
@@ -958,7 +975,9 @@ const SprintBoardUI = ({
                 <LayoutDashboard className="h-3.5 w-3.5" />
                 {project.name}
                 <span className="text-muted-foreground/40">·</span>
-                <span className="text-muted-foreground">{tasks.length} tasks total</span>
+                <span className="text-muted-foreground">
+                  {tasks.length} tasks total
+                </span>
               </p>
             </div>
           </div>

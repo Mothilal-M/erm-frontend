@@ -70,10 +70,7 @@ const CreateNotePage = () => {
         </div>
         <div className="flex items-center gap-2">
           <Select value={shareScope} onValueChange={setShareScope}>
-            <SelectTrigger
-              className="w-35 h-9"
-              aria-label="Share setting"
-            >
+            <SelectTrigger className="w-35 h-9" aria-label="Share setting">
               <SelectValue placeholder="Share setting" />
             </SelectTrigger>
             <SelectContent>

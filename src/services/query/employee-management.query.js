@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   deleteEmployee,
   getEmployee,
+  getEmployee360Profile,
   getEmployeePerformance,
   getEmployees,
   patchEmployee,
@@ -13,6 +14,7 @@ import {
 const QUERY_KEY_EMPLOYEES = "employee-management-list"
 const QUERY_KEY_EMPLOYEE_DETAIL = "employee-management-detail"
 const QUERY_KEY_EMPLOYEE_PERFORMANCE = "employee-performance"
+const QUERY_KEY_EMPLOYEE_360 = "employee-360-profile"
 
 /**
  * React Query hook for fetching the full employee list.
@@ -124,5 +126,24 @@ export const useFetchEmployeePerformance = () => {
     },
     staleTime: 5 * 60 * 1000,
     retry: 2,
+  })
+}
+
+/**
+ * React Query hook for fetching the full 360° profile for a specific employee.
+ * Includes personal info, attendance, leave, performance, assets, documents, timeline.
+ * @param {string|number} id - Employee ID
+ * @returns {import("@tanstack/react-query").UseQueryResult} The complete 360 profile data
+ */
+export const useFetchEmployee360 = (id) => {
+  return useQuery({
+    queryKey: [QUERY_KEY_EMPLOYEE_360, id],
+    queryFn: async ({ signal }) => {
+      const response = await getEmployee360Profile(id, { signal })
+      return response.data
+    },
+    staleTime: 5 * 60 * 1000,
+    retry: 2,
+    enabled: Boolean(id),
   })
 }
