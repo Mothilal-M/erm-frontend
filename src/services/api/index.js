@@ -185,6 +185,16 @@ instance.interceptors.response.use(
       )
     }
 
+    // Unwrap backend SuccessResponse wrapper { data, metadata }
+    if (
+      response.data &&
+      typeof response.data === "object" &&
+      "data" in response.data &&
+      "metadata" in response.data
+    ) {
+      response.data = response.data.data
+    }
+
     return response
   },
   async (error) => {

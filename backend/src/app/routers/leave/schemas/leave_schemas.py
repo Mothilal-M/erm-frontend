@@ -207,7 +207,7 @@ class LeaveSettingsResponse(CamelModel):
     carry_forward_enabled: bool
     half_day_enabled: bool
     wfh_enabled: bool
-    auto_approve_after_days: int
+    auto_approve_after_days: int | None = None
     blackout_dates: list[str]
     leave_year_start: str
 
