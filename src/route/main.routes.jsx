@@ -32,6 +32,7 @@ const InviteUsers = lazy(() => import("@pages/employee-management/invite"))
 const DepartmentList = lazy(
   () => import("@pages/employee-management/departments")
 )
+const Employee360 = lazy(() => import("@pages/employee-management/profile-360"))
 
 // Project Management pages
 const Projects = lazy(() => import("@pages/projects"))
@@ -149,6 +150,10 @@ const mainRoutes = [
   {
     path: ct.route.employeeManagement.DEPARTMENTS,
     element: empGuard(<DepartmentList />),
+  },
+  {
+    path: ct.route.employeeManagement.PROFILE_360,
+    element: empGuard(<Employee360 />),
   },
 
   // Project Management routes

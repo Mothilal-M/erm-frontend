@@ -225,6 +225,189 @@ const getEmployeePerformance = http.get("*/employee/performance/", () =>
   HttpResponse.json(mockEmployeePerformance)
 )
 
+// ─── GET /employee-management/profile/:id ─────────────────────────────────────
+
+/**
+ * 360° profile mock — combines employee info with attendance, leave, performance, assets, docs, timeline
+ */
+const getEmployee360Profile = http.get(
+  "*/employee-management/profile/:id",
+  ({ params }) => {
+    const employee = employees.find((e) => e.id === Number(params.id))
+    if (!employee) {
+      return HttpResponse.json({ detail: "Not found." }, { status: 404 })
+    }
+
+    const profile360 = {
+      employee: {
+        ...employee,
+        avatar: null,
+        manager: "Sarah Chen",
+      },
+      personal: {
+        email: employee.email,
+        phone: employee.phone,
+        location: "San Francisco, CA",
+        dob: "1992-07-15",
+        emergencyContact: "John Doe (+1 555 111 2222)",
+        employmentType: "Full-time",
+      },
+      attendance: {
+        presentDays: 18,
+        absentDays: 1,
+        lateDays: 2,
+        wfhDays: 3,
+        attendanceRate: 94,
+        recentLogs: [
+          {
+            date: "2026-02-20",
+            clockIn: "09:02 AM",
+            clockOut: "06:15 PM",
+            duration: "9h 13m",
+          },
+          {
+            date: "2026-02-19",
+            clockIn: "09:00 AM",
+            clockOut: "06:00 PM",
+            duration: "9h 00m",
+          },
+          {
+            date: "2026-02-18",
+            clockIn: "09:30 AM",
+            clockOut: "06:45 PM",
+            duration: "9h 15m",
+          },
+          {
+            date: "2026-02-17",
+            clockIn: "08:55 AM",
+            clockOut: "05:50 PM",
+            duration: "8h 55m",
+          },
+          {
+            date: "2026-02-14",
+            clockIn: "09:05 AM",
+            clockOut: "06:10 PM",
+            duration: "9h 05m",
+          },
+        ],
+      },
+      leave: {
+        totalRemaining: 14,
+        balances: [
+          { type: "Annual Leave", allocated: 20, used: 6, remaining: 14 },
+          { type: "Sick Leave", allocated: 10, used: 2, remaining: 8 },
+          { type: "Personal Leave", allocated: 3, used: 1, remaining: 2 },
+        ],
+        history: [
+          {
+            id: 1,
+            type: "Annual Leave",
+            from: "2026-02-10",
+            to: "2026-02-12",
+            status: "approved",
+          },
+          {
+            id: 2,
+            type: "Sick Leave",
+            from: "2026-01-25",
+            to: "2026-01-25",
+            status: "approved",
+          },
+          {
+            id: 3,
+            type: "Annual Leave",
+            from: "2025-12-23",
+            to: "2025-12-27",
+            status: "approved",
+          },
+        ],
+      },
+      performance: {
+        tasksCompleted: 47,
+        onTimeRate: 88,
+        rating: "4.5/5",
+        recentTasks: [
+          { id: 101, title: "Implement Employee 360 page", status: "done" },
+          { id: 102, title: "Fix sidebar navigation bug", status: "done" },
+          { id: 103, title: "Add dark mode support", status: "in-progress" },
+        ],
+        awards: ["Star Performer", "Sprint MVP", "Bug Crusher"],
+      },
+      assets: [
+        {
+          id: 1,
+          name: 'MacBook Pro 16"',
+          type: "Laptop",
+          serialNumber: "SN-MBP16-2024-0042",
+          condition: "Good",
+        },
+        {
+          id: 2,
+          name: "Dell U2723QE",
+          type: "Monitor",
+          serialNumber: "SN-DEL-MON-0078",
+          condition: "Good",
+        },
+        {
+          id: 3,
+          name: "Logitech MX Keys",
+          type: "Keyboard",
+          serialNumber: "SN-LGT-KB-0156",
+          condition: "Good",
+        },
+      ],
+      documents: [
+        {
+          id: 1,
+          name: "Employment Contract.pdf",
+          category: "Contract",
+          uploadedAt: "2022-03-01",
+        },
+        {
+          id: 2,
+          name: "ID Proof.pdf",
+          category: "Identity",
+          uploadedAt: "2022-03-01",
+        },
+        {
+          id: 3,
+          name: "Tax Form W4.pdf",
+          category: "Tax",
+          uploadedAt: "2023-01-15",
+        },
+      ],
+      timeline: [
+        {
+          type: "promotion",
+          title: "Promoted to Senior Engineer",
+          date: "2025-04-01",
+          description: "Recognized for outstanding contributions",
+        },
+        {
+          type: "award",
+          title: "Received Star Performer Badge",
+          date: "2026-02-10",
+          description: "Outstanding work on theme switcher",
+        },
+        {
+          type: "training",
+          title: "Completed React Advanced Course",
+          date: "2024-09-15",
+          description: "Internal upskilling program",
+        },
+        {
+          type: "joined",
+          title: "Joined the Team",
+          date: employee.joinDate,
+          description: `Joined as ${employee.role}`,
+        },
+      ],
+    }
+
+    return HttpResponse.json(profile360)
+  }
+)
+
 const handlers = [
   listEmployees,
   getEmployee,
@@ -233,6 +416,7 @@ const handlers = [
   removeEmployee,
   inviteUser,
   getEmployeePerformance,
+  getEmployee360Profile,
 ]
 
 export default handlers

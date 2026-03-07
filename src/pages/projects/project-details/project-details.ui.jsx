@@ -121,26 +121,30 @@ const getSprintStatusConfig = (status) => {
     case "active":
       return {
         dot: "bg-emerald-500",
-        badge: "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400",
+        badge:
+          "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400",
         bar: "bg-emerald-500",
       }
     case "completed":
     case "done":
       return {
         dot: "bg-blue-500",
-        badge: "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400",
+        badge:
+          "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400",
         bar: "bg-blue-500",
       }
     case "planning":
       return {
         dot: "bg-purple-500",
-        badge: "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400",
+        badge:
+          "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400",
         bar: "bg-purple-500",
       }
     default:
       return {
         dot: "bg-slate-400",
-        badge: "bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-700 dark:text-slate-300",
+        badge:
+          "bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-700 dark:text-slate-300",
         bar: "bg-slate-400",
       }
   }
@@ -151,22 +155,26 @@ const getPriorityConfig = (priority) => {
     case "high":
       return {
         dot: "bg-red-500",
-        badge: "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400",
+        badge:
+          "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400",
       }
     case "medium":
       return {
         dot: "bg-yellow-500",
-        badge: "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400",
+        badge:
+          "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400",
       }
     case "low":
       return {
         dot: "bg-green-500",
-        badge: "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400",
+        badge:
+          "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400",
       }
     default:
       return {
         dot: "bg-gray-400",
-        badge: "bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-700 dark:text-gray-300",
+        badge:
+          "bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-700 dark:text-gray-300",
       }
   }
 }
@@ -174,13 +182,29 @@ const getPriorityConfig = (priority) => {
 const getEpicStatusConfig = (status) => {
   switch (status?.toLowerCase()) {
     case "in progress":
-      return { color: "text-blue-600", bg: "bg-blue-100 dark:bg-blue-900/30", bar: "bg-blue-500" }
+      return {
+        color: "text-blue-600",
+        bg: "bg-blue-100 dark:bg-blue-900/30",
+        bar: "bg-blue-500",
+      }
     case "done":
-      return { color: "text-emerald-600", bg: "bg-emerald-100 dark:bg-emerald-900/30", bar: "bg-emerald-500" }
+      return {
+        color: "text-emerald-600",
+        bg: "bg-emerald-100 dark:bg-emerald-900/30",
+        bar: "bg-emerald-500",
+      }
     case "to do":
-      return { color: "text-slate-600", bg: "bg-slate-100 dark:bg-slate-800", bar: "bg-slate-400" }
+      return {
+        color: "text-slate-600",
+        bg: "bg-slate-100 dark:bg-slate-800",
+        bar: "bg-slate-400",
+      }
     default:
-      return { color: "text-muted-foreground", bg: "bg-muted", bar: "bg-muted-foreground" }
+      return {
+        color: "text-muted-foreground",
+        bg: "bg-muted",
+        bar: "bg-muted-foreground",
+      }
   }
 }
 
@@ -245,35 +269,59 @@ const OverviewTab = ({ project, activeSprint }) => (
               </span>
             </div>
             <div className="flex items-center gap-2 mt-1">
-              <h3 className="text-xl font-bold text-foreground">{activeSprint.name}</h3>
+              <h3 className="text-xl font-bold text-foreground">
+                {activeSprint.name}
+              </h3>
             </div>
             <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
               <Calendar className="h-3.5 w-3.5" />
-              {new Date(activeSprint.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+              {new Date(activeSprint.startDate).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
               {" — "}
-              {new Date(activeSprint.endDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+              {new Date(activeSprint.endDate).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
             </p>
           </CardHeader>
           <CardContent className="space-y-5 pt-3">
             <div className="grid grid-cols-3 gap-3">
               <div className="bg-muted/40 rounded-xl p-3 text-center border">
-                <div className="text-3xl font-extrabold text-primary">{activeSprint.progress}%</div>
-                <div className="text-[11px] text-muted-foreground mt-1 font-medium uppercase tracking-wide">Completion</div>
+                <div className="text-3xl font-extrabold text-primary">
+                  {activeSprint.progress}%
+                </div>
+                <div className="text-[11px] text-muted-foreground mt-1 font-medium uppercase tracking-wide">
+                  Completion
+                </div>
               </div>
               <div className="bg-muted/40 rounded-xl p-3 text-center border">
-                <div className="text-3xl font-extrabold text-blue-600 dark:text-blue-400">12</div>
-                <div className="text-[11px] text-muted-foreground mt-1 font-medium uppercase tracking-wide">Tasks Done</div>
+                <div className="text-3xl font-extrabold text-blue-600 dark:text-blue-400">
+                  12
+                </div>
+                <div className="text-[11px] text-muted-foreground mt-1 font-medium uppercase tracking-wide">
+                  Tasks Done
+                </div>
               </div>
               <div className="bg-muted/40 rounded-xl p-3 text-center border">
-                <div className="text-3xl font-extrabold text-amber-600 dark:text-amber-400">5</div>
-                <div className="text-[11px] text-muted-foreground mt-1 font-medium uppercase tracking-wide">Days Left</div>
+                <div className="text-3xl font-extrabold text-amber-600 dark:text-amber-400">
+                  5
+                </div>
+                <div className="text-[11px] text-muted-foreground mt-1 font-medium uppercase tracking-wide">
+                  Days Left
+                </div>
               </div>
             </div>
 
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs font-medium">
                 <span className="text-muted-foreground">Sprint Progress</span>
-                <span className="text-foreground font-semibold">{activeSprint.progress}%</span>
+                <span className="text-foreground font-semibold">
+                  {activeSprint.progress}%
+                </span>
               </div>
               <div className="h-2.5 bg-muted rounded-full overflow-hidden">
                 <div
@@ -316,8 +364,11 @@ const OverviewTab = ({ project, activeSprint }) => (
         <CardContent className="space-y-3">
           <p className="text-sm leading-relaxed text-muted-foreground">
             Based on recent activity, the project is{" "}
-            <strong className="text-emerald-600 dark:text-emerald-400">on track</strong>{" "}
-            to meet its target date. Velocity has increased by 15% compared to the last sprint.
+            <strong className="text-emerald-600 dark:text-emerald-400">
+              on track
+            </strong>{" "}
+            to meet its target date. Velocity has increased by 15% compared to
+            the last sprint.
           </p>
           <div className="space-y-2">
             {[
@@ -329,9 +380,9 @@ const OverviewTab = ({ project, activeSprint }) => (
                 text: `Team member workload is well-balanced, but QA review times are slightly bottlenecking the "Done" column.`,
                 type: "info",
               },
-            ].map((insight, i) => (
+            ].map((insight, index) => (
               <div
-                key={i}
+                key={index}
                 className={`flex items-start gap-2.5 rounded-lg p-2.5 text-sm ${
                   insight.type === "warning"
                     ? "bg-amber-50 dark:bg-amber-900/20 border border-amber-200/60 dark:border-amber-800/40"
@@ -341,7 +392,9 @@ const OverviewTab = ({ project, activeSprint }) => (
                 <Lightbulb
                   className={`h-4 w-4 mt-0.5 shrink-0 ${insight.type === "warning" ? "text-amber-500" : "text-blue-500"}`}
                 />
-                <span className="text-muted-foreground leading-snug">{insight.text}</span>
+                <span className="text-muted-foreground leading-snug">
+                  {insight.text}
+                </span>
               </div>
             ))}
           </div>
@@ -377,8 +430,12 @@ const OverviewTab = ({ project, activeSprint }) => (
         <CardContent className="space-y-4">
           <div>
             <div className="flex items-end justify-between mb-1.5">
-              <span className="text-xs text-muted-foreground font-medium">Completion</span>
-              <span className="text-3xl font-extrabold text-primary leading-none">{project.progress}%</span>
+              <span className="text-xs text-muted-foreground font-medium">
+                Completion
+              </span>
+              <span className="text-3xl font-extrabold text-primary leading-none">
+                {project.progress}%
+              </span>
             </div>
             <div className="h-2 bg-muted rounded-full overflow-hidden">
               <div
@@ -394,7 +451,11 @@ const OverviewTab = ({ project, activeSprint }) => (
                 <Calendar className="h-3.5 w-3.5" /> Start Date
               </span>
               <span className="font-semibold">
-                {new Date(project.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                {new Date(project.startDate).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })}
               </span>
             </div>
             <div className="flex items-center justify-between text-xs">
@@ -402,7 +463,11 @@ const OverviewTab = ({ project, activeSprint }) => (
                 <Target className="h-3.5 w-3.5" /> Target Date
               </span>
               <span className="font-semibold">
-                {new Date(project.endDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                {new Date(project.endDate).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })}
               </span>
             </div>
           </div>
@@ -416,13 +481,18 @@ const OverviewTab = ({ project, activeSprint }) => (
             <Users className="h-4 w-4" />
             Team
           </CardTitle>
-          <Badge variant="secondary" className="text-xs font-bold">{project.members?.length || 0}</Badge>
+          <Badge variant="secondary" className="text-xs font-bold">
+            {project.members?.length || 0}
+          </Badge>
         </CardHeader>
         <CardContent>
           {project.members && project.members.length > 0 ? (
             <div className="space-y-3">
               {project.members.map((member) => (
-                <div key={member.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                <div
+                  key={member.id}
+                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors"
+                >
                   <Avatar className="h-8 w-8 border shadow-sm">
                     <AvatarImage src={member.avatar} alt={member.name} />
                     <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
@@ -430,8 +500,12 @@ const OverviewTab = ({ project, activeSprint }) => (
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold leading-none truncate">{member.name}</p>
-                    <p className="text-[11px] text-muted-foreground mt-0.5">Team Member</p>
+                    <p className="text-sm font-semibold leading-none truncate">
+                      {member.name}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">
+                      Team Member
+                    </p>
                   </div>
                 </div>
               ))}
@@ -462,7 +536,9 @@ const OverviewTab = ({ project, activeSprint }) => (
               <TrendingUp className="h-4 w-4 text-indigo-500" />
               Velocity Chart
             </CardTitle>
-            <CardDescription className="text-xs">Story points completed across sprints</CardDescription>
+            <CardDescription className="text-xs">
+              Story points completed across sprints
+            </CardDescription>
           </CardHeader>
           <CardContent className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -471,7 +547,13 @@ const OverviewTab = ({ project, activeSprint }) => (
                 margin={{ top: 5, right: 10, bottom: 5, left: 0 }}
               >
                 <defs>
-                  <linearGradient id="velocityGradient" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient
+                    id="velocityGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
                     <stop offset="0%" stopColor="#6366f1" stopOpacity={1} />
                     <stop offset="100%" stopColor="#818cf8" stopOpacity={0.7} />
                   </linearGradient>
@@ -503,7 +585,10 @@ const OverviewTab = ({ project, activeSprint }) => (
                     boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
                   }}
                   itemStyle={{ color: "#6366f1", fontWeight: 600 }}
-                  labelStyle={{ color: "hsl(var(--muted-foreground))", fontSize: 11 }}
+                  labelStyle={{
+                    color: "hsl(var(--muted-foreground))",
+                    fontSize: 11,
+                  }}
                   cursor={{ fill: "rgba(99,102,241,0.08)" }}
                 />
                 <Bar
@@ -524,7 +609,9 @@ const OverviewTab = ({ project, activeSprint }) => (
               <Activity className="h-4 w-4 text-red-500" />
               Burndown Chart
             </CardTitle>
-            <CardDescription className="text-xs">Remaining effort in active sprint</CardDescription>
+            <CardDescription className="text-xs">
+              Remaining effort in active sprint
+            </CardDescription>
           </CardHeader>
           <CardContent className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -559,13 +646,22 @@ const OverviewTab = ({ project, activeSprint }) => (
                     boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
                   }}
                   itemStyle={{ fontWeight: 600 }}
-                  labelStyle={{ color: "hsl(var(--muted-foreground))", fontSize: 11 }}
+                  labelStyle={{
+                    color: "hsl(var(--muted-foreground))",
+                    fontSize: 11,
+                  }}
                 />
                 <Legend
                   verticalAlign="top"
                   height={28}
                   formatter={(value, entry) => (
-                    <span style={{ color: entry.color, fontSize: 12, fontWeight: 500 }}>
+                    <span
+                      style={{
+                        color: entry.color,
+                        fontSize: 12,
+                        fontWeight: 500,
+                      }}
+                    >
                       {value}
                     </span>
                   )}
@@ -576,7 +672,12 @@ const OverviewTab = ({ project, activeSprint }) => (
                   dataKey="remaining"
                   stroke="#ef4444"
                   strokeWidth={2.5}
-                  dot={{ r: 3, fill: "#ef4444", stroke: "#ef4444", strokeWidth: 0 }}
+                  dot={{
+                    r: 3,
+                    fill: "#ef4444",
+                    stroke: "#ef4444",
+                    strokeWidth: 0,
+                  }}
                   activeDot={{ r: 5, fill: "#ef4444" }}
                 />
                 <Line
@@ -601,7 +702,9 @@ const OverviewTab = ({ project, activeSprint }) => (
               <Target className="h-4 w-4 text-primary" />
               Issue Breakdown
             </CardTitle>
-            <CardDescription className="text-xs">Current status of all project issues</CardDescription>
+            <CardDescription className="text-xs">
+              Current status of all project issues
+            </CardDescription>
           </CardHeader>
           <CardContent className="h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -614,10 +717,19 @@ const OverviewTab = ({ project, activeSprint }) => (
                   outerRadius={100}
                   paddingAngle={3}
                   dataKey="value"
-                  label={({ cx, cy, midAngle, innerRadius, outerRadius, percent, name }) => {
+                  label={({
+                    cx,
+                    cy,
+                    midAngle,
+                    innerRadius,
+                    outerRadius,
+                    percent,
+                    name,
+                  }) => {
                     if (percent < 0.1) return null
                     const RADIAN = Math.PI / 180
-                    const radius = innerRadius + (outerRadius - innerRadius) * 1.45
+                    const radius =
+                      innerRadius + (outerRadius - innerRadius) * 1.45
                     const x = cx + radius * Math.cos(-midAngle * RADIAN)
                     const y = cy + radius * Math.sin(-midAngle * RADIAN)
                     return (
@@ -634,10 +746,17 @@ const OverviewTab = ({ project, activeSprint }) => (
                       </text>
                     )
                   }}
-                  labelLine={{ stroke: "rgba(148,163,184,0.4)", strokeWidth: 1 }}
+                  labelLine={{
+                    stroke: "rgba(148,163,184,0.4)",
+                    strokeWidth: 1,
+                  }}
                 >
                   {ISSUE_STATUS_DATA.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} stroke="transparent" />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={entry.color}
+                      stroke="transparent"
+                    />
                   ))}
                 </Pie>
                 <RechartsTooltip
@@ -656,7 +775,13 @@ const OverviewTab = ({ project, activeSprint }) => (
                   height={36}
                   iconType="circle"
                   formatter={(value, entry) => (
-                    <span style={{ color: entry.color, fontSize: 12, fontWeight: 500 }}>
+                    <span
+                      style={{
+                        color: entry.color,
+                        fontSize: 12,
+                        fontWeight: 500,
+                      }}
+                    >
                       {value}
                     </span>
                   )}
@@ -684,7 +809,9 @@ const SprintsTab = ({ project, sprints }) => (
     <div className="flex items-center justify-between">
       <div>
         <h2 className="text-lg font-bold text-foreground">Sprints</h2>
-        <p className="text-xs text-muted-foreground mt-0.5">{sprints.length} sprint{sprints.length !== 1 ? "s" : ""} total</p>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          {sprints.length} sprint{sprints.length !== 1 ? "s" : ""} total
+        </p>
       </div>
       <CreateSprintModal />
     </div>
@@ -695,7 +822,8 @@ const SprintsTab = ({ project, sprints }) => (
           <Target className="h-10 w-10 text-muted-foreground mb-4 opacity-40" />
           <h3 className="text-lg font-semibold mb-1">No sprints yet</h3>
           <p className="text-sm text-muted-foreground max-w-sm mt-1">
-            Get started by creating your first sprint to organize tasks and track progress.
+            Get started by creating your first sprint to organize tasks and
+            track progress.
           </p>
           <div className="mt-4">
             <CreateSprintModal />
@@ -712,23 +840,34 @@ const SprintsTab = ({ project, sprints }) => (
               to={`/projects/${project.id}/sprints/${sprint.id}`}
               className="block group"
             >
-              <div className={`flex items-center justify-between p-4 rounded-xl border-2 bg-card hover:bg-accent/30 transition-all duration-150 hover:shadow-md hover:-translate-y-0.5`}>
+              <div className="flex items-center justify-between p-4 rounded-xl border-2 bg-card hover:bg-accent/30 transition-all duration-150 hover:shadow-md hover:-translate-y-0.5">
                 <div className="flex items-center gap-3 min-w-0">
-                  <span className={`h-3 w-3 rounded-full shrink-0 ${config.dot}`} />
+                  <span
+                    className={`h-3 w-3 rounded-full shrink-0 ${config.dot}`}
+                  />
                   <div className="min-w-0">
                     <div className="flex items-center gap-2.5 flex-wrap">
                       <h4 className="font-bold text-sm text-foreground group-hover:text-primary transition-colors truncate">
                         {sprint.name}
                       </h4>
-                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${config.badge}`}>
+                      <span
+                        className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${config.badge}`}
+                      >
                         {sprint.status}
                       </span>
                     </div>
                     <div className="flex items-center text-xs text-muted-foreground gap-1.5 mt-0.5">
                       <Calendar className="h-3 w-3" />
-                      {new Date(sprint.startDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                      {new Date(sprint.startDate).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                      })}
                       {" – "}
-                      {new Date(sprint.endDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                      {new Date(sprint.endDate).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
                     </div>
                   </div>
                 </div>
@@ -736,7 +875,9 @@ const SprintsTab = ({ project, sprints }) => (
                   <div className="hidden sm:block w-36">
                     <div className="flex justify-between text-[11px] mb-1 font-medium">
                       <span className="text-muted-foreground">Progress</span>
-                      <span className="text-foreground">{sprint.progress}%</span>
+                      <span className="text-foreground">
+                        {sprint.progress}%
+                      </span>
                     </div>
                     <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                       <div
@@ -790,7 +931,10 @@ const PlanningTab = () => {
       status: "To Do",
       startDate: "2025-02-20",
       endDate: "2025-03-10",
-      assignee: { name: "Sarah Smith", avatar: "https://i.pravatar.cc/40?img=2" },
+      assignee: {
+        name: "Sarah Smith",
+        avatar: "https://i.pravatar.cc/40?img=2",
+      },
     },
     {
       id: "US-103",
@@ -802,7 +946,10 @@ const PlanningTab = () => {
       status: "In Progress",
       startDate: "2025-02-10",
       endDate: "2025-03-15",
-      assignee: { name: "Mike Johnson", avatar: "https://i.pravatar.cc/40?img=3" },
+      assignee: {
+        name: "Mike Johnson",
+        avatar: "https://i.pravatar.cc/40?img=3",
+      },
     },
     {
       id: "US-104",
@@ -839,13 +986,27 @@ const PlanningTab = () => {
   const getIssueStatusConfig = (status) => {
     switch (status?.toLowerCase()) {
       case "in progress":
-        return { icon: <Circle className="h-3.5 w-3.5 text-blue-500 fill-blue-500/20" />, text: "text-blue-600 dark:text-blue-400" }
+        return {
+          icon: (
+            <Circle className="h-3.5 w-3.5 text-blue-500 fill-blue-500/20" />
+          ),
+          text: "text-blue-600 dark:text-blue-400",
+        }
       case "done":
-        return { icon: <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />, text: "text-emerald-600 dark:text-emerald-400" }
+        return {
+          icon: <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />,
+          text: "text-emerald-600 dark:text-emerald-400",
+        }
       case "blocked":
-        return { icon: <AlertCircle className="h-3.5 w-3.5 text-red-500" />, text: "text-red-600 dark:text-red-400" }
+        return {
+          icon: <AlertCircle className="h-3.5 w-3.5 text-red-500" />,
+          text: "text-red-600 dark:text-red-400",
+        }
       default:
-        return { icon: <Circle className="h-3.5 w-3.5 text-muted-foreground" />, text: "text-muted-foreground" }
+        return {
+          icon: <Circle className="h-3.5 w-3.5 text-muted-foreground" />,
+          text: "text-muted-foreground",
+        }
     }
   }
 
@@ -854,8 +1015,12 @@ const PlanningTab = () => {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-foreground">Plans & Backlog</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">{ISSUES_DATA.length} issues</p>
+            <h2 className="text-lg font-bold text-foreground">
+              Plans & Backlog
+            </h2>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {ISSUES_DATA.length} issues
+            </p>
           </div>
           <CreateIssueModal
             triggerText="Add Issue"
@@ -893,19 +1058,29 @@ const PlanningTab = () => {
                     <span className="text-[10px] font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded shrink-0">
                       {story.id}
                     </span>
-                    <p className="text-sm font-medium truncate">{story.title}</p>
+                    <p className="text-sm font-medium truncate">
+                      {story.title}
+                    </p>
                   </div>
 
                   {/* Status */}
                   <div className="hidden md:flex col-span-2 items-center gap-1.5">
                     {statusConfig.icon}
-                    <span className={`text-xs font-medium ${statusConfig.text}`}>{story.status}</span>
+                    <span
+                      className={`text-xs font-medium ${statusConfig.text}`}
+                    >
+                      {story.status}
+                    </span>
                   </div>
 
                   {/* Priority */}
                   <div className="hidden md:flex col-span-2 items-center gap-1.5">
-                    <span className={`h-2 w-2 rounded-full ${priorityConfig.dot}`} />
-                    <span className="text-xs text-muted-foreground">{story.priority}</span>
+                    <span
+                      className={`h-2 w-2 rounded-full ${priorityConfig.dot}`}
+                    />
+                    <span className="text-xs text-muted-foreground">
+                      {story.priority}
+                    </span>
                   </div>
 
                   {/* Assignee */}
@@ -922,7 +1097,9 @@ const PlanningTab = () => {
                         </span>
                       </>
                     ) : (
-                      <span className="text-xs text-muted-foreground/50 italic">Unassigned</span>
+                      <span className="text-xs text-muted-foreground/50 italic">
+                        Unassigned
+                      </span>
                     )}
                   </div>
 
@@ -943,12 +1120,20 @@ const PlanningTab = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleEditIssue(story) }}>
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleEditIssue(story)
+                          }}
+                        >
                           <Edit className="h-4 w-4 mr-2" /> Edit
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                          onClick={(e) => { e.stopPropagation(); handleDeleteIssue(story.id) }}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleDeleteIssue(story.id)
+                          }}
                           className="text-destructive"
                         >
                           <Trash2 className="h-4 w-4 mr-2" /> Delete
@@ -960,13 +1145,21 @@ const PlanningTab = () => {
 
                 {/* Mobile extras */}
                 <div className="md:hidden flex items-center gap-2 px-4 pb-3 flex-wrap">
-                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${priorityConfig.badge}`}>
+                  <span
+                    className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${priorityConfig.badge}`}
+                  >
                     {story.priority}
                   </span>
-                  <span className="text-[10px] text-muted-foreground">{story.status}</span>
+                  <span className="text-[10px] text-muted-foreground">
+                    {story.status}
+                  </span>
                   {story.endDate && (
                     <span className="text-[10px] text-orange-600 font-medium">
-                      Due {new Date(story.endDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                      Due{" "}
+                      {new Date(story.endDate).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                      })}
                     </span>
                   )}
                 </div>
@@ -1038,7 +1231,9 @@ const EpicsTab = () => {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-bold text-foreground">Epics</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">{EPICS_DATA.length} epics total</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {EPICS_DATA.length} epics total
+            </p>
           </div>
           <CreateIssueModal triggerText="Create Epic" />
         </div>
@@ -1053,20 +1248,29 @@ const EpicsTab = () => {
                 onClick={() => handleEpicSelect(epic)}
               >
                 <div className="flex items-center gap-4 flex-1 min-w-0">
-                  <div className={`h-10 w-10 rounded-xl ${config.bg} flex items-center justify-center shrink-0`}>
+                  <div
+                    className={`h-10 w-10 rounded-xl ${config.bg} flex items-center justify-center shrink-0`}
+                  >
                     <Layers className={`h-5 w-5 ${config.color}`} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-semibold text-sm truncate">{epic.title}</p>
+                      <p className="font-semibold text-sm truncate">
+                        {epic.title}
+                      </p>
                       <span className="text-[10px] font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded shrink-0">
                         {epic.id}
                       </span>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{epic.description}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                      {epic.description}
+                    </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 shrink-0 ml-4" onClick={(e) => e.stopPropagation()}>
+                <div
+                  className="flex items-center gap-4 shrink-0 ml-4"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <div className="w-36 hidden sm:block">
                     <div className="flex justify-between text-[11px] mb-1 font-medium">
                       <span className={config.color}>{epic.status}</span>
@@ -1125,7 +1329,8 @@ const NotesTab = ({ projectId }) => {
     architecture: {
       label: "Architecture",
       dot: "bg-purple-500",
-      badge: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300",
+      badge:
+        "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300",
     },
     guide: {
       label: "Guide",
@@ -1135,7 +1340,8 @@ const NotesTab = ({ projectId }) => {
     documentation: {
       label: "Docs",
       dot: "bg-slate-500",
-      badge: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+      badge:
+        "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
     },
   }
 
@@ -1172,7 +1378,8 @@ const NotesTab = ({ projectId }) => {
         <div>
           <h2 className="text-lg font-bold text-foreground">Project Notes</h2>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {SAMPLE_NOTES.length} notes across {Object.keys(NOTE_CATEGORY_CONFIG).length} categories
+            {SAMPLE_NOTES.length} notes across{" "}
+            {Object.keys(NOTE_CATEGORY_CONFIG).length} categories
           </p>
         </div>
         <Button size="sm" asChild>
@@ -1191,13 +1398,17 @@ const NotesTab = ({ projectId }) => {
             Start documenting your project with your first note.
           </p>
           <Button asChild size="sm">
-            <Link to={`/projects/${projectId}/notes/new`}>Create First Note</Link>
+            <Link to={`/projects/${projectId}/notes/new`}>
+              Create First Note
+            </Link>
           </Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {SAMPLE_NOTES.map((note) => {
-            const catConfig = NOTE_CATEGORY_CONFIG[note.category] || NOTE_CATEGORY_CONFIG.documentation
+            const catConfig =
+              NOTE_CATEGORY_CONFIG[note.category] ||
+              NOTE_CATEGORY_CONFIG.documentation
             return (
               <div
                 key={note.id}
@@ -1205,7 +1416,9 @@ const NotesTab = ({ projectId }) => {
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-start gap-2.5 flex-1 min-w-0">
-                    <div className={`mt-1.5 h-2 w-2 rounded-full shrink-0 ${catConfig.dot}`} />
+                    <div
+                      className={`mt-1.5 h-2 w-2 rounded-full shrink-0 ${catConfig.dot}`}
+                    />
                     <p className="font-semibold text-sm leading-snug group-hover:text-primary transition-colors line-clamp-2">
                       {note.title}
                     </p>
@@ -1222,7 +1435,9 @@ const NotesTab = ({ projectId }) => {
                   {note.content}
                 </p>
                 <div className="flex items-center justify-between pt-1 border-t border-border/50">
-                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${catConfig.badge}`}>
+                  <span
+                    className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${catConfig.badge}`}
+                  >
                     {catConfig.label}
                   </span>
                   <span className="text-[11px] text-muted-foreground flex items-center gap-1">
@@ -1335,7 +1550,9 @@ const ProjectDetailsUI = ({ project, sprints, isLoading, error }) => {
           </div>
           <div>
             <p className="text-xs text-muted-foreground font-medium">Team</p>
-            <p className="text-sm font-bold text-foreground">{teamSize} members</p>
+            <p className="text-sm font-bold text-foreground">
+              {teamSize} members
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2.5 px-4 py-3 rounded-xl bg-muted/40 border">
@@ -1343,8 +1560,12 @@ const ProjectDetailsUI = ({ project, sprints, isLoading, error }) => {
             <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
           </div>
           <div>
-            <p className="text-xs text-muted-foreground font-medium">Progress</p>
-            <p className="text-sm font-bold text-foreground">{completionPct}%</p>
+            <p className="text-xs text-muted-foreground font-medium">
+              Progress
+            </p>
+            <p className="text-sm font-bold text-foreground">
+              {completionPct}%
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2.5 px-4 py-3 rounded-xl bg-muted/40 border">
@@ -1352,7 +1573,9 @@ const ProjectDetailsUI = ({ project, sprints, isLoading, error }) => {
             <Timer className="h-4 w-4 text-amber-600 dark:text-amber-400" />
           </div>
           <div>
-            <p className="text-xs text-muted-foreground font-medium">Days Left</p>
+            <p className="text-xs text-muted-foreground font-medium">
+              Days Left
+            </p>
             <p className="text-sm font-bold text-foreground">{daysLeft}</p>
           </div>
         </div>

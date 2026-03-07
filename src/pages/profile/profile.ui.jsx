@@ -1,8 +1,10 @@
 import {
+  Briefcase,
   BriefcaseBusiness,
   Building2,
   Calendar,
   Cog,
+  FileText,
   Key,
   Mail,
   Pencil,
@@ -484,6 +486,224 @@ ProfileContent.defaultProps = {
   isChangingPassword: false,
 }
 
+// ─── Assets Section ───────────────────────────────────────────────────────────
+
+const TIMELINE_ICON_STYLE = {
+  joined: "bg-emerald-500",
+  promotion: "bg-blue-500",
+  leave: "bg-amber-500",
+  award: "bg-purple-500",
+  training: "bg-cyan-500",
+  default: "bg-slate-400",
+}
+
+const AssetsSection = ({ assets }) => {
+  const items = assets ?? []
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base flex items-center gap-2">
+          <Briefcase className="h-4 w-4" /> Assigned Assets
+        </CardTitle>
+        <CardDescription>
+          Equipment and resources assigned to you
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {items.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No assets assigned.</p>
+        ) : (
+          <div className="space-y-2">
+            {items.map((asset) => (
+              <div
+                key={asset.id}
+                className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/50"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Briefcase className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">{asset.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {asset.type} · {asset.serialNumber}
+                    </p>
+                  </div>
+                </div>
+                <Badge variant="outline" className="text-xs">
+                  {asset.condition}
+                </Badge>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
+AssetsSection.propTypes = {
+  assets: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number,
+      name: PropTypes.string,
+      type: PropTypes.string,
+      serialNumber: PropTypes.string,
+      condition: PropTypes.string,
+    })
+  ),
+}
+
+AssetsSection.defaultProps = { assets: null }
+
+// ─── Documents Section ────────────────────────────────────────────────────────
+
+const DocumentsSection = ({ documents }) => {
+  const docs = documents ?? []
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base flex items-center gap-2">
+          <FileText className="h-4 w-4" /> My Documents
+        </CardTitle>
+        <CardDescription>Uploaded documents and files</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {docs.length === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            No documents uploaded.
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {docs.map((document_) => (
+              <div
+                key={document_.id}
+                className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/50"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded bg-primary/10 flex items-center justify-center">
+                    <FileText className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">{document_.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {document_.category} · {document_.uploadedAt}
+                    </p>
+                  </div>
+                </div>
+                <Button variant="ghost" size="sm" className="text-xs">
+                  View
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
+DocumentsSection.propTypes = {
+  documents: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number,
+      name: PropTypes.string,
+      category: PropTypes.string,
+      uploadedAt: PropTypes.string,
+    })
+  ),
+}
+
+DocumentsSection.defaultProps = { documents: null }
+
+// ─── Assets & Documents Tab Content ───────────────────────────────────────────
+
+const AssetsAndDocsContent = ({ assets, documents }) => (
+  <div className="space-y-4 p-4 md:p-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <AssetsSection assets={assets} />
+      <DocumentsSection documents={documents} />
+    </div>
+  </div>
+)
+
+AssetsAndDocsContent.propTypes = {
+  assets: PropTypes.array,
+  documents: PropTypes.array,
+}
+
+AssetsAndDocsContent.defaultProps = {
+  assets: null,
+  documents: null,
+}
+
+// ─── Timeline Section ─────────────────────────────────────────────────────────
+
+const TimelineContent = ({ timeline }) => {
+  const events = timeline ?? []
+
+  return (
+    <div className="p-4 md:p-6">
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Career Timeline</CardTitle>
+          <CardDescription className="text-xs">
+            Key milestones and events in your journey
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {events.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No timeline events yet.
+            </p>
+          ) : (
+            <div className="relative space-y-4 pl-6 before:absolute before:left-2 before:top-2 before:h-[calc(100%-16px)] before:w-0.5 before:bg-border">
+              {events.map((event, index) => (
+                <div key={index} className="relative">
+                  <div
+                    className={`absolute -left-6 top-1 w-4 h-4 rounded-full ${
+                      TIMELINE_ICON_STYLE[event.type] ??
+                      TIMELINE_ICON_STYLE.default
+                    }`}
+                  />
+                  <div className="p-3 rounded-lg bg-muted/30">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-sm font-medium">{event.title}</p>
+                      <span className="text-xs text-muted-foreground">
+                        {event.date}
+                      </span>
+                    </div>
+                    {event.description && (
+                      <p className="text-xs text-muted-foreground">
+                        {event.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+TimelineContent.propTypes = {
+  timeline: PropTypes.arrayOf(
+    PropTypes.shape({
+      type: PropTypes.string,
+      title: PropTypes.string,
+      date: PropTypes.string,
+      description: PropTypes.string,
+    })
+  ),
+}
+
+TimelineContent.defaultProps = { timeline: null }
+
 // ─── Roles & Responsibilities ────────────────────────────────────────────────
 
 const ROLE_OPTIONS = [
@@ -904,10 +1124,18 @@ const ProfileUI = ({
       </Card>
 
       <Tabs defaultValue="profile" className="space-y-4">
-        <TabsList className="grid grid-cols-1 sm:grid-cols-3 h-auto gap-1 w-full">
+        <TabsList className="grid grid-cols-2 sm:grid-cols-5 h-auto gap-1 w-full">
           <TabsTrigger value="profile" className="gap-2 justify-center py-2">
             <UserRound className="h-4 w-4" />
             Profile
+          </TabsTrigger>
+          <TabsTrigger value="assets" className="gap-2 justify-center py-2">
+            <Briefcase className="h-4 w-4" />
+            Assets
+          </TabsTrigger>
+          <TabsTrigger value="timeline" className="gap-2 justify-center py-2">
+            <Calendar className="h-4 w-4" />
+            Timeline
           </TabsTrigger>
           <TabsTrigger value="settings" className="gap-2 justify-center py-2">
             <Cog className="h-4 w-4" />
@@ -921,6 +1149,15 @@ const ProfileUI = ({
 
         <TabsContent value="profile" className="mt-0">
           {profileContent()}
+        </TabsContent>
+        <TabsContent value="assets" className="mt-0">
+          <AssetsAndDocsContent
+            assets={profile?.assets}
+            documents={profile?.documents}
+          />
+        </TabsContent>
+        <TabsContent value="timeline" className="mt-0">
+          <TimelineContent timeline={profile?.timeline} />
         </TabsContent>
         <TabsContent value="settings" className="mt-0">
           <SettingsUI
