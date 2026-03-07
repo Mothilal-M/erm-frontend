@@ -85,18 +85,6 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str
 
     #################################
-    ###### EMAIL Config ##########
-    #################################
-    # MAIL_USERNAME: str
-    # MAIL_PASSWORD: str
-    # MAIL_FROM: str
-    # MAIL_PORT: int
-    # MAIL_SERVER: str
-    # MAIL_TLS: bool
-    # MAIL_SSL: bool
-    # USE_CREDENTIALS: bool
-
-    #################################
     ###### sentry Config ############
     #################################
     SENTRY_DSN: str
@@ -106,19 +94,6 @@ class Settings(BaseSettings):
     #################################
     DEFAULT_EMPLOYEE_ID: int = 1
 
-    # Create Email Config
-    # using FastAPI Mail
-    # def email_config(self) -> ConnectionConfig:
-    #     return ConnectionConfig(
-    #         MAIL_USERNAME=self.MAIL_USERNAME,
-    #         MAIL_PASSWORD=self.MAIL_PASSWORD,
-    #         MAIL_FROM=self.MAIL_FROM,
-    #         MAIL_PORT=self.MAIL_PORT,
-    #         MAIL_SERVER=self.MAIL_SERVER,
-    #         MAIL_TLS=self.MAIL_TLS,
-    #         MAIL_SSL=self.MAIL_SSL,
-    #         USE_CREDENTIALS=self.USE_CREDENTIALS
-    #     )
 
     class Config:
         extra = "allow"

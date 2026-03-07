@@ -6,12 +6,12 @@ from fastapi.logger import logger
 from injectq.integrations.fastapi import InjectFastAPI
 from taskiq import AsyncTaskiqTask
 
-from backend.src.app.core.auth.authentication import get_current_user
-from backend.src.app.utils.schemas.user_schemas import AuthUserSchema
+from src.app.core.auth.authentication import get_current_user
 from src.app.routers.auth.schemas import UserSchema
 from src.app.routers.auth.services import UserService
 from src.app.tasks.user_tasks import add_task_math
 from src.app.utils import generate_swagger_responses, success_response
+from src.app.utils.schemas.user_schemas import AuthUserSchema
 
 
 # dependencies=[Depends(get_current_user)]
