@@ -71,7 +71,7 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str = "postgres"
     POSTGRES_DB: str = "erm"
     POSTGRES_PORT: str = "5432"
-    POSTGRES_SCHEMA: str = "cv"
+    POSTGRES_SCHEMA: str = "erm"
 
     #################################
     ###### REDIS Config ##########
