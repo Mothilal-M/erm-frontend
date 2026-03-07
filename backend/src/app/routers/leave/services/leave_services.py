@@ -4,7 +4,8 @@ from datetime import UTC, date, datetime, timedelta
 
 from injectq import inject, singleton
 
-from src.app.db.tables.erm_tables import AttendanceLogTable, EmployeeTable
+from src.app.core.auth.employee_resolver import resolve_employee
+from src.app.db.tables.erm_tables import AttendanceLogTable
 from src.app.routers.leave.repositories import LeaveRepo
 from src.app.routers.leave.schemas import (
     AdminEmployeeItem,
@@ -34,6 +35,7 @@ from src.app.routers.leave.schemas import (
     ThisMonthStats,
     TopLeaveTakerItem,
 )
+from src.app.utils.schemas import AuthUserSchema
 
 
 @singleton
@@ -275,7 +277,8 @@ class LeaveService:
             for emp in employees
         ]
 
-    async def get_employee_profile(self, employee: EmployeeTable) -> EmployeeLeaveProfileResponse:
+    async def get_employee_profile(self, user: AuthUserSchema) -> EmployeeLeaveProfileResponse:
+        employee = await resolve_employee(user)
         today = date.today()
         year = today.year
 
@@ -370,7 +373,8 @@ class LeaveService:
             upcoming=[],
         )
 
-    async def submit_leave_request(self, employee: EmployeeTable, data: LeaveRequestSchema) -> LeaveRequestResponse:
+    async def submit_leave_request(self, user: AuthUserSchema, data: LeaveRequestSchema) -> LeaveRequestResponse:
+        employee = await resolve_employee(user)
         leave_type = await self._repo.get_or_create_leave_type(data.leave_type)
         lr = await self._repo.create_leave_request({
             "employee_id": employee.id,

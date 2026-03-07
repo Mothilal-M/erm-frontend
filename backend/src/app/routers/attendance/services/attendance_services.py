@@ -2,7 +2,8 @@ from datetime import UTC, date, datetime
 
 from injectq import inject, singleton
 
-from src.app.db.tables.erm_tables import AttendanceLogTable, EmployeeTable
+from src.app.core.auth.employee_resolver import resolve_employee
+from src.app.db.tables.erm_tables import AttendanceLogTable
 from src.app.routers.attendance.repositories import AttendanceRepo
 from src.app.routers.attendance.schemas import (
     AdminAttendanceSummaryResponse,
@@ -20,6 +21,7 @@ from src.app.routers.attendance.schemas import (
     NotClockedInEmployeeSchema,
     TodayAttendanceResponse,
 )
+from src.app.utils.schemas import AuthUserSchema
 
 MAX_SESSION_SECONDS = 14400  # 4 hours
 
@@ -78,7 +80,8 @@ class AttendanceService:
     def __init__(self, repo: AttendanceRepo):
         self._repo = repo
 
-    async def get_status(self, employee: EmployeeTable) -> AttendanceStatusResponse:
+    async def get_status(self, user: AuthUserSchema) -> AttendanceStatusResponse:
+        employee = await resolve_employee(user)
         today = date.today()
         active = await self._repo.get_active_session(employee.id, today)
         today_entries = await self._repo.get_today_entries(employee.id, today)
@@ -108,7 +111,8 @@ class AttendanceService:
             today_total_minutes=total_minutes,
         )
 
-    async def clock_in(self, employee: EmployeeTable, data: ClockInSchema) -> ClockInResponse:
+    async def clock_in(self, user: AuthUserSchema, data: ClockInSchema) -> ClockInResponse:
+        employee = await resolve_employee(user)
         today = date.today()
         active = await self._repo.get_active_session(employee.id, today)
         if active:
@@ -128,7 +132,8 @@ class AttendanceService:
             note=entry.note,
         )
 
-    async def clock_out(self, employee: EmployeeTable, data: ClockOutSchema) -> ClockOutResponse:
+    async def clock_out(self, user: AuthUserSchema, data: ClockOutSchema) -> ClockOutResponse:
+        employee = await resolve_employee(user)
         today = date.today()
         active = await self._repo.get_active_session(employee.id, today)
         if not active:
@@ -151,7 +156,8 @@ class AttendanceService:
             work_summary=active.work_summary,
         )
 
-    async def get_today(self, employee: EmployeeTable) -> TodayAttendanceResponse:
+    async def get_today(self, user: AuthUserSchema) -> TodayAttendanceResponse:
+        employee = await resolve_employee(user)
         today = date.today()
         entries = await self._repo.get_today_entries(employee.id, today)
 
@@ -180,8 +186,9 @@ class AttendanceService:
         )
 
     async def get_history(
-        self, employee: EmployeeTable, year: int | None, month: int | None, page: int = 1
+        self, user: AuthUserSchema, year: int | None, month: int | None, page: int = 1
     ) -> AttendanceHistoryResponse:
+        employee = await resolve_employee(user)
         entries, total = await self._repo.get_history(employee.id, year, month, page)
         return AttendanceHistoryResponse(
             count=total,

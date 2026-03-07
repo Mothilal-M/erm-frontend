@@ -3,9 +3,8 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, Request
 from injectq.integrations.fastapi import InjectFastAPI
 
-from src.app.core.auth.employee_resolver import get_authenticated_employee
+from src.app.core.auth.authentication import get_current_user
 from src.app.core.auth.rbac import require_role
-from src.app.db.tables.erm_tables import EmployeeTable
 from src.app.routers.leave.schemas import (
     AdminEmployeeItem,
     AdminLeaveSummaryResponse,
@@ -146,10 +145,10 @@ async def admin_employees(
 )
 async def employee_profile(
     request: Request,
-    employee: Annotated[EmployeeTable, Depends(get_authenticated_employee)],
     service: Annotated[LeaveService, InjectFastAPI(LeaveService)],
+    user: AuthUserSchema = Depends(get_current_user),
 ):
-    result = await service.get_employee_profile(employee)
+    result = await service.get_employee_profile(user)
     return success_response(result.model_dump(by_alias=True), request)
 
 
@@ -164,10 +163,10 @@ async def employee_profile(
 async def employee_request(
     request: Request,
     payload: LeaveRequestSchema,
-    employee: Annotated[EmployeeTable, Depends(get_authenticated_employee)],
     service: Annotated[LeaveService, InjectFastAPI(LeaveService)],
+    user: AuthUserSchema = Depends(get_current_user),
 ):
-    result = await service.submit_leave_request(employee, payload)
+    result = await service.submit_leave_request(user, payload)
     return success_response(result.model_dump(by_alias=True), request, status_code=201)
 
 

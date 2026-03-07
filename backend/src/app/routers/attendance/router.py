@@ -3,9 +3,8 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, Request
 from injectq.integrations.fastapi import InjectFastAPI
 
-from src.app.core.auth.employee_resolver import get_authenticated_employee
+from src.app.core.auth.authentication import get_current_user
 from src.app.core.auth.rbac import require_role
-from src.app.db.tables.erm_tables import EmployeeTable
 from src.app.routers.attendance.schemas import (
     AdminAttendanceSummaryResponse,
     AdminEditEntrySchema,
@@ -38,10 +37,10 @@ router = APIRouter(tags=["Attendance"])
 )
 async def get_status(
     request: Request,
-    employee: Annotated[EmployeeTable, Depends(get_authenticated_employee)],
     service: Annotated[AttendanceService, InjectFastAPI(AttendanceService)],
+    user: AuthUserSchema = Depends(get_current_user),
 ):
-    result = await service.get_status(employee)
+    result = await service.get_status(user)
     return success_response(result.model_dump(by_alias=True), request)
 
 
@@ -55,10 +54,10 @@ async def get_status(
 async def clock_in(
     request: Request,
     payload: ClockInSchema,
-    employee: Annotated[EmployeeTable, Depends(get_authenticated_employee)],
     service: Annotated[AttendanceService, InjectFastAPI(AttendanceService)],
+    user: AuthUserSchema = Depends(get_current_user),
 ):
-    result = await service.clock_in(employee, payload)
+    result = await service.clock_in(user, payload)
     return success_response(result.model_dump(by_alias=True), request)
 
 
@@ -72,10 +71,10 @@ async def clock_in(
 async def clock_out(
     request: Request,
     payload: ClockOutSchema,
-    employee: Annotated[EmployeeTable, Depends(get_authenticated_employee)],
     service: Annotated[AttendanceService, InjectFastAPI(AttendanceService)],
+    user: AuthUserSchema = Depends(get_current_user),
 ):
-    result = await service.clock_out(employee, payload)
+    result = await service.clock_out(user, payload)
     return success_response(result.model_dump(by_alias=True), request)
 
 
@@ -88,10 +87,10 @@ async def clock_out(
 )
 async def get_today(
     request: Request,
-    employee: Annotated[EmployeeTable, Depends(get_authenticated_employee)],
     service: Annotated[AttendanceService, InjectFastAPI(AttendanceService)],
+    user: AuthUserSchema = Depends(get_current_user),
 ):
-    result = await service.get_today(employee)
+    result = await service.get_today(user)
     return success_response(result.model_dump(by_alias=True), request)
 
 
@@ -104,13 +103,13 @@ async def get_today(
 )
 async def get_history(
     request: Request,
-    employee: Annotated[EmployeeTable, Depends(get_authenticated_employee)],
     service: Annotated[AttendanceService, InjectFastAPI(AttendanceService)],
+    user: AuthUserSchema = Depends(get_current_user),
     page: int = Query(1, ge=1),
     month: int | None = Query(None),
     year: int | None = Query(None),
 ):
-    result = await service.get_history(employee, year, month, page)
+    result = await service.get_history(user, year, month, page)
     return success_response(result.model_dump(by_alias=True), request)
 
 
