@@ -28,3 +28,108 @@ class AdminManualEntrySchema(CamelModel):
     clock_out: str
     work_summary: str | None = None
     manual_entry_reason: str | None = None
+
+
+# --- Response Schemas ---
+
+
+class AttendanceStatusResponse(CamelModel):
+    is_clocked: bool
+    clocked_in_at: str | None = None
+    elapsed_seconds: int | None = None
+    expires_in_seconds: int | None = None
+    will_auto_expire: bool
+    today_total_minutes: int
+
+
+class ClockInResponse(CamelModel):
+    id: int
+    clocked_in_at: str
+    note: str | None = None
+
+
+class ClockOutResponse(CamelModel):
+    id: int
+    clock_out: str
+    duration_minutes: int
+    work_summary: str | None = None
+
+
+class AttendanceEntrySchema(CamelModel):
+    id: int
+    date: str
+    clock_in: str | None = None
+    clock_out: str | None = None
+    duration_minutes: int | None = None
+    work_summary: str | None = None
+    status: str
+    is_manual_entry: bool
+    manual_entry_reason: str | None = None
+    is_flagged: bool
+    flag_reason: str | None = None
+    flagged_by: str | None = None
+    flagged_at: str | None = None
+    edited_by: str | None = None
+    edited_at: str | None = None
+    edit_reason: str | None = None
+
+
+class AttendanceEntryWithEmployeeSchema(AttendanceEntrySchema):
+    employee_id: int
+    employee_name: str
+    department: str
+
+
+class TodayAttendanceResponse(CamelModel):
+    date: str
+    total_work_minutes: int
+    first_clock_in: str | None = None
+    last_clock_out: str | None = None
+    is_currently_in: bool
+    has_auto_expired_entry: bool
+    entries: list[AttendanceEntrySchema]
+
+
+class AttendanceHistoryResponse(CamelModel):
+    count: int
+    page: int
+    page_size: int
+    results: list[AttendanceEntrySchema]
+
+
+class AdminLogsResponse(CamelModel):
+    count: int
+    page: int
+    page_size: int
+    results: list[AttendanceEntryWithEmployeeSchema]
+
+
+class LiveEmployeeSchema(CamelModel):
+    employee_id: int
+    employee_name: str
+    department: str
+    clocked_in_at: str
+    elapsed_seconds: int
+    expires_in_seconds: int
+    will_auto_expire: bool
+
+
+class NotClockedInEmployeeSchema(CamelModel):
+    employee_id: int
+    employee_name: str
+    department: str
+
+
+class AdminLiveResponse(CamelModel):
+    live_count: int
+    live_employees: list[LiveEmployeeSchema]
+    not_clocked_in: list[NotClockedInEmployeeSchema]
+
+
+class AdminAttendanceSummaryResponse(CamelModel):
+    present_today: int
+    absent_today: int
+    live_now: int
+    auto_expired_today: int
+    flagged_entries: int
+    total_employees: int

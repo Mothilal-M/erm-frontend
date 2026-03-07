@@ -4,46 +4,70 @@ from injectq import inject, singleton
 
 from src.app.db.tables.erm_tables import AttendanceLogTable, EmployeeTable
 from src.app.routers.attendance.repositories import AttendanceRepo
+from src.app.routers.attendance.schemas import (
+    AdminAttendanceSummaryResponse,
+    AdminLiveResponse,
+    AdminLogsResponse,
+    AttendanceEntrySchema,
+    AttendanceEntryWithEmployeeSchema,
+    AttendanceHistoryResponse,
+    AttendanceStatusResponse,
+    ClockInResponse,
+    ClockInSchema,
+    ClockOutResponse,
+    ClockOutSchema,
+    LiveEmployeeSchema,
+    NotClockedInEmployeeSchema,
+    TodayAttendanceResponse,
+)
 
 MAX_SESSION_SECONDS = 14400  # 4 hours
 
 
-def _serialize_entry(entry: AttendanceLogTable, include_employee: bool = False) -> dict:
-    """Serializes an attendance log entry into a dictionary suitable for API responses.
+def _to_entry_schema(entry: AttendanceLogTable) -> AttendanceEntrySchema:
+    return AttendanceEntrySchema(
+        id=entry.id,
+        date=entry.date.isoformat(),
+        clock_in=entry.clock_in.isoformat() if entry.clock_in else None,
+        clock_out=entry.clock_out.isoformat() if entry.clock_out else None,
+        duration_minutes=entry.duration_minutes,
+        work_summary=entry.work_summary,
+        status=entry.attendance_status,
+        is_manual_entry=entry.is_manual_entry,
+        manual_entry_reason=entry.manual_entry_reason,
+        is_flagged=entry.is_flagged,
+        flag_reason=entry.flag_reason,
+        flagged_by=entry.flagged_by,
+        flagged_at=entry.flagged_at.isoformat() if entry.flagged_at else None,
+        edited_by=entry.edited_by,
+        edited_at=entry.edited_at.isoformat() if entry.edited_at else None,
+        edit_reason=entry.edit_reason,
+    )
 
-    Args:
-        entry (AttendanceLogTable): The attendance log entry to serialize.
-        include_employee (bool): Whether to include employee details (id, name, department)
-            in the serialized output. Defaults to False.
 
-    Returns:
-        dict: A dictionary containing the serialized attendance log data, with optional
-            employee information if include_employee is True.
-    """
-    result = {
-        "id": entry.id,
-        "date": entry.date.isoformat(),
-        "clockIn": entry.clock_in.isoformat() if entry.clock_in else None,
-        "clockOut": entry.clock_out.isoformat() if entry.clock_out else None,
-        "durationMinutes": entry.duration_minutes,
-        "workSummary": entry.work_summary,
-        "status": entry.attendance_status,
-        "isManualEntry": entry.is_manual_entry,
-        "manualEntryReason": entry.manual_entry_reason,
-        "isFlagged": entry.is_flagged,
-        "flagReason": entry.flag_reason,
-        "flaggedBy": entry.flagged_by,
-        "flaggedAt": entry.flagged_at.isoformat() if entry.flagged_at else None,
-        "editedBy": entry.edited_by,
-        "editedAt": entry.edited_at.isoformat() if entry.edited_at else None,
-        "editReason": entry.edit_reason,
-    }
-    if include_employee:
-        emp = entry.employee
-        result["employeeId"] = emp.id
-        result["employeeName"] = emp.name
-        result["department"] = emp.department.name if emp.department else ""
-    return result
+def _to_entry_with_employee_schema(entry: AttendanceLogTable) -> AttendanceEntryWithEmployeeSchema:
+    emp = entry.employee
+    return AttendanceEntryWithEmployeeSchema(
+        id=entry.id,
+        date=entry.date.isoformat(),
+        clock_in=entry.clock_in.isoformat() if entry.clock_in else None,
+        clock_out=entry.clock_out.isoformat() if entry.clock_out else None,
+        duration_minutes=entry.duration_minutes,
+        work_summary=entry.work_summary,
+        status=entry.attendance_status,
+        is_manual_entry=entry.is_manual_entry,
+        manual_entry_reason=entry.manual_entry_reason,
+        is_flagged=entry.is_flagged,
+        flag_reason=entry.flag_reason,
+        flagged_by=entry.flagged_by,
+        flagged_at=entry.flagged_at.isoformat() if entry.flagged_at else None,
+        edited_by=entry.edited_by,
+        edited_at=entry.edited_at.isoformat() if entry.edited_at else None,
+        edit_reason=entry.edit_reason,
+        employee_id=emp.id,
+        employee_name=emp.name,
+        department=emp.department.name if emp.department else "",
+    )
 
 
 @singleton
@@ -52,23 +76,9 @@ class AttendanceService:
 
     @inject
     def __init__(self, repo: AttendanceRepo):
-        """Initializes the AttendanceService with the required repository dependency.
-
-        Args:
-            repo (AttendanceRepo): The attendance repository instance for database operations.
-        """
         self._repo = repo
 
-    async def get_status(self, employee: EmployeeTable) -> dict:
-        """Retrieves the current clock-in status for an employee, including session timing details.
-
-        Args:
-            employee (EmployeeTable): The employee whose attendance status is being queried.
-
-        Returns:
-            dict: A dictionary containing clock-in status with keys: isClocked, clockedInAt,
-                elapsedSeconds, expiresInSeconds, willAutoExpire, and todayTotalMinutes.
-        """
+    async def get_status(self, employee: EmployeeTable) -> AttendanceStatusResponse:
         today = date.today()
         active = await self._repo.get_active_session(employee.id, today)
         today_entries = await self._repo.get_today_entries(employee.id, today)
@@ -80,37 +90,25 @@ class AttendanceService:
             clock_in_aware = active.clock_in if active.clock_in.tzinfo else active.clock_in.replace(tzinfo=UTC)
             elapsed = int((now - clock_in_aware).total_seconds())
             expires_in = max(0, MAX_SESSION_SECONDS - elapsed)
-            return {
-                "isClocked": True,
-                "clockedInAt": active.clock_in.isoformat(),
-                "elapsedSeconds": elapsed,
-                "expiresInSeconds": expires_in,
-                "willAutoExpire": True,
-                "todayTotalMinutes": total_minutes,
-            }
+            return AttendanceStatusResponse(
+                is_clocked=True,
+                clocked_in_at=active.clock_in.isoformat(),
+                elapsed_seconds=elapsed,
+                expires_in_seconds=expires_in,
+                will_auto_expire=True,
+                today_total_minutes=total_minutes,
+            )
 
-        return {
-            "isClocked": False,
-            "clockedInAt": None,
-            "elapsedSeconds": None,
-            "expiresInSeconds": None,
-            "willAutoExpire": False,
-            "todayTotalMinutes": total_minutes,
-        }
+        return AttendanceStatusResponse(
+            is_clocked=False,
+            clocked_in_at=None,
+            elapsed_seconds=None,
+            expires_in_seconds=None,
+            will_auto_expire=False,
+            today_total_minutes=total_minutes,
+        )
 
-    async def clock_in(self, employee: EmployeeTable, data: dict) -> dict:
-        """Records a clock-in event for the given employee.
-
-        Args:
-            employee (EmployeeTable): The employee who is clocking in.
-            data (dict): A dictionary containing optional clock-in data such as "note".
-
-        Returns:
-            dict: A dictionary containing the new entry's id, clockedInAt timestamp, and note.
-
-        Raises:
-            ValueError: If the employee is already clocked in for today.
-        """
+    async def clock_in(self, employee: EmployeeTable, data: ClockInSchema) -> ClockInResponse:
         today = date.today()
         active = await self._repo.get_active_session(employee.id, today)
         if active:
@@ -122,28 +120,15 @@ class AttendanceService:
             "date": today,
             "clock_in": now,
             "attendance_status": "IN_PROGRESS",
-            "note": data.get("note"),
+            "note": data.note,
         })
-        return {
-            "id": entry.id,
-            "clockedInAt": entry.clock_in.isoformat(),
-            "note": entry.note,
-        }
+        return ClockInResponse(
+            id=entry.id,
+            clocked_in_at=entry.clock_in.isoformat(),
+            note=entry.note,
+        )
 
-    async def clock_out(self, employee: EmployeeTable, data: dict) -> dict:
-        """Records a clock-out event for the given employee, calculating the session duration.
-
-        Args:
-            employee (EmployeeTable): The employee who is clocking out.
-            data (dict): A dictionary containing optional clock-out data such as "work_summary".
-
-        Returns:
-            dict: A dictionary containing the entry's id, clockOut timestamp, durationMinutes,
-                and workSummary.
-
-        Raises:
-            ValueError: If the employee is not currently clocked in.
-        """
+    async def clock_out(self, employee: EmployeeTable, data: ClockOutSchema) -> ClockOutResponse:
         today = date.today()
         active = await self._repo.get_active_session(employee.id, today)
         if not active:
@@ -155,27 +140,18 @@ class AttendanceService:
 
         active.clock_out = now
         active.duration_minutes = duration
-        active.work_summary = data.get("work_summary")
+        active.work_summary = data.work_summary
         active.attendance_status = "COMPLETED"
         await active.save()
 
-        return {
-            "id": active.id,
-            "clockOut": active.clock_out.isoformat(),
-            "durationMinutes": duration,
-            "workSummary": active.work_summary,
-        }
+        return ClockOutResponse(
+            id=active.id,
+            clock_out=active.clock_out.isoformat(),
+            duration_minutes=duration,
+            work_summary=active.work_summary,
+        )
 
-    async def get_today(self, employee: EmployeeTable) -> dict:
-        """Retrieves a comprehensive summary of the employee's attendance for today.
-
-        Args:
-            employee (EmployeeTable): The employee whose today's attendance is being queried.
-
-        Returns:
-            dict: A dictionary containing date, totalWorkMinutes, firstClockIn, lastClockOut,
-                isCurrentlyIn, hasAutoExpiredEntry, and a list of serialized entries.
-        """
+    async def get_today(self, employee: EmployeeTable) -> TodayAttendanceResponse:
         today = date.today()
         entries = await self._repo.get_today_entries(employee.id, today)
 
@@ -193,35 +169,26 @@ class AttendanceService:
             if e.attendance_status == "AUTO_EXPIRED":
                 has_auto_expired = True
 
-        return {
-            "date": today.isoformat(),
-            "totalWorkMinutes": total_minutes,
-            "firstClockIn": first_clock_in,
-            "lastClockOut": last_clock_out,
-            "isCurrentlyIn": is_currently_in,
-            "hasAutoExpiredEntry": has_auto_expired,
-            "entries": [_serialize_entry(e) for e in entries],
-        }
+        return TodayAttendanceResponse(
+            date=today.isoformat(),
+            total_work_minutes=total_minutes,
+            first_clock_in=first_clock_in,
+            last_clock_out=last_clock_out,
+            is_currently_in=is_currently_in,
+            has_auto_expired_entry=has_auto_expired,
+            entries=[_to_entry_schema(e) for e in entries],
+        )
 
-    async def get_history(self, employee: EmployeeTable, year: int | None, month: int | None, page: int = 1) -> dict:
-        """Retrieves paginated attendance history for an employee with optional date filters.
-
-        Args:
-            employee (EmployeeTable): The employee whose attendance history is being queried.
-            year (int | None): The year to filter by. If None, no year filter is applied.
-            month (int | None): The month to filter by (used with year). If None, no month filter is applied.
-            page (int): The page number for pagination. Defaults to 1.
-
-        Returns:
-            dict: A dictionary containing count, page, pageSize, and a list of serialized results.
-        """
+    async def get_history(
+        self, employee: EmployeeTable, year: int | None, month: int | None, page: int = 1
+    ) -> AttendanceHistoryResponse:
         entries, total = await self._repo.get_history(employee.id, year, month, page)
-        return {
-            "count": total,
-            "page": page,
-            "pageSize": 20,
-            "results": [_serialize_entry(e) for e in entries],
-        }
+        return AttendanceHistoryResponse(
+            count=total,
+            page=page,
+            page_size=20,
+            results=[_to_entry_schema(e) for e in entries],
+        )
 
     async def get_admin_logs(
         self,
@@ -232,45 +199,20 @@ class AttendanceService:
         date_to: str | None = None,
         employee_id: int | None = None,
         department_id: int | None = None,
-    ) -> dict:
-        """Retrieves paginated attendance logs for administrative review with various filters.
-
-        Args:
-            page (int): The page number for pagination. Defaults to 1.
-            status (str | None): Filter by attendance status (e.g., "COMPLETED", "FLAGGED"). Defaults to None.
-            date_filter (str | None): Filter by an exact date. Defaults to None.
-            date_from (str | None): Filter entries from this date onward (inclusive). Defaults to None.
-            date_to (str | None): Filter entries up to this date (inclusive). Defaults to None.
-            employee_id (int | None): Filter by a specific employee ID. Defaults to None.
-            department_id (int | None): Filter by a specific department ID. Defaults to None.
-
-        Returns:
-            dict: A dictionary containing count, page, pageSize, and a list of serialized results
-                with employee details included.
-        """
+    ) -> AdminLogsResponse:
         entries, total = await self._repo.get_admin_logs(
             page=page, status=status, date_filter=date_filter,
             date_from=date_from, date_to=date_to,
             employee_id=employee_id, department_id=department_id,
         )
-        return {
-            "count": total,
-            "page": page,
-            "pageSize": 20,
-            "results": [_serialize_entry(e, include_employee=True) for e in entries],
-        }
+        return AdminLogsResponse(
+            count=total,
+            page=page,
+            page_size=20,
+            results=[_to_entry_with_employee_schema(e) for e in entries],
+        )
 
-    async def admin_edit_entry(self, entry_id: int, data: dict) -> dict:
-        """Allows an administrator to edit an existing attendance log entry.
-
-        Args:
-            entry_id (int): The unique identifier of the attendance log entry to edit.
-            data (dict): A dictionary containing the fields to update. Supported keys include
-                "clock_in", "clock_out", "work_summary", and "edit_reason".
-
-        Returns:
-            dict: A serialized dictionary of the updated attendance log entry with employee details.
-        """
+    async def admin_edit_entry(self, entry_id: int, data: dict) -> AttendanceEntryWithEmployeeSchema:
         entry = await self._repo.get_entry(entry_id)
 
         if data.get("clock_in"):
@@ -292,18 +234,9 @@ class AttendanceService:
         await entry.save()
 
         await entry.fetch_related("employee__department")
-        return _serialize_entry(entry, include_employee=True)
+        return _to_entry_with_employee_schema(entry)
 
-    async def admin_flag_entry(self, entry_id: int, data: dict) -> dict:
-        """Allows an administrator to flag or unflag an attendance log entry.
-
-        Args:
-            entry_id (int): The unique identifier of the attendance log entry to flag or unflag.
-            data (dict): A dictionary containing "is_flagged" (bool) and optionally "flag_reason" (str).
-
-        Returns:
-            dict: A serialized dictionary of the updated attendance log entry with employee details.
-        """
+    async def admin_flag_entry(self, entry_id: int, data: dict) -> AttendanceEntryWithEmployeeSchema:
         entry = await self._repo.get_entry(entry_id)
         entry.is_flagged = data["is_flagged"]
         entry.flag_reason = data.get("flag_reason")
@@ -317,18 +250,9 @@ class AttendanceService:
         await entry.save()
 
         await entry.fetch_related("employee__department")
-        return _serialize_entry(entry, include_employee=True)
+        return _to_entry_with_employee_schema(entry)
 
-    async def admin_manual_entry(self, data: dict) -> dict:
-        """Allows an administrator to create a manual attendance entry for an employee.
-
-        Args:
-            data (dict): A dictionary containing the required fields: "employee_id", "clock_in",
-                "clock_out", and optional fields "work_summary" and "manual_entry_reason".
-
-        Returns:
-            dict: A serialized dictionary of the newly created attendance log entry with employee details.
-        """
+    async def admin_manual_entry(self, data: dict) -> AttendanceEntryWithEmployeeSchema:
         clock_in = datetime.fromisoformat(data["clock_in"])
         clock_out = datetime.fromisoformat(data["clock_out"])
         ci = clock_in if clock_in.tzinfo else clock_in.replace(tzinfo=UTC)
@@ -347,16 +271,9 @@ class AttendanceService:
             "manual_entry_reason": data.get("manual_entry_reason"),
         })
         await entry.fetch_related("employee__department")
-        return _serialize_entry(entry, include_employee=True)
+        return _to_entry_with_employee_schema(entry)
 
-    async def get_admin_live(self) -> dict:
-        """Retrieves a live overview of all currently clocked-in employees and those not yet clocked in.
-
-        Returns:
-            dict: A dictionary containing liveCount, liveEmployees (list of currently clocked-in
-                employees with timing details), and notClockedIn (list of active employees
-                who have not clocked in today).
-        """
+    async def get_admin_live(self) -> AdminLiveResponse:
         today = date.today()
         live_entries = await self._repo.get_live_clocked_in(today)
         all_employees = await self._repo.get_all_employees_active()
@@ -371,39 +288,33 @@ class AttendanceService:
             clock_in_aware = entry.clock_in if entry.clock_in.tzinfo else entry.clock_in.replace(tzinfo=UTC)
             elapsed = int((now - clock_in_aware).total_seconds())
             expires_in = max(0, MAX_SESSION_SECONDS - elapsed)
-            live_employees.append({
-                "employeeId": emp.id,
-                "employeeName": emp.name,
-                "department": emp.department.name if emp.department else "",
-                "clockedInAt": entry.clock_in.isoformat(),
-                "elapsedSeconds": elapsed,
-                "expiresInSeconds": expires_in,
-                "willAutoExpire": True,
-            })
+            live_employees.append(LiveEmployeeSchema(
+                employee_id=emp.id,
+                employee_name=emp.name,
+                department=emp.department.name if emp.department else "",
+                clocked_in_at=entry.clock_in.isoformat(),
+                elapsed_seconds=elapsed,
+                expires_in_seconds=expires_in,
+                will_auto_expire=True,
+            ))
 
         not_clocked_in = [
-            {
-                "employeeId": emp.id,
-                "employeeName": emp.name,
-                "department": emp.department.name if emp.department else "",
-            }
+            NotClockedInEmployeeSchema(
+                employee_id=emp.id,
+                employee_name=emp.name,
+                department=emp.department.name if emp.department else "",
+            )
             for emp in all_employees
             if emp.id not in live_ids
         ]
 
-        return {
-            "liveCount": len(live_employees),
-            "liveEmployees": live_employees,
-            "notClockedIn": not_clocked_in,
-        }
+        return AdminLiveResponse(
+            live_count=len(live_employees),
+            live_employees=live_employees,
+            not_clocked_in=not_clocked_in,
+        )
 
-    async def get_admin_summary(self) -> dict:
-        """Retrieves a high-level attendance summary for administrative dashboards.
-
-        Returns:
-            dict: A dictionary containing presentToday, absentToday, liveNow, autoExpiredToday,
-                flaggedEntries, and totalEmployees counts for the current day.
-        """
+    async def get_admin_summary(self) -> AdminAttendanceSummaryResponse:
         today = date.today()
         all_employees = await self._repo.get_all_employees_active()
         total = len(all_employees)
@@ -416,11 +327,11 @@ class AttendanceService:
         flagged = await AttendanceLogTable.filter(is_flagged=True, date=today).count()
         auto_expired = await AttendanceLogTable.filter(attendance_status="AUTO_EXPIRED", date=today).count()
 
-        return {
-            "presentToday": present_today,
-            "absentToday": total - present_today,
-            "liveNow": len(live_entries),
-            "autoExpiredToday": auto_expired,
-            "flaggedEntries": flagged,
-            "totalEmployees": total,
-        }
+        return AdminAttendanceSummaryResponse(
+            present_today=present_today,
+            absent_today=total - present_today,
+            live_now=len(live_entries),
+            auto_expired_today=auto_expired,
+            flagged_entries=flagged,
+            total_employees=total,
+        )
