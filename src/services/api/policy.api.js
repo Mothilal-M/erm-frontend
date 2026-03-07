@@ -22,7 +22,7 @@ export const getPolicies = async ({ signal } = {}) => {
  * @returns {Promise} API response with policy data
  */
 export const getPolicy = async (id, { signal } = {}) => {
-  return api.get(`${ct.api.policy.detail}/${id}/`, { signal })
+  return api.get(`${ct.api.policy.detail}/${id}`, { signal })
 }
 
 /**
@@ -49,7 +49,7 @@ export const postPolicy = async (payload) => {
  * @returns {Promise} API response with updated policy
  */
 export const patchPolicy = async (id, payload) => {
-  return api.patch(`${ct.api.policy.update}/${id}/`, payload)
+  return api.patch(`${ct.api.policy.update}/${id}`, payload)
 }
 
 /**
@@ -59,5 +59,5 @@ export const patchPolicy = async (id, payload) => {
  * @returns {Promise} API response
  */
 export const deletePolicy = async (id) => {
-  return api.delete(`${ct.api.policy.delete}/${id}/`)
+  return api.delete(`${ct.api.policy.delete}/${id}`)
 }

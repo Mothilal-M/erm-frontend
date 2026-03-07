@@ -91,6 +91,11 @@ instance.interceptors.request.use(
     // Example: request.headers.Authorization = `Bearer ${token}`
     // See src/docs/AUTHENTICATION_PATTERNS.md for Firebase and JWT examples
 
+    // ERM: Set current employee ID for dev mode
+    if (config.isDevelopment) {
+      request.headers["X-Employee-Id"] = "1"
+    }
+
     return request
   },
   (error) => {
@@ -178,6 +183,16 @@ instance.interceptors.response.use(
       console.warn(
         `✅ ${response.config.method.toUpperCase()} ${response.config.url} (${duration}ms)`
       )
+    }
+
+    // Unwrap backend SuccessResponse wrapper { data, metadata }
+    if (
+      response.data &&
+      typeof response.data === "object" &&
+      "data" in response.data &&
+      "metadata" in response.data
+    ) {
+      response.data = response.data.data
     }
 
     return response

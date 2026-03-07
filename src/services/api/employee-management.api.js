@@ -39,7 +39,7 @@ export const getEmployeePerformance = async ({ signal } = {}) => {
  */
 export const getEmployee = async (id, { signal } = {}) => {
   const config = { headers: { "Content-Type": "application/json" }, signal }
-  return api.get(`${ct.api.employeeManagement.detail}/${id}/`, config)
+  return api.get(`${ct.api.employeeManagement.detail}/${id}`, config)
 }
 
 /**
@@ -68,7 +68,7 @@ export const postEmployee = async (payload) => {
  * @returns {Promise} The response from the API with the updated employee record
  */
 export const patchEmployee = async (id, payload) => {
-  return api.patch(`${ct.api.employeeManagement.detail}/${id}/`, payload)
+  return api.patch(`${ct.api.employeeManagement.detail}/${id}`, payload)
 }
 
 /**
@@ -79,7 +79,7 @@ export const patchEmployee = async (id, payload) => {
  * @returns {Promise} The response from the API
  */
 export const deleteEmployee = async (id) => {
-  return api.delete(`${ct.api.employeeManagement.detail}/${id}/`)
+  return api.delete(`${ct.api.employeeManagement.detail}/${id}`)
 }
 
 /**
