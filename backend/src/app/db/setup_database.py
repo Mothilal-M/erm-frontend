@@ -3,7 +3,6 @@ from tortoise.contrib.fastapi import register_tortoise
 
 from src.app.core import get_settings, logger
 from src.app.db.tables.erm_constants import ERM_TABLES
-from src.app.db.tables.user_constants import USER_TABLES
 
 
 def get_database_config():
@@ -40,7 +39,7 @@ TORTOISE_ORM = {
     "routers": ["src.app.db.router.Router"],
     "apps": {
         "tables": {
-            "models": [*USER_TABLES, *ERM_TABLES, "aerich.models"],
+            "models": [*ERM_TABLES, "aerich.models"],
             "default_connection": "master",
         },
     },
