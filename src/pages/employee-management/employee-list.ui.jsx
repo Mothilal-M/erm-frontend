@@ -1,5 +1,6 @@
 import {
   Edit,
+  Mail,
   MailPlus,
   MoreHorizontal,
   Plus,
@@ -92,7 +93,7 @@ StatsCard.propTypes = {
 
 // ─── Employee row ─────────────────────────────────────────────────────────────
 
-const EmployeeRow = ({ employee, onDelete }) => {
+const EmployeeRow = ({ employee, onDelete, onSendInvite }) => {
   const initials = employee.name
     .split(" ")
     .map((n) => n[0])
@@ -137,6 +138,10 @@ const EmployeeRow = ({ employee, onDelete }) => {
               Edit
             </Link>
           </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onSendInvite(employee.email)}>
+            <Mail className="mr-2 h-4 w-4" />
+            Send Invite Email
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="text-destructive focus:text-destructive"
@@ -160,6 +165,7 @@ EmployeeRow.propTypes = {
     status: PropTypes.string.isRequired,
   }).isRequired,
   onDelete: PropTypes.func.isRequired,
+  onSendInvite: PropTypes.func.isRequired,
 }
 
 // ─── Employee list content ────────────────────────────────────────────────────
@@ -172,7 +178,7 @@ EmployeeRow.propTypes = {
  * @param {Array} props.employees - The array of employee objects to display.
  * @param {(id: string) => void} props.onDelete - Callback function to call when an employee is deleted, receives the employee ID as an argument.
  */
-const EmployeeListContent = ({ isLoading, isError, employees, onDelete }) => {
+const EmployeeListContent = ({ isLoading, isError, employees, onDelete, onSendInvite }) => {
   if (isError) {
     return (
       <p className="px-4 py-6 text-sm text-center text-destructive">
@@ -197,7 +203,7 @@ const EmployeeListContent = ({ isLoading, isError, employees, onDelete }) => {
   }
 
   return employees?.map((emp) => (
-    <EmployeeRow key={emp.id} employee={emp} onDelete={onDelete} />
+    <EmployeeRow key={emp.id} employee={emp} onDelete={onDelete} onSendInvite={onSendInvite} />
   ))
 }
 
@@ -206,6 +212,7 @@ EmployeeListContent.propTypes = {
   isError: PropTypes.bool.isRequired,
   employees: PropTypes.array.isRequired,
   onDelete: PropTypes.func.isRequired,
+  onSendInvite: PropTypes.func.isRequired,
 }
 
 // ─── Main UI ──────────────────────────────────────────────────────────────────
@@ -217,6 +224,7 @@ const EmployeeListUI = ({
   isError,
   search,
   onSearchChange,
+  onSendInvite,
   onDelete,
 }) => {
   return (
@@ -297,6 +305,7 @@ const EmployeeListUI = ({
             isError={isError}
             employees={employees}
             onDelete={onDelete}
+            onSendInvite={onSendInvite}
           />
         </CardContent>
       </Card>
@@ -315,6 +324,7 @@ EmployeeListUI.propTypes = {
   isError: PropTypes.bool.isRequired,
   search: PropTypes.string.isRequired,
   onSearchChange: PropTypes.func.isRequired,
+  onSendInvite: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
 }
 

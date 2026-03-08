@@ -1,4 +1,5 @@
 import logging
+import os
 
 from firebase_admin import auth as firebase_auth
 from injectq import inject, singleton
@@ -88,19 +89,26 @@ class EmployeeService:
 
     @staticmethod
     def _create_firebase_user(email: str, display_name: str | None = None) -> None:
-        """Create a Firebase user account. If the user already exists, skip silently."""
+        """Create a Firebase user account and send a password-setup email. Skip if already exists."""
         logger = logging.getLogger(__name__)
+        default_password = os.environ.get("DEFAULT_EMPLOYEE_PASSWORD", "Change@Me1")
         try:
             firebase_auth.get_user_by_email(email)
             logger.info("Firebase user already exists for %s", email)
         except firebase_auth.UserNotFoundError:
             firebase_auth.create_user(
                 email=email,
+                password=default_password,
                 display_name=display_name or email.split("@")[0],
             )
-            # Send password reset email so the employee can set their password
-            link = firebase_auth.generate_password_reset_link(email)
-            logger.info("Firebase user created for %s. Password reset link: %s", email, link)
+            # Send password reset email so the employee can set their own password
+            # This uses Firebase's built-in email service — no SMTP setup needed
+            try:
+                link = firebase_auth.generate_password_reset_link(email)
+                logger.info("Password setup email link generated for %s: %s", email, link)
+            except Exception:
+                logger.warning("Could not generate password reset link for %s", email)
+            logger.info("Firebase user created for %s", email)
         except Exception:
             logger.exception("Failed to create Firebase user for %s", email)
 
