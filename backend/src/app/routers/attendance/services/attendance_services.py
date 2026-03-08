@@ -48,7 +48,9 @@ def _to_entry_schema(entry: AttendanceLogTable) -> AttendanceEntrySchema:
     )
 
 
-def _to_entry_with_employee_schema(entry: AttendanceLogTable) -> AttendanceEntryWithEmployeeSchema:
+def _to_entry_with_employee_schema(
+    entry: AttendanceLogTable,
+) -> AttendanceEntryWithEmployeeSchema:
     emp = entry.employee
     return AttendanceEntryWithEmployeeSchema(
         id=entry.id,

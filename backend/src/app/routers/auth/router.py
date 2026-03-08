@@ -20,7 +20,9 @@ router = APIRouter(
     "/v1/auth/me",
     responses=generate_swagger_responses(AuthUserSchema),
     summary="Get current authenticated user",
-    description="Returns the authenticated user's profile from the Firebase token and employee record",
+    description=(
+        "Returns the authenticated user's profile from" " the Firebase token and employee record"
+    ),
     openapi_extra={},
 )
 async def get_me(

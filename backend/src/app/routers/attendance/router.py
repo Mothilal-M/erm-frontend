@@ -33,7 +33,10 @@ router = APIRouter(tags=["Attendance"])
     "/v1/attendance/status",
     responses=generate_swagger_responses(AttendanceStatusResponse),
     summary="Get current clock-in status",
-    description="Check whether the current employee is clocked in, along with elapsed time and auto-expiry details",
+    description=(
+        "Check whether the current employee is clocked in,"
+        " along with elapsed time and auto-expiry details"
+    ),
     openapi_extra={},
 )
 async def get_status(
@@ -49,7 +52,9 @@ async def get_status(
     "/v1/attendance/clock-in",
     responses=generate_swagger_responses(ClockInResponse),
     summary="Clock in for the day",
-    description="Start a new attendance session for the current employee. Fails if already clocked in",
+    description=(
+        "Start a new attendance session for the current" " employee. Fails if already clocked in"
+    ),
     openapi_extra={},
 )
 async def clock_in(
@@ -66,7 +71,10 @@ async def clock_in(
     "/v1/attendance/clock-out",
     responses=generate_swagger_responses(ClockOutResponse),
     summary="Clock out and end session",
-    description="End the current attendance session, calculate duration, and record an optional work summary",
+    description=(
+        "End the current attendance session, calculate"
+        " duration, and record an optional work summary"
+    ),
     openapi_extra={},
 )
 async def clock_out(
@@ -83,7 +91,10 @@ async def clock_out(
     "/v1/attendance/today",
     responses=generate_swagger_responses(TodayAttendanceResponse),
     summary="Get today's attendance entries",
-    description="Retrieve all attendance entries for the current employee for today, including clock-in/out times and work summaries",
+    description=(
+        "Retrieve all attendance entries for the current employee"
+        " for today, including clock-in/out times and work summaries"
+    ),
     openapi_extra={},
 )
 async def get_today(
@@ -99,7 +110,10 @@ async def get_today(
     "/v1/attendance/history",
     responses=generate_swagger_responses(AttendanceHistoryResponse),
     summary="Get paginated attendance history",
-    description="Retrieve the current employee's attendance history with optional year and month filters and pagination support",
+    description=(
+        "Retrieve the current employee's attendance history"
+        " with optional year/month filters and pagination"
+    ),
     openapi_extra={},
 )
 async def get_history(
@@ -118,7 +132,11 @@ async def get_history(
     "/v1/attendance/admin/logs",
     responses=generate_swagger_responses(AdminLogsResponse),
     summary="Admin: list all attendance logs",
-    description="Retrieve paginated attendance logs for all employees with optional filters for status, date range, employee, and department",
+    description=(
+        "Retrieve paginated attendance logs for all employees"
+        " with filters for status, date range, employee,"
+        " and department"
+    ),
     openapi_extra={},
 )
 async def admin_logs(
@@ -149,7 +167,10 @@ async def admin_logs(
     "/v1/attendance/admin/logs/{entry_id}",
     responses=generate_swagger_responses(AttendanceEntryWithEmployeeSchema),
     summary="Admin: edit an attendance entry",
-    description="Update clock-in/out times, work summary, or add an edit reason for an existing attendance entry",
+    description=(
+        "Update clock-in/out times, work summary, or add"
+        " an edit reason for an existing attendance entry"
+    ),
     openapi_extra={},
 )
 async def admin_edit_entry(
@@ -169,7 +190,9 @@ async def admin_edit_entry(
     "/v1/attendance/admin/logs/{entry_id}/flag",
     responses=generate_swagger_responses(AttendanceEntryWithEmployeeSchema),
     summary="Admin: flag or unflag an entry",
-    description="Toggle the flagged status of an attendance entry with an optional reason for flagging",
+    description=(
+        "Toggle the flagged status of an attendance entry" " with an optional reason for flagging"
+    ),
     openapi_extra={},
 )
 async def admin_flag_entry(
@@ -187,7 +210,9 @@ async def admin_flag_entry(
     "/v1/attendance/admin/manual-entry",
     responses=generate_swagger_responses(AttendanceEntryWithEmployeeSchema),
     summary="Admin: create manual attendance entry",
-    description="Create a manual attendance entry for an employee with specified clock-in/out times",
+    description=(
+        "Create a manual attendance entry for an employee" " with specified clock-in/out times"
+    ),
     openapi_extra={},
     status_code=201,
 )
@@ -205,7 +230,10 @@ async def admin_manual_entry(
     "/v1/attendance/admin/live",
     responses=generate_swagger_responses(AdminLiveResponse),
     summary="Admin: view live clocked-in employees",
-    description="Get a real-time list of all employees currently clocked in and those who have not clocked in today",
+    description=(
+        "Get a real-time list of all employees currently"
+        " clocked in and those not clocked in today"
+    ),
     openapi_extra={},
 )
 async def admin_live(
@@ -221,7 +249,11 @@ async def admin_live(
     "/v1/attendance/admin/summary",
     responses=generate_swagger_responses(AdminAttendanceSummaryResponse),
     summary="Admin: get attendance summary stats",
-    description="Retrieve aggregated attendance statistics including present count, absent count, live sessions, and flagged entries",
+    description=(
+        "Retrieve aggregated attendance statistics including"
+        " present count, absent count, live sessions,"
+        " and flagged entries"
+    ),
     openapi_extra={},
 )
 async def admin_summary(

@@ -38,6 +38,9 @@ from src.app.routers.leave.schemas import (
 from src.app.utils.schemas import AuthUserSchema
 
 
+WEEKEND_START = 5  # Saturday (Monday=0)
+
+
 @singleton
 class LeaveService:
     """Service class for leave management business logic and operations."""
@@ -73,7 +76,7 @@ class LeaveService:
         records = []
         for day in range(1, num_days + 1):
             d = date(year, actual_month, day)
-            is_weekend = d.weekday() >= 5
+            is_weekend = d.weekday() >= WEEKEND_START
             present = len(present_by_date.get(d, set()))
             on_leave = len(on_leave_by_date.get(d, set()))
             absent = max(0, total_employees - present - on_leave) if not is_weekend else 0
@@ -332,7 +335,7 @@ class LeaveService:
         working_days = sum(
             1
             for d in range(1, num_days + 1)
-            if date(today.year, today.month, d).weekday() < 5
+            if date(today.year, today.month, d).weekday() < WEEKEND_START
             and date(today.year, today.month, d) <= today
         )
 

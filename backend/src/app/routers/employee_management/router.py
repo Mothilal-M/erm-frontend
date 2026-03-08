@@ -25,7 +25,11 @@ router = APIRouter(tags=["Employee Management"])
     "/v1/employee-management",
     responses=generate_swagger_responses(EmployeeListResponseSchema),
     summary="List all employees with statistics",
-    description="Retrieve a list of all employees along with aggregated statistics including total, active, inactive, and invited counts",
+    description=(
+        "Retrieve a list of all employees along with"
+        " aggregated statistics including total, active,"
+        " inactive, and invited counts"
+    ),
     openapi_extra={},
 )
 async def list_employees(
@@ -58,7 +62,10 @@ async def get_employee(
     "/v1/employee-management",
     responses=generate_swagger_responses(EmployeeResponseSchema),
     summary="Create a new employee record",
-    description="Create a new employee with the provided details including name, email, department, and role",
+    description=(
+        "Create a new employee with the provided details"
+        " including name, email, department, and role"
+    ),
     openapi_extra={},
     status_code=201,
 )
@@ -114,7 +121,10 @@ async def delete_employee(
     "/v1/employee-management/invite",
     responses=generate_swagger_responses(EmployeeResponseSchema),
     summary="Invite a new user via email",
-    description="Send an invitation to a new user and create a placeholder employee record with invited status",
+    description=(
+        "Send an invitation to a new user and create a"
+        " placeholder employee record with invited status"
+    ),
     openapi_extra={},
     status_code=201,
 )
@@ -132,7 +142,10 @@ async def invite_user(
     "/v1/employee/performance",
     responses=generate_swagger_responses(PerformanceResponse),
     summary="Get employee performance metrics",
-    description="Retrieve performance data including sprint history, velocity scores, and recognition badges",
+    description=(
+        "Retrieve performance data including sprint history,"
+        " velocity scores, and recognition badges"
+    ),
     openapi_extra={},
 )
 async def get_performance(

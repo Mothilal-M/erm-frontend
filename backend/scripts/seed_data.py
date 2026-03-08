@@ -4,6 +4,7 @@ Run from backend-base directory: python -m scripts.seed_data
 """
 
 import asyncio
+import os
 from datetime import date
 
 from firebase_admin import auth as firebase_auth
@@ -20,7 +21,7 @@ from src.app.db.tables.erm_tables import (
 )
 
 
-DEFAULT_PASSWORD = "Jack@123"
+DEFAULT_PASSWORD = os.environ.get("SEED_DEFAULT_PASSWORD", "Change@Me1")
 
 
 def create_firebase_user(email: str, display_name: str) -> None:
