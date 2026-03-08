@@ -7,14 +7,15 @@ class AttendanceRepoAbstract(ABC):
 
     @abstractmethod
     async def get_active_session(self, employee_id: int, today: date):
-        """Retrieves the currently active (in-progress) attendance session for an employee on a given date.
+        """Retrieves the currently active attendance session for an employee.
 
         Args:
             employee_id (int): The unique identifier of the employee.
             today (date): The date to check for an active session.
 
         Returns:
-            AttendanceLogTable | None: The active attendance log entry, or None if no active session exists.
+            The active attendance log entry, or None if no active
+            session exists.
         """
         raise NotImplementedError
 

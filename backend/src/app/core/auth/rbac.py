@@ -1,8 +1,6 @@
-from typing import Callable
+from collections.abc import Callable
 
 from fastapi import Depends
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from starlette.responses import Response
 
 from src.app.core.auth.authentication import get_current_user
 from src.app.core.exceptions import UserPermissionError
@@ -21,8 +19,9 @@ def require_role(*allowed_roles: str) -> Callable:
         user: AuthUserSchema = Depends(get_current_user),
     ) -> AuthUserSchema:
         if user.role not in allowed_roles:
+            allowed = ", ".join(allowed_roles)
             raise UserPermissionError(
-                message=f"Role '{user.role}' is not authorized. Required: {', '.join(allowed_roles)}"
+                message=f"Role '{user.role}' is not authorized. Required: {allowed}"
             )
         return user
 

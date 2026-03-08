@@ -1,8 +1,7 @@
 import calendar
-from datetime import date, datetime
+from datetime import date
 
 from injectq import singleton
-from tortoise.expressions import Q
 
 from src.app.db.tables.erm_tables import AttendanceLogTable, EmployeeTable
 
@@ -14,14 +13,15 @@ class AttendanceRepo(AttendanceRepoAbstract):
     """Repository class for attendance-related database operations."""
 
     async def get_active_session(self, employee_id: int, today: date) -> AttendanceLogTable | None:
-        """Retrieves the currently active (in-progress) attendance session for an employee on a given date.
+        """Retrieves the currently active attendance session for an employee.
 
         Args:
             employee_id (int): The unique identifier of the employee.
             today (date): The date to check for an active session.
 
         Returns:
-            AttendanceLogTable | None: The active attendance log entry, or None if no active session exists.
+            The active attendance log entry, or None if no active
+            session exists.
         """
         return await AttendanceLogTable.filter(
             employee_id=employee_id,
@@ -30,14 +30,14 @@ class AttendanceRepo(AttendanceRepoAbstract):
         ).first()
 
     async def get_today_entries(self, employee_id: int, today: date) -> list[AttendanceLogTable]:
-        """Retrieves all attendance log entries for an employee on a given date, ordered by clock-in time.
+        """Retrieves all attendance entries for an employee on a given date.
 
         Args:
             employee_id (int): The unique identifier of the employee.
             today (date): The date to retrieve entries for.
 
         Returns:
-            list[AttendanceLogTable]: A list of attendance log entries ordered by clock-in time ascending.
+            A list of attendance log entries ordered by clock-in time.
         """
         return await AttendanceLogTable.filter(
             employee_id=employee_id,
@@ -57,7 +57,7 @@ class AttendanceRepo(AttendanceRepoAbstract):
         return await AttendanceLogTable.create(**data)
 
     async def get_entry(self, entry_id: int) -> AttendanceLogTable:
-        """Retrieves a single attendance log entry by its unique identifier with the related employee prefetched.
+        """Retrieves a single attendance log entry by its ID.
 
         Args:
             entry_id (int): The unique identifier of the attendance log entry.
@@ -71,20 +71,25 @@ class AttendanceRepo(AttendanceRepoAbstract):
         return await AttendanceLogTable.get(id=entry_id).prefetch_related("employee")
 
     async def get_history(
-        self, employee_id: int, year: int | None, month: int | None, page: int = 1, page_size: int = 20
+        self,
+        employee_id: int,
+        year: int | None,
+        month: int | None,
+        page: int = 1,
+        page_size: int = 20,
     ) -> tuple[list[AttendanceLogTable], int]:
-        """Retrieves paginated attendance history for an employee, optionally filtered by year and month.
+        """Retrieves paginated attendance history for an employee.
 
         Args:
             employee_id (int): The unique identifier of the employee.
-            year (int | None): The year to filter by. If None, no year filter is applied.
-            month (int | None): The month to filter by (used in conjunction with year). If None, no month filter is applied.
-            page (int): The page number for pagination. Defaults to 1.
-            page_size (int): The number of entries per page. Defaults to 20.
+            year (int | None): Year filter. None means no filter.
+            month (int | None): Month filter (with year). None means
+                no filter.
+            page (int): Page number for pagination. Defaults to 1.
+            page_size (int): Entries per page. Defaults to 20.
 
         Returns:
-            tuple[list[AttendanceLogTable], int]: A tuple containing the list of attendance log entries
-                for the requested page and the total count of matching entries.
+            A tuple of (entries for the page, total count).
         """
         qs = AttendanceLogTable.filter(employee_id=employee_id)
         if year and month:
@@ -95,7 +100,8 @@ class AttendanceRepo(AttendanceRepoAbstract):
             qs = qs.filter(date__gte=date(year, 1, 1), date__lte=date(year, 12, 31))
 
         total = await qs.count()
-        entries = await qs.order_by("-date", "-clock_in").offset((page - 1) * page_size).limit(page_size)
+        offset = (page - 1) * page_size
+        entries = await qs.order_by("-date", "-clock_in").offset(offset).limit(page_size)
         return entries, total
 
     async def get_admin_logs(
@@ -109,21 +115,20 @@ class AttendanceRepo(AttendanceRepoAbstract):
         employee_id: int | None = None,
         department_id: int | None = None,
     ) -> tuple[list[AttendanceLogTable], int]:
-        """Retrieves paginated attendance logs for administrative purposes with various optional filters.
+        """Retrieves paginated admin attendance logs with filters.
 
         Args:
-            page (int): The page number for pagination. Defaults to 1.
-            page_size (int): The number of entries per page. Defaults to 20.
-            status (str | None): Filter by attendance status (e.g., "COMPLETED", "FLAGGED"). Defaults to None.
-            date_filter (str | None): Filter by an exact date. Defaults to None.
-            date_from (str | None): Filter entries from this date onward (inclusive). Defaults to None.
-            date_to (str | None): Filter entries up to this date (inclusive). Defaults to None.
-            employee_id (int | None): Filter by a specific employee ID. Defaults to None.
-            department_id (int | None): Filter by a specific department ID. Defaults to None.
+            page (int): Page number. Defaults to 1.
+            page_size (int): Entries per page. Defaults to 20.
+            status (str | None): Filter by attendance status.
+            date_filter (str | None): Filter by exact date.
+            date_from (str | None): Start date filter (inclusive).
+            date_to (str | None): End date filter (inclusive).
+            employee_id (int | None): Filter by employee ID.
+            department_id (int | None): Filter by department ID.
 
         Returns:
-            tuple[list[AttendanceLogTable], int]: A tuple containing the list of attendance log entries
-                (with employee and department prefetched) for the requested page and the total count of matching entries.
+            A tuple of (entries for the page, total count).
         """
         qs = AttendanceLogTable.all().prefetch_related("employee__department")
 
@@ -144,7 +149,8 @@ class AttendanceRepo(AttendanceRepoAbstract):
             qs = qs.filter(employee__department_id=department_id)
 
         total = await qs.count()
-        entries = await qs.order_by("-date", "-clock_in").offset((page - 1) * page_size).limit(page_size)
+        offset = (page - 1) * page_size
+        entries = await qs.order_by("-date", "-clock_in").offset(offset).limit(page_size)
         return entries, total
 
     async def get_live_clocked_in(self, today: date) -> list[AttendanceLogTable]:
@@ -167,6 +173,9 @@ class AttendanceRepo(AttendanceRepoAbstract):
         """Retrieves all active employees with their department data prefetched.
 
         Returns:
-            list[EmployeeTable]: A list of active employee records with department relations prefetched.
+            A list of active employee records with department
+            relations prefetched.
         """
-        return await EmployeeTable.filter(status=True, employee_status="active").prefetch_related("department")
+        return await EmployeeTable.filter(status=True, employee_status="active").prefetch_related(
+            "department"
+        )

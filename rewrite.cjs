@@ -107,7 +107,7 @@ const DashboardHeader = ({ userName, leaveProfile, dateRange, onDateRangeChange 
           </p>
         </div>
       </div>
-      
+
       <div className="flex flex-wrap items-center gap-3">
         <DateRangePicker dateRange={dateRange} onDateRangeChange={onDateRangeChange} />
         <div className="flex gap-2">
@@ -225,11 +225,11 @@ let newCode =
 newCode = newCode.replace(
   /{[\s\S]*Hero Header with Date Filter[\s\S]*DashboardHeader[\s\S]*Profile Card[\s\S]*ProfileCard[\s\S]*Stats Grid[\s\S]*StatsGrid[^/>]*\/>/,
   `{/* Hero Header */}
-      <DashboardHeader 
-        userName={userName} 
-        leaveProfile={leaveProfile} 
-        dateRange={dateRange} 
-        onDateRangeChange={onDateRangeChange} 
+      <DashboardHeader
+        userName={userName}
+        leaveProfile={leaveProfile}
+        dateRange={dateRange}
+        onDateRangeChange={onDateRangeChange}
       />
 
       {/* Stats Grid */}

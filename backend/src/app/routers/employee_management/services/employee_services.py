@@ -69,8 +69,12 @@ class EmployeeService:
         emp = await self._repo.create_employee(data.model_dump(by_alias=False))
         return _to_employee_schema(emp)
 
-    async def update_employee(self, employee_id: int, data: EmployeeUpdateSchema) -> EmployeeResponseSchema:
-        emp = await self._repo.update_employee(employee_id, data.model_dump(by_alias=False, exclude_none=True))
+    async def update_employee(
+        self, employee_id: int, data: EmployeeUpdateSchema
+    ) -> EmployeeResponseSchema:
+        emp = await self._repo.update_employee(
+            employee_id, data.model_dump(by_alias=False, exclude_none=True)
+        )
         return _to_employee_schema(emp)
 
     async def delete_employee(self, employee_id: int) -> None:
@@ -118,9 +122,15 @@ class EmployeeService:
             ),
             sprint_history=[
                 SprintHistoryItemSchema(sprint="Sprint 9", allocated=7, completed=6, efficiency=86),
-                SprintHistoryItemSchema(sprint="Sprint 10", allocated=8, completed=7, efficiency=88),
-                SprintHistoryItemSchema(sprint="Sprint 11", allocated=9, completed=8, efficiency=89),
-                SprintHistoryItemSchema(sprint="Sprint 12", allocated=8, completed=5, efficiency=85),
+                SprintHistoryItemSchema(
+                    sprint="Sprint 10", allocated=8, completed=7, efficiency=88
+                ),
+                SprintHistoryItemSchema(
+                    sprint="Sprint 11", allocated=9, completed=8, efficiency=89
+                ),
+                SprintHistoryItemSchema(
+                    sprint="Sprint 12", allocated=8, completed=5, efficiency=85
+                ),
             ],
             performance=PerformanceScoresSchema(
                 velocity_score=82,
