@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react"
 
 import { toast } from "@/components/ui/use-toast"
+import { resetPassword } from "@/lib/firebase"
 import {
   useDeleteEmployee,
   useFetchEmployees,
@@ -28,6 +29,22 @@ const EmployeeList = () => {
     )
   }, [data, search])
 
+  const handleSendInvite = async (email) => {
+    try {
+      await resetPassword(email)
+      toast({
+        title: "Invite sent",
+        description: `Password setup email sent to ${email}.`,
+      })
+    } catch {
+      toast({
+        title: "Error",
+        description: "Failed to send invite email. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
   const handleDelete = (id) => {
     deleteEmployee(id, {
       onSuccess: () => {
@@ -51,6 +68,7 @@ const EmployeeList = () => {
       isError={isError || Boolean(error)}
       search={search}
       onSearchChange={setSearch}
+      onSendInvite={handleSendInvite}
       onDelete={handleDelete}
     />
   )
