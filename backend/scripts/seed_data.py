@@ -1,13 +1,15 @@
 """
-Seed script to populate initial ERM data.
+Seed script to populate initial ERM data and create Firebase auth accounts.
 Run from backend-base directory: python -m scripts.seed_data
 """
 
 import asyncio
 from datetime import date
 
+from firebase_admin import auth as firebase_auth
 from tortoise import Tortoise
 
+from src.app.core.auth.firebase_setup import init_firebase
 from src.app.db.setup_database import TORTOISE_ORM
 from src.app.db.tables.erm_tables import (
     DepartmentTable,
@@ -17,8 +19,29 @@ from src.app.db.tables.erm_tables import (
     LeaveTypeTable,
 )
 
+DEFAULT_PASSWORD = "Jack@123"
+
+
+def create_firebase_user(email: str, display_name: str) -> None:
+    """Create a Firebase user with a default password. Skip if already exists."""
+    try:
+        firebase_auth.get_user_by_email(email)
+        print(f"  Firebase user already exists: {email}")
+    except firebase_auth.UserNotFoundError:
+        firebase_auth.create_user(
+            email=email,
+            password=DEFAULT_PASSWORD,
+            display_name=display_name,
+        )
+        print(f"  Created Firebase user: {email} (password: {DEFAULT_PASSWORD})")
+    except Exception as e:
+        print(f"  Failed to create Firebase user for {email}: {e}")
+
 
 async def seed():
+    # Initialize Firebase Admin SDK
+    init_firebase()
+
     await Tortoise.init(config=TORTOISE_ORM)
     await Tortoise.generate_schemas()
 
@@ -95,6 +118,10 @@ async def seed():
                 "employee_status": "active",
             },
         )
+
+        # Create Firebase account for every employee
+        create_firebase_user(emp_data["email"], emp_data["name"])
+
         if created:
             # Create leave balances
             for lt_name in ["Annual Leave", "Sick Leave", "Casual Leave"]:
@@ -107,10 +134,10 @@ async def seed():
                     defaults={"allocated": quota},
                 )
 
-    print(f"Seeded {len(employees_data)} employees with leave balances")
+    print(f"Seeded {len(employees_data)} employees with leave balances and Firebase accounts")
 
     await Tortoise.close_connections()
-    print("Seed complete!")
+    print(f"\nSeed complete! All users can log in with password: {DEFAULT_PASSWORD}")
 
 
 if __name__ == "__main__":

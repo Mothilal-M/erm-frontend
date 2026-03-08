@@ -2,22 +2,32 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Request
-from fastapi.logger import logger
 from injectq.integrations.fastapi import InjectFastAPI
-from taskiq import AsyncTaskiqTask
 
 from src.app.core.auth.authentication import get_current_user
 from src.app.routers.auth.schemas import UserSchema
 from src.app.routers.auth.services import UserService
-from src.app.tasks.user_tasks import add_task_math
 from src.app.utils import generate_swagger_responses, success_response
 from src.app.utils.schemas.user_schemas import AuthUserSchema
 
 
-# dependencies=[Depends(get_current_user)]
 router = APIRouter(
     tags=["User"],
 )
+
+
+@router.get(
+    "/v1/auth/me",
+    responses=generate_swagger_responses(AuthUserSchema),
+    summary="Get current authenticated user",
+    description="Returns the authenticated user's profile from the Firebase token and employee record",
+    openapi_extra={},
+)
+async def get_me(
+    request: Request,
+    user: AuthUserSchema = Depends(get_current_user),
+):
+    return success_response(user.model_dump(exclude={"firebase"}), request)
 
 
 @router.get(
@@ -31,7 +41,7 @@ async def user_details(
     request: Request,
     user_id: UUID,
     service: Annotated[UserService, InjectFastAPI(UserService)],
-    user: AuthUserSchema = Depends(get_current_user)
+    user: AuthUserSchema = Depends(get_current_user),
 ):
     user = await service.get_user(user_id)
     return success_response(user.model_dump(), request)
