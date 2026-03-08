@@ -1,5 +1,5 @@
 import calendar
-from datetime import date, datetime
+from datetime import date
 
 from injectq import singleton
 
@@ -126,9 +126,9 @@ class LeaveRepo(LeaveRepoAbstract):
             list[LeaveBalanceTable]: A list of leave balance records with
                 prefetched leave type relations.
         """
-        return await LeaveBalanceTable.filter(
-            employee_id=employee_id, year=year
-        ).prefetch_related("leave_type")
+        return await LeaveBalanceTable.filter(employee_id=employee_id, year=year).prefetch_related(
+            "leave_type"
+        )
 
     async def get_or_create_balance(
         self, employee_id: int, leave_type_id: int, year: int
@@ -158,9 +158,9 @@ class LeaveRepo(LeaveRepoAbstract):
                 prefetched department relations. Only employees with status=True
                 and employee_status="active" are included.
         """
-        return await EmployeeTable.filter(
-            status=True, employee_status="active"
-        ).prefetch_related("department")
+        return await EmployeeTable.filter(status=True, employee_status="active").prefetch_related(
+            "department"
+        )
 
     async def get_employees_simple(self) -> list[EmployeeTable]:
         """Retrieves all employees with an enabled status flag.
@@ -171,9 +171,7 @@ class LeaveRepo(LeaveRepoAbstract):
         """
         return await EmployeeTable.filter(status=True).prefetch_related("department")
 
-    async def get_attendance_for_month(
-        self, year: int, month: int
-    ) -> list[AttendanceLogTable]:
+    async def get_attendance_for_month(self, year: int, month: int) -> list[AttendanceLogTable]:
         """Retrieves all attendance log entries for a given month.
 
         Args:
@@ -190,9 +188,7 @@ class LeaveRepo(LeaveRepoAbstract):
             date__gte=month_start, date__lte=month_end
         ).prefetch_related("employee")
 
-    async def get_leave_requests_for_month(
-        self, year: int, month: int
-    ) -> list[LeaveRequestTable]:
+    async def get_leave_requests_for_month(self, year: int, month: int) -> list[LeaveRequestTable]:
         """Retrieves all approved or pending leave requests that overlap with a given month.
 
         Args:
@@ -254,9 +250,11 @@ class LeaveRepo(LeaveRepoAbstract):
                 employee, ordered by most recently applied first, with prefetched
                 leave type relations.
         """
-        return await LeaveRequestTable.filter(
-            employee_id=employee_id
-        ).prefetch_related("leave_type").order_by("-applied_on")
+        return (
+            await LeaveRequestTable.filter(employee_id=employee_id)
+            .prefetch_related("leave_type")
+            .order_by("-applied_on")
+        )
 
     async def get_all_leave_types(self) -> list[LeaveTypeTable]:
         """Retrieves all active leave types.

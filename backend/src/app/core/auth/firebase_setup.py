@@ -3,6 +3,7 @@ from firebase_admin import auth, credentials
 
 from src.app.core.config.settings import get_settings
 
+
 _firebase_app = None
 
 

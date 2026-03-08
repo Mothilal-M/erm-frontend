@@ -25,6 +25,7 @@ from src.app.routers.attendance.services import AttendanceService
 from src.app.utils import generate_swagger_responses, success_response
 from src.app.utils.schemas import AuthUserSchema
 
+
 router = APIRouter(tags=["Attendance"])
 
 
@@ -178,9 +179,7 @@ async def admin_flag_entry(
     service: Annotated[AttendanceService, InjectFastAPI(AttendanceService)],
     user: AuthUserSchema = Depends(require_role("admin")),
 ):
-    result = await service.admin_flag_entry(
-        entry_id, payload.model_dump(by_alias=False)
-    )
+    result = await service.admin_flag_entry(entry_id, payload.model_dump(by_alias=False))
     return success_response(result.model_dump(by_alias=True), request)
 
 

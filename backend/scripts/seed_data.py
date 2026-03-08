@@ -19,6 +19,7 @@ from src.app.db.tables.erm_tables import (
     LeaveTypeTable,
 )
 
+
 DEFAULT_PASSWORD = "Jack@123"
 
 
@@ -86,22 +87,70 @@ async def seed():
 
     # Sample Employees
     employees_data = [
-        {"name": "John Doe", "email": "john@example.com", "phone": "+1234567890",
-         "department": "Engineering", "role": "admin", "join_date": date(2023, 1, 15)},
-        {"name": "Jane Smith", "email": "jane@example.com", "phone": "+1234567891",
-         "department": "Engineering", "role": "manager", "join_date": date(2023, 3, 1)},
-        {"name": "Bob Wilson", "email": "bob@example.com", "phone": "+1234567892",
-         "department": "Design", "role": "employee", "join_date": date(2023, 6, 10)},
-        {"name": "Alice Johnson", "email": "alice@example.com", "phone": "+1234567893",
-         "department": "Marketing", "role": "employee", "join_date": date(2023, 9, 20)},
-        {"name": "Charlie Brown", "email": "charlie@example.com", "phone": "+1234567894",
-         "department": "HR", "role": "manager", "join_date": date(2024, 1, 5)},
-        {"name": "Diana Prince", "email": "diana@example.com", "phone": "+1234567895",
-         "department": "Finance", "role": "employee", "join_date": date(2024, 4, 15)},
-        {"name": "Eve Davis", "email": "eve@example.com", "phone": "+1234567896",
-         "department": "Operations", "role": "employee", "join_date": date(2024, 7, 1)},
-        {"name": "Frank Miller", "email": "frank@example.com", "phone": "+1234567897",
-         "department": "Engineering", "role": "employee", "join_date": date(2024, 10, 10)},
+        {
+            "name": "John Doe",
+            "email": "john@example.com",
+            "phone": "+1234567890",
+            "department": "Engineering",
+            "role": "admin",
+            "join_date": date(2023, 1, 15),
+        },
+        {
+            "name": "Jane Smith",
+            "email": "jane@example.com",
+            "phone": "+1234567891",
+            "department": "Engineering",
+            "role": "manager",
+            "join_date": date(2023, 3, 1),
+        },
+        {
+            "name": "Bob Wilson",
+            "email": "bob@example.com",
+            "phone": "+1234567892",
+            "department": "Design",
+            "role": "employee",
+            "join_date": date(2023, 6, 10),
+        },
+        {
+            "name": "Alice Johnson",
+            "email": "alice@example.com",
+            "phone": "+1234567893",
+            "department": "Marketing",
+            "role": "employee",
+            "join_date": date(2023, 9, 20),
+        },
+        {
+            "name": "Charlie Brown",
+            "email": "charlie@example.com",
+            "phone": "+1234567894",
+            "department": "HR",
+            "role": "manager",
+            "join_date": date(2024, 1, 5),
+        },
+        {
+            "name": "Diana Prince",
+            "email": "diana@example.com",
+            "phone": "+1234567895",
+            "department": "Finance",
+            "role": "employee",
+            "join_date": date(2024, 4, 15),
+        },
+        {
+            "name": "Eve Davis",
+            "email": "eve@example.com",
+            "phone": "+1234567896",
+            "department": "Operations",
+            "role": "employee",
+            "join_date": date(2024, 7, 1),
+        },
+        {
+            "name": "Frank Miller",
+            "email": "frank@example.com",
+            "phone": "+1234567897",
+            "department": "Engineering",
+            "role": "employee",
+            "join_date": date(2024, 10, 10),
+        },
     ]
 
     year = date.today().year

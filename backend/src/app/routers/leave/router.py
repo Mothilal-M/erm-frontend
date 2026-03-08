@@ -25,6 +25,7 @@ from src.app.routers.leave.services import LeaveService
 from src.app.utils import generate_swagger_responses, success_response
 from src.app.utils.schemas import AuthUserSchema
 
+
 router = APIRouter(tags=["Leave Management"])
 
 
@@ -75,9 +76,7 @@ async def admin_approvals(
     user: AuthUserSchema = Depends(require_role("admin", "manager")),
 ):
     result = await service.get_approvals()
-    return success_response(
-        [item.model_dump(by_alias=True) for item in result], request
-    )
+    return success_response([item.model_dump(by_alias=True) for item in result], request)
 
 
 @router.patch(
@@ -94,9 +93,7 @@ async def approve_or_reject(
     service: Annotated[LeaveService, InjectFastAPI(LeaveService)],
     user: AuthUserSchema = Depends(require_role("admin", "manager")),
 ):
-    result = await service.approve_or_reject(
-        request_id, payload.status, payload.note
-    )
+    result = await service.approve_or_reject(request_id, payload.status, payload.note)
     return success_response(result.model_dump(by_alias=True), request)
 
 
@@ -131,9 +128,7 @@ async def admin_employees(
     user: AuthUserSchema = Depends(require_role("admin", "manager")),
 ):
     result = await service.get_admin_employees()
-    return success_response(
-        [item.model_dump(by_alias=True) for item in result], request
-    )
+    return success_response([item.model_dump(by_alias=True) for item in result], request)
 
 
 @router.get(
@@ -199,9 +194,7 @@ async def update_settings(
     service: Annotated[LeaveService, InjectFastAPI(LeaveService)],
     user: AuthUserSchema = Depends(require_role("admin")),
 ):
-    result = await service.update_settings(
-        payload.model_dump(by_alias=False, exclude_none=True)
-    )
+    result = await service.update_settings(payload.model_dump(by_alias=False, exclude_none=True))
     return success_response(result.model_dump(by_alias=True), request)
 
 

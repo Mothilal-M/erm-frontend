@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 /**
  * Service Worker for PWA
- * 
+ *
  * Features:
  * - Cache-first strategy for static assets
  * - Network-first strategy for API calls

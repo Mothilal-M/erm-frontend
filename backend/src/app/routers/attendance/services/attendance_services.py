@@ -23,6 +23,7 @@ from src.app.routers.attendance.schemas import (
 )
 from src.app.utils.schemas import AuthUserSchema
 
+
 MAX_SESSION_SECONDS = 14400  # 4 hours
 
 
@@ -90,7 +91,9 @@ class AttendanceService:
 
         if active:
             now = datetime.now(UTC)
-            clock_in_aware = active.clock_in if active.clock_in.tzinfo else active.clock_in.replace(tzinfo=UTC)
+            clock_in_aware = (
+                active.clock_in if active.clock_in.tzinfo else active.clock_in.replace(tzinfo=UTC)
+            )
             elapsed = int((now - clock_in_aware).total_seconds())
             expires_in = max(0, MAX_SESSION_SECONDS - elapsed)
             return AttendanceStatusResponse(
@@ -119,13 +122,15 @@ class AttendanceService:
             raise ValueError("Already clocked in")
 
         now = datetime.now(UTC)
-        entry = await self._repo.create_entry({
-            "employee_id": employee.id,
-            "date": today,
-            "clock_in": now,
-            "attendance_status": "IN_PROGRESS",
-            "note": data.note,
-        })
+        entry = await self._repo.create_entry(
+            {
+                "employee_id": employee.id,
+                "date": today,
+                "clock_in": now,
+                "attendance_status": "IN_PROGRESS",
+                "note": data.note,
+            }
+        )
         return ClockInResponse(
             id=entry.id,
             clocked_in_at=entry.clock_in.isoformat(),
@@ -140,7 +145,9 @@ class AttendanceService:
             raise ValueError("Not clocked in")
 
         now = datetime.now(UTC)
-        clock_in_aware = active.clock_in if active.clock_in.tzinfo else active.clock_in.replace(tzinfo=UTC)
+        clock_in_aware = (
+            active.clock_in if active.clock_in.tzinfo else active.clock_in.replace(tzinfo=UTC)
+        )
         duration = int((now - clock_in_aware).total_seconds() / 60)
 
         active.clock_out = now
@@ -208,9 +215,13 @@ class AttendanceService:
         department_id: int | None = None,
     ) -> AdminLogsResponse:
         entries, total = await self._repo.get_admin_logs(
-            page=page, status=status, date_filter=date_filter,
-            date_from=date_from, date_to=date_to,
-            employee_id=employee_id, department_id=department_id,
+            page=page,
+            status=status,
+            date_filter=date_filter,
+            date_from=date_from,
+            date_to=date_to,
+            employee_id=employee_id,
+            department_id=department_id,
         )
         return AdminLogsResponse(
             count=total,
@@ -219,7 +230,9 @@ class AttendanceService:
             results=[_to_entry_with_employee_schema(e) for e in entries],
         )
 
-    async def admin_edit_entry(self, entry_id: int, data: dict) -> AttendanceEntryWithEmployeeSchema:
+    async def admin_edit_entry(
+        self, entry_id: int, data: dict
+    ) -> AttendanceEntryWithEmployeeSchema:
         entry = await self._repo.get_entry(entry_id)
 
         if data.get("clock_in"):
@@ -243,7 +256,9 @@ class AttendanceService:
         await entry.fetch_related("employee__department")
         return _to_entry_with_employee_schema(entry)
 
-    async def admin_flag_entry(self, entry_id: int, data: dict) -> AttendanceEntryWithEmployeeSchema:
+    async def admin_flag_entry(
+        self, entry_id: int, data: dict
+    ) -> AttendanceEntryWithEmployeeSchema:
         entry = await self._repo.get_entry(entry_id)
         entry.is_flagged = data["is_flagged"]
         entry.flag_reason = data.get("flag_reason")
@@ -266,17 +281,19 @@ class AttendanceService:
         co = clock_out if clock_out.tzinfo else clock_out.replace(tzinfo=UTC)
         duration = int((co - ci).total_seconds() / 60)
 
-        entry = await self._repo.create_entry({
-            "employee_id": data["employee_id"],
-            "date": clock_in.date(),
-            "clock_in": clock_in,
-            "clock_out": clock_out,
-            "duration_minutes": duration,
-            "work_summary": data.get("work_summary"),
-            "attendance_status": "MANUAL",
-            "is_manual_entry": True,
-            "manual_entry_reason": data.get("manual_entry_reason"),
-        })
+        entry = await self._repo.create_entry(
+            {
+                "employee_id": data["employee_id"],
+                "date": clock_in.date(),
+                "clock_in": clock_in,
+                "clock_out": clock_out,
+                "duration_minutes": duration,
+                "work_summary": data.get("work_summary"),
+                "attendance_status": "MANUAL",
+                "is_manual_entry": True,
+                "manual_entry_reason": data.get("manual_entry_reason"),
+            }
+        )
         await entry.fetch_related("employee__department")
         return _to_entry_with_employee_schema(entry)
 
@@ -292,18 +309,22 @@ class AttendanceService:
         for entry in live_entries:
             emp = entry.employee
             live_ids.add(emp.id)
-            clock_in_aware = entry.clock_in if entry.clock_in.tzinfo else entry.clock_in.replace(tzinfo=UTC)
+            clock_in_aware = (
+                entry.clock_in if entry.clock_in.tzinfo else entry.clock_in.replace(tzinfo=UTC)
+            )
             elapsed = int((now - clock_in_aware).total_seconds())
             expires_in = max(0, MAX_SESSION_SECONDS - elapsed)
-            live_employees.append(LiveEmployeeSchema(
-                employee_id=emp.id,
-                employee_name=emp.name,
-                department=emp.department.name if emp.department else "",
-                clocked_in_at=entry.clock_in.isoformat(),
-                elapsed_seconds=elapsed,
-                expires_in_seconds=expires_in,
-                will_auto_expire=True,
-            ))
+            live_employees.append(
+                LiveEmployeeSchema(
+                    employee_id=emp.id,
+                    employee_name=emp.name,
+                    department=emp.department.name if emp.department else "",
+                    clocked_in_at=entry.clock_in.isoformat(),
+                    elapsed_seconds=elapsed,
+                    expires_in_seconds=expires_in,
+                    will_auto_expire=True,
+                )
+            )
 
         not_clocked_in = [
             NotClockedInEmployeeSchema(
@@ -332,7 +353,9 @@ class AttendanceService:
 
         live_entries = await self._repo.get_live_clocked_in(today)
         flagged = await AttendanceLogTable.filter(is_flagged=True, date=today).count()
-        auto_expired = await AttendanceLogTable.filter(attendance_status="AUTO_EXPIRED", date=today).count()
+        auto_expired = await AttendanceLogTable.filter(
+            attendance_status="AUTO_EXPIRED", date=today
+        ).count()
 
         return AdminAttendanceSummaryResponse(
             present_today=present_today,

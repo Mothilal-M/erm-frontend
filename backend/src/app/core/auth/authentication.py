@@ -1,10 +1,11 @@
-from fastapi import Depends, Request
+from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from src.app.core.auth.firebase_setup import get_firebase_auth
 from src.app.core.exceptions import UserAccountError
 from src.app.db.tables.erm_tables import EmployeeTable
 from src.app.utils.schemas import AuthUserSchema
+
 
 _bearer_scheme = HTTPBearer()
 

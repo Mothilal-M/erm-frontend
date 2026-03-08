@@ -117,7 +117,10 @@ class LeaveRequestTable(TimestampMixin):
     reason = fields.TextField(null=True)
     applied_on = fields.DateField(default=date.today)
     reviewed_by = fields.ForeignKeyField(
-        "tables.EmployeeTable", related_name="reviewed_requests", null=True, on_delete=fields.SET_NULL
+        "tables.EmployeeTable",
+        related_name="reviewed_requests",
+        null=True,
+        on_delete=fields.SET_NULL,
     )
     review_note = fields.TextField(null=True)
     reviewed_at = fields.DatetimeField(null=True)

@@ -17,6 +17,7 @@ from src.app.routers.employee_management.services import EmployeeService
 from src.app.utils import generate_swagger_responses, success_response
 from src.app.utils.schemas import AuthUserSchema
 
+
 router = APIRouter(tags=["Employee Management"])
 
 

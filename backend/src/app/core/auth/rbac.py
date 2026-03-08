@@ -1,8 +1,6 @@
-from typing import Callable
+from collections.abc import Callable
 
 from fastapi import Depends
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from starlette.responses import Response
 
 from src.app.core.auth.authentication import get_current_user
 from src.app.core.exceptions import UserPermissionError

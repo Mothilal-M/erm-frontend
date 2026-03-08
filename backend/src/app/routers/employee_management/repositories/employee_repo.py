@@ -1,7 +1,6 @@
 from datetime import date
 
 from injectq import singleton
-from tortoise.exceptions import DoesNotExist
 
 from src.app.db.tables.erm_tables import DepartmentTable, EmployeeTable
 

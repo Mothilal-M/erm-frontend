@@ -99,7 +99,6 @@ class Settings(BaseSettings):
     #################################
     DEFAULT_EMPLOYEE_ID: int = 1
 
-
     class Config:
         extra = "allow"
 

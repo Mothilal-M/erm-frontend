@@ -1,8 +1,7 @@
 import calendar
-from datetime import date, datetime
+from datetime import date
 
 from injectq import singleton
-from tortoise.expressions import Q
 
 from src.app.db.tables.erm_tables import AttendanceLogTable, EmployeeTable
 
@@ -71,7 +70,12 @@ class AttendanceRepo(AttendanceRepoAbstract):
         return await AttendanceLogTable.get(id=entry_id).prefetch_related("employee")
 
     async def get_history(
-        self, employee_id: int, year: int | None, month: int | None, page: int = 1, page_size: int = 20
+        self,
+        employee_id: int,
+        year: int | None,
+        month: int | None,
+        page: int = 1,
+        page_size: int = 20,
     ) -> tuple[list[AttendanceLogTable], int]:
         """Retrieves paginated attendance history for an employee, optionally filtered by year and month.
 
@@ -95,7 +99,9 @@ class AttendanceRepo(AttendanceRepoAbstract):
             qs = qs.filter(date__gte=date(year, 1, 1), date__lte=date(year, 12, 31))
 
         total = await qs.count()
-        entries = await qs.order_by("-date", "-clock_in").offset((page - 1) * page_size).limit(page_size)
+        entries = (
+            await qs.order_by("-date", "-clock_in").offset((page - 1) * page_size).limit(page_size)
+        )
         return entries, total
 
     async def get_admin_logs(
@@ -144,7 +150,9 @@ class AttendanceRepo(AttendanceRepoAbstract):
             qs = qs.filter(employee__department_id=department_id)
 
         total = await qs.count()
-        entries = await qs.order_by("-date", "-clock_in").offset((page - 1) * page_size).limit(page_size)
+        entries = (
+            await qs.order_by("-date", "-clock_in").offset((page - 1) * page_size).limit(page_size)
+        )
         return entries, total
 
     async def get_live_clocked_in(self, today: date) -> list[AttendanceLogTable]:
@@ -169,4 +177,6 @@ class AttendanceRepo(AttendanceRepoAbstract):
         Returns:
             list[EmployeeTable]: A list of active employee records with department relations prefetched.
         """
-        return await EmployeeTable.filter(status=True, employee_status="active").prefetch_related("department")
+        return await EmployeeTable.filter(status=True, employee_status="active").prefetch_related(
+            "department"
+        )
