@@ -8,6 +8,7 @@ from snowflakekit import SnowflakeConfig, SnowflakeGenerator
 from tortoise import Tortoise
 
 from src.app.core import get_settings, init_errors_handler, init_logger, setup_middleware
+from src.app.core.auth.firebase_setup import init_firebase
 from src.app.core.di import container, ensure_app_modules
 from src.app.core.snowflake import SnowflakeID, snowflake_id_factory
 from src.app.db import setup_db
@@ -46,6 +47,9 @@ app = FastAPI(
 ensure_app_modules()
 setup_fastapi(container, app)
 setup_middleware(app)
+
+# init Firebase Admin SDK
+init_firebase()
 
 setup_db(app)
 

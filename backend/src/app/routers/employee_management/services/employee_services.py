@@ -1,3 +1,6 @@
+import logging
+
+from firebase_admin import auth as firebase_auth
 from injectq import inject, singleton
 
 from src.app.db.tables.erm_tables import EmployeeTable
@@ -61,6 +64,8 @@ class EmployeeService:
         return _to_employee_schema(emp)
 
     async def create_employee(self, data: EmployeeCreateSchema) -> EmployeeResponseSchema:
+        # Create Firebase account so the employee can log in
+        self._create_firebase_user(data.email, data.name)
         emp = await self._repo.create_employee(data.model_dump(by_alias=False))
         return _to_employee_schema(emp)
 
@@ -72,8 +77,28 @@ class EmployeeService:
         await self._repo.delete_employee(employee_id)
 
     async def invite_user(self, data: InviteUserSchema) -> EmployeeResponseSchema:
+        # Create Firebase account and send password-reset email as invitation
+        self._create_firebase_user(data.email)
         emp = await self._repo.create_invited_employee(data.model_dump(by_alias=False))
         return _to_employee_schema(emp)
+
+    @staticmethod
+    def _create_firebase_user(email: str, display_name: str | None = None) -> None:
+        """Create a Firebase user account. If the user already exists, skip silently."""
+        logger = logging.getLogger(__name__)
+        try:
+            firebase_auth.get_user_by_email(email)
+            logger.info("Firebase user already exists for %s", email)
+        except firebase_auth.UserNotFoundError:
+            firebase_auth.create_user(
+                email=email,
+                display_name=display_name or email.split("@")[0],
+            )
+            # Send password reset email so the employee can set their password
+            link = firebase_auth.generate_password_reset_link(email)
+            logger.info("Firebase user created for %s. Password reset link: %s", email, link)
+        except Exception:
+            logger.exception("Failed to create Firebase user for %s", email)
 
     async def get_performance(self) -> PerformanceResponse:
         return PerformanceResponse(

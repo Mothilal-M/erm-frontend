@@ -3,6 +3,9 @@ const EMPLOYEE_MANAGEMENT_DEPARTMENTS = "v1/employee-management/departments"
 const ATTENDANCE_ADMIN_LOGS = "v1/attendance/admin/logs"
 
 const apiConstant = {
+  auth: {
+    me: "v1/auth/me",
+  },
   comment: {
     comment: "comments/",
   },

@@ -90,6 +90,11 @@ class Settings(BaseSettings):
     SENTRY_DSN: str
 
     #################################
+    ###### Firebase Config ##########
+    #################################
+    FIREBASE_CREDENTIALS_PATH: str = "./firebase-credentials.json"
+
+    #################################
     ###### ERM Config ###############
     #################################
     DEFAULT_EMPLOYEE_ID: int = 1

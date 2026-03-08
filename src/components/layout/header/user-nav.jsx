@@ -18,6 +18,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { logoutFirebase } from "@/lib/firebase"
 import ct from "@constants/"
 import { logout } from "@store/slices/user.slice"
 
@@ -40,7 +41,8 @@ const UserNav = () => {
 
   const initials = getInitials(userName) || "JD"
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await logoutFirebase()
     dispatch(logout())
   }
 
