@@ -1,46 +1,48 @@
-const EMPLOYEE_MANAGEMENT = "employee-management/"
-const EMPLOYEE_MANAGEMENT_DETAILS = "employee-management"
-const EMPLOYEE_MANAGEMENT_DEPARTMENTS = "employee-management/departments"
-const ATTENDANCE_ADMIN_LOGS = "attendance/admin/logs"
+const EMPLOYEE_MANAGEMENT = "v1/employee-management"
+const EMPLOYEE_MANAGEMENT_DEPARTMENTS = "v1/employee-management/departments"
+const ATTENDANCE_ADMIN_LOGS = "v1/attendance/admin/logs"
 
 const apiConstant = {
+  auth: {
+    me: "v1/auth/me",
+  },
   comment: {
     comment: "comments/",
   },
   leave: {
-    attendance: "leave/attendance/",
-    adminSummary: "leave/admin/summary/",
-    adminApprovals: "leave/admin/approvals/",
-    adminApprovalAction: "leave/admin/approvals",
-    adminManualRecord: "leave/admin/manual-record/",
-    adminEmployees: "leave/admin/employees/",
-    employeeProfile: "leave/employee/profile/",
-    employeeRequest: "leave/employee/request/",
-    adminSettings: "leave/admin/settings/",
-    attendanceDay: "leave/attendance/day/", // GET ?date=YYYY-MM-DD
+    attendance: "v1/leave/attendance",
+    adminSummary: "v1/leave/admin/summary",
+    adminApprovals: "v1/leave/admin/approvals",
+    adminApprovalAction: "v1/leave/admin/approvals",
+    adminManualRecord: "v1/leave/admin/manual-record",
+    adminEmployees: "v1/leave/admin/employees",
+    employeeProfile: "v1/leave/employee/profile",
+    employeeRequest: "v1/leave/employee/request",
+    adminSettings: "v1/leave/admin/settings",
+    attendanceDay: "v1/leave/attendance/day", // GET ?date=YYYY-MM-DD
   },
   employeeManagement: {
     list: EMPLOYEE_MANAGEMENT,
     create: EMPLOYEE_MANAGEMENT,
-    detail: EMPLOYEE_MANAGEMENT_DETAILS, // /employee-management/:id/
-    invite: `${EMPLOYEE_MANAGEMENT}invite/`,
+    detail: EMPLOYEE_MANAGEMENT, // /v1/employee-management/:id
+    invite: `${EMPLOYEE_MANAGEMENT}/invite`,
     departments: EMPLOYEE_MANAGEMENT_DEPARTMENTS,
-    departmentDetail: EMPLOYEE_MANAGEMENT_DEPARTMENTS, // /departments/:id/
-    performance: "employee/performance/",
+    departmentDetail: EMPLOYEE_MANAGEMENT_DEPARTMENTS, // /departments/:id
+    performance: "v1/employee/performance",
     profile360: `${EMPLOYEE_MANAGEMENT}profile`, // /employee-management/profile/:id/
   },
   attendance: {
-    clockIn: "attendance/clock-in/",
-    clockOut: "attendance/clock-out/",
-    status: "attendance/status/",
-    today: "attendance/today/",
-    history: "attendance/history/",
-    adminLogs: `${ATTENDANCE_ADMIN_LOGS}/`,
-    adminLogDetail: ATTENDANCE_ADMIN_LOGS, // append /{id}/
-    adminLogFlag: ATTENDANCE_ADMIN_LOGS, // append /{id}/flag/
-    adminManualEntry: "attendance/admin/manual-entry/",
-    adminSummary: "attendance/admin/summary/",
-    adminLive: "attendance/admin/live/",
+    clockIn: "v1/attendance/clock-in",
+    clockOut: "v1/attendance/clock-out",
+    status: "v1/attendance/status",
+    today: "v1/attendance/today",
+    history: "v1/attendance/history",
+    adminLogs: ATTENDANCE_ADMIN_LOGS,
+    adminLogDetail: ATTENDANCE_ADMIN_LOGS, // append /{id}
+    adminLogFlag: ATTENDANCE_ADMIN_LOGS, // append /{id}/flag
+    adminManualEntry: "v1/attendance/admin/manual-entry",
+    adminSummary: "v1/attendance/admin/summary",
+    adminLive: "v1/attendance/admin/live",
   },
   project: {
     list: "projects/",

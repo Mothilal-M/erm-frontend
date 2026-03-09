@@ -7,34 +7,36 @@ export const authSlice = createSlice({
   name: ct.store.USER_STORE,
   initialState: {
     userName: "",
-    isAuthenticated: false,
+    userEmail: "",
     userRole: "",
-    leave_management_role: "", // "admin" | "employee" — scoped role for Leave Management module
-    employee_management_role: "", // "admin" | "" — scoped role for Employee Management module
-    attendance_management_role: "", // "admin" | "employee" — scoped role for Attendance Management module
+    uid: "",
+    isAuthenticated: false,
+    leave_management_role: "",
+    employee_management_role: "",
+    attendance_management_role: "",
   },
   reducers: {
     login: (state, action) => {
-      state.userName = action.payload.userName
+      const { userName, userEmail, userRole, uid } = action.payload
+      state.userName = userName
+      state.userEmail = userEmail
+      state.userRole = userRole
+      state.uid = uid
       state.isAuthenticated = true
-      state.userRole = action.payload.userRole
-      state.leave_management_role = action.payload.leave_management_role ?? ""
-      state.employee_management_role =
-        action.payload.employee_management_role ?? ""
-
-      // as of not hardcode
-      state.attendance_management_role =
-        action.payload.employee_management_role ?? ""
+      state.leave_management_role = userRole
+      state.employee_management_role = userRole
+      state.attendance_management_role = userRole
     },
     logout: (state) => {
       state.userName = ""
-      state.isAuthenticated = false
+      state.userEmail = ""
       state.userRole = ""
+      state.uid = ""
+      state.isAuthenticated = false
       state.attendance_management_role = ""
       state.leave_management_role = ""
       state.employee_management_role = ""
 
-      // also clear localhost
       queryClient.clear()
     },
   },
