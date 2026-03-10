@@ -1,91 +1,110 @@
-import apiConstant from "@/lib/constants/api.constant"
+/**
+ * Project API — returns local mock data directly.
+ * Backend API for projects is not yet implemented.
+ * Replace these with real API calls once the backend is ready.
+ */
 
-import api from "./index"
+import { mockData } from "./project.data"
 
-export const getProjects = async (parameters) => {
-  const response = await api.get(apiConstant.project.list, {
-    params: parameters,
-  })
-  return response.data
+export const getProjects = async () => {
+  return {
+    count: mockData.projects.length,
+    next: null,
+    previous: null,
+    results: mockData.projects,
+  }
 }
 
 export const getProjectById = async (id) => {
-  const response = await api.get(`${apiConstant.project.detail}${id}/`)
-  return response.data
+  const project = mockData.projects.find((p) => p.id === Number(id))
+  if (!project) throw new Error("Project not found")
+  return project
 }
 
-export const getSprints = async (projectId, parameters) => {
-  const response = await api.get(apiConstant.project.sprints(projectId), {
-    params: parameters,
-  })
-  return response.data
+export const getSprints = async (projectId) => {
+  const sprints = mockData.sprints[projectId] || []
+  return {
+    count: sprints.length,
+    next: null,
+    previous: null,
+    results: sprints,
+  }
 }
 
 export const getSprintById = async (projectId, sprintId) => {
-  const response = await api.get(
-    apiConstant.project.sprintDetail(projectId, sprintId)
-  )
-  return response.data
+  const sprints = mockData.sprints[projectId] || []
+  const sprint = sprints.find((s) => s.id === Number(sprintId))
+  if (!sprint) throw new Error("Sprint not found")
+  return sprint
 }
 
-export const getTasks = async (projectId, sprintId, parameters) => {
-  const response = await api.get(
-    apiConstant.project.tasks(projectId, sprintId),
-    { params: parameters }
-  )
-  return response.data
+export const getTasks = async (projectId, sprintId) => {
+  const tasks = mockData.tasks[sprintId] || []
+  return {
+    count: tasks.length,
+    next: null,
+    previous: null,
+    results: tasks,
+  }
 }
+
 export const getTaskById = async (projectId, sprintId, taskId) => {
-  const response = await api.get(
-    `${apiConstant.project.tasks(projectId, sprintId)}${taskId}/`
-  )
-  return response.data
+  const tasks = mockData.tasks[sprintId] || []
+  const task = tasks.find((t) => t.id === taskId)
+  if (!task) throw new Error("Task not found")
+  return task
 }
 
 export const updateTask = async (projectId, sprintId, taskId, data) => {
-  const response = await api.patch(
-    `${apiConstant.project.tasks(projectId, sprintId)}${taskId}/`,
-    data
-  )
-  return response.data
+  const tasks = mockData.tasks[sprintId] || []
+  const taskIndex = tasks.findIndex((t) => t.id === taskId)
+  if (taskIndex === -1) throw new Error("Task not found")
+  const updated = { ...tasks[taskIndex], ...data }
+  mockData.tasks[sprintId][taskIndex] = updated
+  return updated
 }
+
+export const addTaskComment = async (projectId, sprintId, taskId, data) => {
+  const tasks = mockData.tasks[sprintId] || []
+  const task = tasks.find((t) => t.id === taskId)
+  if (!task) throw new Error("Task not found")
+  const newComment = {
+    id: (task.comments?.length || 0) + 1,
+    ...data,
+    createdAt: new Date().toISOString().split("T")[0],
+  }
+  if (!task.comments) task.comments = []
+  task.comments.push(newComment)
+  return newComment
+}
+
 export const getAIInsights = async (projectId, sprintId) => {
-  const response = await api.get(
-    `projects/${projectId}/sprints/${sprintId}/ai-insights/`
-  )
-  return response.data
+  const insights = mockData.aiInsights[sprintId] || null
+  if (!insights) throw new Error("AI insights not found")
+  return insights
 }
 
 export const getWorkflows = async (projectId) => {
-  const response = await api.get(`projects/${projectId}/workflows/`)
-  return response.data
+  const workflow = mockData.workflows[projectId] || null
+  return workflow ? [workflow] : []
 }
 
 export const getWorkflowById = async (projectId, workflowId) => {
-  const response = await api.get(
-    `projects/${projectId}/workflows/${workflowId}/`
-  )
-  return response.data
+  const workflow = mockData.workflows[projectId] || null
+  if (!workflow) throw new Error("Workflow not found")
+  return workflow
 }
 
 export const updateWorkflow = async (projectId, workflowId, data) => {
-  const response = await api.patch(
-    `projects/${projectId}/workflows/${workflowId}/`,
-    data
-  )
-  return response.data
+  const workflow = mockData.workflows[projectId]
+  if (!workflow) throw new Error("Workflow not found")
+  const updated = { ...workflow, ...data }
+  mockData.workflows[projectId] = updated
+  return updated
 }
 
 export const getSprintAnalytics = async (projectId, sprintId) => {
-  const response = await api.get(
-    `projects/${projectId}/sprints/${sprintId}/analytics/`
-  )
-  return response.data
-}
-export const addTaskComment = async (projectId, sprintId, taskId, data) => {
-  const response = await api.post(
-    `${apiConstant.project.tasks(projectId, sprintId)}${taskId}/comments/`,
-    data
-  )
-  return response.data
+  const analytics = mockData.analytics[sprintId] || null
+  if (!analytics) throw new Error("Analytics not found")
+  return analytics
 }
