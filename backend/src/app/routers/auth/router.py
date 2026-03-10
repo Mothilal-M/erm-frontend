@@ -1,4 +1,3 @@
-from datetime import date
 from typing import Annotated
 from uuid import UUID
 
@@ -6,8 +5,6 @@ from fastapi import APIRouter, Depends, Request
 from injectq.integrations.fastapi import InjectFastAPI
 
 from src.app.core.auth.authentication import get_current_user, get_firebase_user
-from src.app.core.exceptions import ResourceDuplicationError
-from src.app.db.tables.erm_tables import EmployeeTable
 from src.app.routers.auth.schemas import RegisterSchema, UserSchema
 from src.app.routers.auth.services import UserService
 from src.app.utils import generate_swagger_responses, success_response
@@ -48,37 +45,10 @@ async def get_me(
 async def register(
     request: Request,
     body: RegisterSchema,
+    service: Annotated[UserService, InjectFastAPI(UserService)],
     token: dict = Depends(get_firebase_user),
 ):
-    email = token.get("email", "")
-    uid = token.get("uid", "")
-    email_verified = token.get("email_verified", False)
-
-    # Check if user already has an employee record
-    existing = await EmployeeTable.filter(email=email, status=True).first()
-    if existing:
-        raise ResourceDuplicationError("Account already registered")
-
-    # Create employee record with admin role
-    employee = await EmployeeTable.create(
-        name=body.name,
-        email=email,
-        role="admin",
-        employee_status="active",
-        join_date=date.today(),
-    )
-
-    user = AuthUserSchema(
-        name=employee.name,
-        role=employee.role,
-        company=1,
-        uuid=uid,
-        user_id=uid,
-        email=email,
-        email_verified=email_verified,
-        firebase=token,
-        uid=uid,
-    )
+    user = await service.register_user(body.name, token)
     return success_response(user.model_dump(exclude={"firebase"}), request, status_code=201)
 
 

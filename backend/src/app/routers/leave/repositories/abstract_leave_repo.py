@@ -42,3 +42,17 @@ class LeaveRepoAbstract(ABC):
             NotImplementedError: If the method is not implemented by a subclass.
         """
         raise NotImplementedError
+
+    @abstractmethod
+    async def get_employee_attendance_for_range(self, employee_id: int, date_from, date_to) -> list:
+        """Retrieves attendance entries for an employee within a date range.
+
+        Args:
+            employee_id (int): The unique identifier of the employee.
+            date_from: Start date (inclusive).
+            date_to: End date (inclusive).
+
+        Raises:
+            NotImplementedError: If the method is not implemented by a subclass.
+        """
+        raise NotImplementedError

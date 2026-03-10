@@ -263,3 +263,22 @@ class LeaveRepo(LeaveRepoAbstract):
             list[LeaveTypeTable]: A list of leave type records where status is True.
         """
         return await LeaveTypeTable.filter(status=True).all()
+
+    async def get_employee_attendance_for_range(
+        self, employee_id: int, date_from: date, date_to: date
+    ) -> list[AttendanceLogTable]:
+        """Retrieves attendance entries for an employee within a date range.
+
+        Args:
+            employee_id (int): The unique identifier of the employee.
+            date_from (date): Start date (inclusive).
+            date_to (date): End date (inclusive).
+
+        Returns:
+            list[AttendanceLogTable]: A list of attendance log entries for the range.
+        """
+        return await AttendanceLogTable.filter(
+            employee_id=employee_id,
+            date__gte=date_from,
+            date__lte=date_to,
+        ).all()

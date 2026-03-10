@@ -58,3 +58,39 @@ class AttendanceRepoAbstract(ABC):
             DoesNotExist: If no attendance log entry with the given ID is found.
         """
         raise NotImplementedError
+
+    @abstractmethod
+    async def get_entries_for_date(self, target_date: date) -> list:
+        """Retrieves all attendance entries for a given date with employee relations.
+
+        Args:
+            target_date (date): The date to retrieve entries for.
+
+        Returns:
+            A list of attendance log entries with employee prefetched.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    async def count_flagged_for_date(self, target_date: date) -> int:
+        """Counts flagged attendance entries for a given date.
+
+        Args:
+            target_date (date): The date to count flagged entries for.
+
+        Returns:
+            int: The number of flagged entries.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    async def count_auto_expired_for_date(self, target_date: date) -> int:
+        """Counts auto-expired attendance entries for a given date.
+
+        Args:
+            target_date (date): The date to count auto-expired entries for.
+
+        Returns:
+            int: The number of auto-expired entries.
+        """
+        raise NotImplementedError

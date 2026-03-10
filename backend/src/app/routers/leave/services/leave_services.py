@@ -5,7 +5,6 @@ from datetime import UTC, date, datetime, timedelta
 from injectq import inject, singleton
 
 from src.app.core.auth.employee_resolver import resolve_employee
-from src.app.db.tables.erm_tables import AttendanceLogTable
 from src.app.routers.leave.repositories import LeaveRepo
 from src.app.routers.leave.schemas import (
     AdminEmployeeItem,
@@ -47,9 +46,24 @@ class LeaveService:
 
     @inject
     def __init__(self, repo: LeaveRepo):
+        """Initializes the LeaveService with a LeaveRepo instance.
+
+        Args:
+            repo (LeaveRepo): The leave repository for database operations.
+        """
         self._repo = repo
 
     async def get_monthly_attendance(self, year: int, month: int) -> MonthlyAttendanceResponse:
+        """Retrieves a day-by-day attendance overview for a given month.
+
+        Args:
+            year (int): The calendar year.
+            month (int): The month (0-indexed from frontend, converted internally).
+
+        Returns:
+            MonthlyAttendanceResponse: Daily attendance records with present,
+                absent, and on-leave counts per day.
+        """
         # month from frontend is 0-indexed
         actual_month = month + 1
         employees = await self._repo.get_active_employees()
@@ -100,6 +114,12 @@ class LeaveService:
         )
 
     async def get_admin_summary(self) -> AdminLeaveSummaryResponse:
+        """Retrieves aggregated leave statistics for the admin dashboard.
+
+        Returns:
+            AdminLeaveSummaryResponse: Summary including leave breakdown by type,
+                department stats, top leave takers, and pending approvals.
+        """
         today = date.today()
         employees = await self._repo.get_active_employees()
         total_employees = len(employees)
@@ -207,6 +227,12 @@ class LeaveService:
         )
 
     async def get_approvals(self) -> list[ApprovalItem]:
+        """Retrieves all leave requests with their approval status.
+
+        Returns:
+            list[ApprovalItem]: A list of leave approval items with employee
+                details and leave type information.
+        """
         requests = await self._repo.get_leave_requests()
         return [
             ApprovalItem(
@@ -229,6 +255,16 @@ class LeaveService:
     async def approve_or_reject(
         self, request_id: int, status: str, note: str | None
     ) -> ApprovalActionResponse:
+        """Approves or rejects a leave request and updates the leave balance.
+
+        Args:
+            request_id (int): The unique identifier of the leave request.
+            status (str): The new status ("approved" or "rejected").
+            note (str | None): Optional review note from the admin.
+
+        Returns:
+            ApprovalActionResponse: The updated request ID and status.
+        """
         lr = await self._repo.get_leave_request(request_id)
         old_status = lr.leave_status
         lr.leave_status = status
@@ -251,6 +287,15 @@ class LeaveService:
         return ApprovalActionResponse(id=lr.id, status=lr.leave_status)
 
     async def manual_record(self, data: ManualLeaveRecordSchema) -> ManualRecordResponse:
+        """Creates a manual leave record with auto-approved status.
+
+        Args:
+            data (ManualLeaveRecordSchema): The manual leave record data including
+                employee_id, leave_type, dates, days, and reason.
+
+        Returns:
+            ManualRecordResponse: The created record's ID and status.
+        """
         leave_type = await self._repo.get_or_create_leave_type(data.leave_type)
         lr = await self._repo.create_leave_request(
             {
@@ -275,6 +320,12 @@ class LeaveService:
         return ManualRecordResponse(id=lr.id, status="approved")
 
     async def get_admin_employees(self) -> list[AdminEmployeeItem]:
+        """Retrieves a simplified list of active employees for selection dropdowns.
+
+        Returns:
+            list[AdminEmployeeItem]: A list of employees with id, name,
+                department, and avatar.
+        """
         employees = await self._repo.get_employees_simple()
         return [
             AdminEmployeeItem(
@@ -287,6 +338,17 @@ class LeaveService:
         ]
 
     async def get_employee_profile(self, user: AuthUserSchema) -> EmployeeLeaveProfileResponse:
+        """Retrieves the authenticated employee's leave profile.
+
+        Includes leave balances, this month's attendance stats, and leave history.
+        Creates default leave balances from settings if none exist.
+
+        Args:
+            user (AuthUserSchema): The authenticated user's profile.
+
+        Returns:
+            EmployeeLeaveProfileResponse: The employee's complete leave profile.
+        """
         employee = await resolve_employee(user)
         today = date.today()
         year = today.year
@@ -324,11 +386,9 @@ class LeaveService:
         # This month stats
         month_start = date(today.year, today.month, 1)
         month_end = date(today.year, today.month, calendar.monthrange(today.year, today.month)[1])
-        month_attendance = await AttendanceLogTable.filter(
-            employee_id=employee.id,
-            date__gte=month_start,
-            date__lte=month_end,
-        ).all()
+        month_attendance = await self._repo.get_employee_attendance_for_range(
+            employee.id, month_start, month_end
+        )
 
         present_days = len({a.date for a in month_attendance})
         num_days = calendar.monthrange(today.year, today.month)[1]
@@ -391,6 +451,16 @@ class LeaveService:
     async def submit_leave_request(
         self, user: AuthUserSchema, data: LeaveRequestSchema
     ) -> LeaveRequestResponse:
+        """Submits a new leave request and updates the pending balance.
+
+        Args:
+            user (AuthUserSchema): The authenticated user's profile.
+            data (LeaveRequestSchema): The leave request data including type,
+                dates, days, and reason.
+
+        Returns:
+            LeaveRequestResponse: The created request's ID and status.
+        """
         employee = await resolve_employee(user)
         leave_type = await self._repo.get_or_create_leave_type(data.leave_type)
         lr = await self._repo.create_leave_request(
@@ -416,6 +486,12 @@ class LeaveService:
         return LeaveRequestResponse(id=lr.id, status="pending")
 
     async def get_settings(self) -> LeaveSettingsResponse:
+        """Retrieves the current leave policy settings.
+
+        Returns:
+            LeaveSettingsResponse: The leave settings including quotas,
+                carry-forward rules, and feature toggles.
+        """
         settings = await self._repo.get_settings()
         return LeaveSettingsResponse(
             annual_leave_quota=settings.annual_leave_quota,
@@ -431,10 +507,27 @@ class LeaveService:
         )
 
     async def update_settings(self, data: dict) -> LeaveSettingsResponse:
+        """Updates the leave policy settings with the provided values.
+
+        Args:
+            data (dict): A dictionary of setting field names to their new values.
+
+        Returns:
+            LeaveSettingsResponse: The updated leave settings.
+        """
         await self._repo.update_settings(data)
         return await self.get_settings()
 
     async def get_day_detail(self, target_date_str: str) -> DayDetailResponse:
+        """Retrieves per-employee attendance breakdown for a specific date.
+
+        Args:
+            target_date_str (str): The target date in ISO format (YYYY-MM-DD).
+
+        Returns:
+            DayDetailResponse: Detailed breakdown of present, on-leave,
+                and absent employees for the given date.
+        """
         target_date = date.fromisoformat(target_date_str)
         employees = await self._repo.get_active_employees()
         attendance = await self._repo.get_attendance_for_date(target_date)

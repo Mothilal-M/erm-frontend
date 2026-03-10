@@ -20,8 +20,8 @@ class AttendanceRepo(AttendanceRepoAbstract):
             today (date): The date to check for an active session.
 
         Returns:
-            The active attendance log entry, or None if no active
-            session exists.
+            AttendanceLogTable | None: The active attendance log entry, or None
+                if no active session exists.
         """
         return await AttendanceLogTable.filter(
             employee_id=employee_id,
@@ -37,7 +37,7 @@ class AttendanceRepo(AttendanceRepoAbstract):
             today (date): The date to retrieve entries for.
 
         Returns:
-            A list of attendance log entries ordered by clock-in time.
+            list[AttendanceLogTable]: A list of attendance log entries ordered by clock-in time.
         """
         return await AttendanceLogTable.filter(
             employee_id=employee_id,
@@ -83,13 +83,12 @@ class AttendanceRepo(AttendanceRepoAbstract):
         Args:
             employee_id (int): The unique identifier of the employee.
             year (int | None): Year filter. None means no filter.
-            month (int | None): Month filter (with year). None means
-                no filter.
+            month (int | None): Month filter (with year). None means no filter.
             page (int): Page number for pagination. Defaults to 1.
             page_size (int): Entries per page. Defaults to 20.
 
         Returns:
-            A tuple of (entries for the page, total count).
+            tuple[list[AttendanceLogTable], int]: A tuple of (entries for the page, total count).
         """
         qs = AttendanceLogTable.filter(employee_id=employee_id)
         if year and month:
@@ -128,7 +127,7 @@ class AttendanceRepo(AttendanceRepoAbstract):
             department_id (int | None): Filter by department ID.
 
         Returns:
-            A tuple of (entries for the page, total count).
+            tuple[list[AttendanceLogTable], int]: A tuple of (entries for the page, total count).
         """
         qs = AttendanceLogTable.all().prefetch_related("employee__department")
 
@@ -173,9 +172,44 @@ class AttendanceRepo(AttendanceRepoAbstract):
         """Retrieves all active employees with their department data prefetched.
 
         Returns:
-            A list of active employee records with department
-            relations prefetched.
+            list[EmployeeTable]: A list of active employee records with department
+                relations prefetched.
         """
         return await EmployeeTable.filter(status=True, employee_status="active").prefetch_related(
             "department"
         )
+
+    async def get_entries_for_date(self, target_date: date) -> list[AttendanceLogTable]:
+        """Retrieves all attendance entries for a given date with employee relations.
+
+        Args:
+            target_date (date): The date to retrieve entries for.
+
+        Returns:
+            list[AttendanceLogTable]: A list of attendance log entries with employee prefetched.
+        """
+        return await AttendanceLogTable.filter(date=target_date).prefetch_related("employee")
+
+    async def count_flagged_for_date(self, target_date: date) -> int:
+        """Counts flagged attendance entries for a given date.
+
+        Args:
+            target_date (date): The date to count flagged entries for.
+
+        Returns:
+            int: The number of flagged entries.
+        """
+        return await AttendanceLogTable.filter(is_flagged=True, date=target_date).count()
+
+    async def count_auto_expired_for_date(self, target_date: date) -> int:
+        """Counts auto-expired attendance entries for a given date.
+
+        Args:
+            target_date (date): The date to count auto-expired entries for.
+
+        Returns:
+            int: The number of auto-expired entries.
+        """
+        return await AttendanceLogTable.filter(
+            attendance_status="AUTO_EXPIRED", date=target_date
+        ).count()
