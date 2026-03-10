@@ -14,3 +14,9 @@ class UserSchema(BaseModel):
     phone: str = Field(..., description="Phone number in international format (e.g., +1234567890)")
     token: str = Field(..., min_length=20, description="Authentication token for the user")
     type: int = Field(..., ge=0, description="Type of the user (e.g., admin = 0, regular user = 1)")
+
+
+class RegisterSchema(BaseModel):
+    """Schema for self-registration request body."""
+
+    name: str = Field(..., min_length=1, max_length=255, description="Full name of the user")

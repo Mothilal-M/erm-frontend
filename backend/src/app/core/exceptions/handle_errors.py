@@ -12,7 +12,11 @@ from src.app.core import logger
 from src.app.utils import error_response
 from src.app.utils.schemas import ErrorSchemas
 
-from .resources_exceptions import ResourceNotFoundError
+from .resources_exceptions import (
+    InvalidOperationError,
+    ResourceDuplicationError,
+    ResourceNotFoundError,
+)
 from .user_exception import (
     UserAccountError,
     UserPermissionError,
@@ -134,4 +138,39 @@ def init_errors_handler(app: FastAPI):
             error_code=exc.error_code,
             message=exc.message,
             status_code=exc.status_code,
+        )
+
+    @app.exception_handler(ResourceDuplicationError)
+    async def resource_duplication_exception_handler(
+        request: Request, exc: ResourceDuplicationError
+    ):
+        logger.error(f"ResourceDuplicationError: url: {request.base_url}", exc_info=exc)
+        return error_response(
+            request,
+            error_code=exc.error_code,
+            message=exc.message,
+            status_code=exc.status_code,
+        )
+
+    @app.exception_handler(InvalidOperationError)
+    async def invalid_operation_exception_handler(request: Request, exc: InvalidOperationError):
+        logger.error(f"InvalidOperationError: url: {request.base_url}", exc_info=exc)
+        return error_response(
+            request,
+            error_code=exc.error_code,
+            message=exc.message,
+            status_code=exc.status_code,
+        )
+
+    ########################################
+    ##### Catch-all for unhandled errors ###
+    ########################################
+    @app.exception_handler(Exception)
+    async def unhandled_exception_handler(request: Request, exc: Exception):
+        logger.error(f"Unhandled exception: url: {request.base_url}", exc_info=exc)
+        return error_response(
+            request,
+            error_code="INTERNAL_ERROR",
+            message="An unexpected error occurred. Please try again later.",
+            status_code=500,
         )
