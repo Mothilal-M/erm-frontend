@@ -1,6 +1,6 @@
 import calendar
 from collections import defaultdict
-from datetime import UTC, date, datetime, timedelta
+from datetime import date, timedelta
 
 from injectq import inject, singleton
 
@@ -22,7 +22,6 @@ from src.app.routers.leave.schemas import (
     EmployeeProfileInfo,
     LeaveBalanceItem,
     LeaveBreakdownItem,
-    LeaveHistoryItem,
     LeaveRequestResponse,
     LeaveRequestSchema,
     LeaveSettingsResponse,
@@ -61,10 +60,8 @@ class LeaveService:
             month (int): The month (0-indexed from frontend, converted internally).
 
         Returns:
-            MonthlyAttendanceResponse: Daily attendance records with present,
-                absent, and on-leave counts per day.
+            MonthlyAttendanceResponse: Daily attendance records.
         """
-        # month from frontend is 0-indexed
         actual_month = month + 1
         employees = await self._repo.get_active_employees()
         total_employees = len(employees)
@@ -72,12 +69,10 @@ class LeaveService:
         attendance_logs = await self._repo.get_attendance_for_month(year, actual_month)
         leave_requests = await self._repo.get_leave_requests_for_month(year, actual_month)
 
-        # Build per-date attendance sets
         present_by_date = defaultdict(set)
         for log in attendance_logs:
             present_by_date[log.date].add(log.employee_id)
 
-        # Build per-date leave sets
         on_leave_by_date = defaultdict(set)
         for lr in leave_requests:
             current = lr.date_from
@@ -124,10 +119,8 @@ class LeaveService:
         employees = await self._repo.get_active_employees()
         total_employees = len(employees)
 
-        # This month's leave requests
         leave_requests = await self._repo.get_leave_requests_for_month(today.year, today.month)
 
-        # Count by type
         type_counts: dict[str, float] = defaultdict(int)
         dept_stats: dict[str, dict[str, int]] = defaultdict(
             lambda: {"on_leave": 0, "absent": 0, "present": 0, "wfh": 0}
@@ -135,20 +128,16 @@ class LeaveService:
         employee_leave_days: dict[int, dict] = defaultdict(lambda: {"total": 0, "types": set()})
 
         for lr in leave_requests:
-            type_name = lr.leave_type.name if lr.leave_type else "Other"
-            type_counts[type_name] += lr.days
-            emp = lr.employee
-            dept = emp.department.name if emp.department else "Unknown"
-            dept_stats[dept]["on_leave"] += 1
+            type_counts[lr.leave_type_name] += lr.days
+            dept_stats[lr.employee_department]["on_leave"] += 1
             if lr.sub_type == "wfh":
-                dept_stats[dept]["wfh"] += 1
+                dept_stats[lr.employee_department]["wfh"] += 1
 
-            employee_leave_days[emp.id]["total"] += lr.days
-            employee_leave_days[emp.id]["types"].add(type_name)
-            employee_leave_days[emp.id]["name"] = emp.name
-            employee_leave_days[emp.id]["department"] = dept
+            employee_leave_days[lr.employee_id]["total"] += lr.days
+            employee_leave_days[lr.employee_id]["types"].add(lr.leave_type_name)
+            employee_leave_days[lr.employee_id]["name"] = lr.employee_name
+            employee_leave_days[lr.employee_id]["department"] = lr.employee_department
 
-        # Leave breakdown
         colors = {
             "Annual Leave": "blue",
             "Sick Leave": "red",
@@ -164,12 +153,10 @@ class LeaveService:
             for t, c in type_counts.items()
         ]
 
-        # Department stats
         department_stats = [
             DepartmentStatItem(department=dept, **stats) for dept, stats in dept_stats.items()
         ]
 
-        # Top leave takers
         top_leave_takers_raw = sorted(
             [
                 {
@@ -186,14 +173,13 @@ class LeaveService:
         )[:5]
         top_leave_takers = [TopLeaveTakerItem(**item) for item in top_leave_takers_raw]
 
-        # Pending approvals
         pending = await self._repo.get_leave_requests(leave_status="pending")
         pending_approvals = [
             PendingApprovalItem(
                 id=lr.id,
-                name=lr.employee.name,
-                avatar=lr.employee.avatar or "",
-                type=lr.leave_type.name if lr.leave_type else "",
+                name=lr.employee_name,
+                avatar=lr.employee_avatar,
+                type=lr.leave_type_name,
                 sub_type=lr.sub_type,
                 from_date=lr.date_from.isoformat(),
                 to_date=lr.date_to.isoformat(),
@@ -230,17 +216,16 @@ class LeaveService:
         """Retrieves all leave requests with their approval status.
 
         Returns:
-            list[ApprovalItem]: A list of leave approval items with employee
-                details and leave type information.
+            list[ApprovalItem]: A list of leave approval items.
         """
         requests = await self._repo.get_leave_requests()
         return [
             ApprovalItem(
                 id=lr.id,
-                name=lr.employee.name,
-                avatar=lr.employee.avatar or "",
-                department=lr.employee.department.name if lr.employee.department else "",
-                type=lr.leave_type.name if lr.leave_type else "",
+                name=lr.employee_name,
+                avatar=lr.employee_avatar,
+                department=lr.employee_department,
+                type=lr.leave_type_name,
                 sub_type=lr.sub_type,
                 from_date=lr.date_from.isoformat(),
                 to_date=lr.date_to.isoformat(),
@@ -265,33 +250,13 @@ class LeaveService:
         Returns:
             ApprovalActionResponse: The updated request ID and status.
         """
-        lr = await self._repo.get_leave_request(request_id)
-        old_status = lr.leave_status
-        lr.leave_status = status
-        lr.review_note = note
-        lr.reviewed_at = datetime.now(UTC)
-        await lr.save()
-
-        # Update leave balance
-        year = lr.date_from.year
-        balance = await self._repo.get_or_create_balance(lr.employee_id, lr.leave_type_id, year)
-
-        if status == "approved" and old_status == "pending":
-            balance.pending = max(0, balance.pending - lr.days)
-            balance.used += lr.days
-            await balance.save()
-        elif status == "rejected" and old_status == "pending":
-            balance.pending = max(0, balance.pending - lr.days)
-            await balance.save()
-
-        return ApprovalActionResponse(id=lr.id, status=lr.leave_status)
+        return await self._repo.approve_or_reject_request(request_id, status, note)
 
     async def manual_record(self, data: ManualLeaveRecordSchema) -> ManualRecordResponse:
         """Creates a manual leave record with auto-approved status.
 
         Args:
-            data (ManualLeaveRecordSchema): The manual leave record data including
-                employee_id, leave_type, dates, days, and reason.
+            data (ManualLeaveRecordSchema): The manual leave record data.
 
         Returns:
             ManualRecordResponse: The created record's ID and status.
@@ -311,11 +276,7 @@ class LeaveService:
             }
         )
 
-        # Update balance
-        year = lr.date_from.year
-        balance = await self._repo.get_or_create_balance(data.employee_id, leave_type.id, year)
-        balance.used += data.days
-        await balance.save()
+        await self._repo.add_balance_used(data.employee_id, leave_type.id, lr.date_from_year, data.days)
 
         return ManualRecordResponse(id=lr.id, status="approved")
 
@@ -326,22 +287,10 @@ class LeaveService:
             list[AdminEmployeeItem]: A list of employees with id, name,
                 department, and avatar.
         """
-        employees = await self._repo.get_employees_simple()
-        return [
-            AdminEmployeeItem(
-                id=emp.id,
-                name=emp.name,
-                department=emp.department.name if emp.department else "",
-                avatar=emp.avatar or "",
-            )
-            for emp in employees
-        ]
+        return await self._repo.get_employees_simple()
 
     async def get_employee_profile(self, user: AuthUserSchema) -> EmployeeLeaveProfileResponse:
         """Retrieves the authenticated employee's leave profile.
-
-        Includes leave balances, this month's attendance stats, and leave history.
-        Creates default leave balances from settings if none exist.
 
         Args:
             user (AuthUserSchema): The authenticated user's profile.
@@ -353,28 +302,21 @@ class LeaveService:
         today = date.today()
         year = today.year
 
-        # Get balances
         balances = await self._repo.get_leave_balances(employee.id, year)
 
-        # If no balances exist, create defaults from settings
         if not balances:
             settings = await self._repo.get_settings()
-            leave_types_map = {
+            quotas = {
                 "Annual Leave": settings.annual_leave_quota,
                 "Sick Leave": settings.sick_leave_quota,
                 "Casual Leave": settings.casual_leave_quota,
             }
-            for lt_name, quota in leave_types_map.items():
-                lt = await self._repo.get_or_create_leave_type(lt_name)
-                await self._repo.get_or_create_balance(employee.id, lt.id, year)
-                bal = await self._repo.get_or_create_balance(employee.id, lt.id, year)
-                bal.allocated = quota
-                await bal.save()
+            await self._repo.ensure_default_balances(employee.id, year, quotas)
             balances = await self._repo.get_leave_balances(employee.id, year)
 
         leave_balance = [
             LeaveBalanceItem(
-                type=b.leave_type.name,
+                type=b.leave_type_name,
                 allocated=b.allocated,
                 used=b.used,
                 pending=b.pending,
@@ -383,14 +325,13 @@ class LeaveService:
             for b in balances
         ]
 
-        # This month stats
         month_start = date(today.year, today.month, 1)
         month_end = date(today.year, today.month, calendar.monthrange(today.year, today.month)[1])
-        month_attendance = await self._repo.get_employee_attendance_for_range(
+        attendance_dates = await self._repo.get_employee_attendance_dates_for_range(
             employee.id, month_start, month_end
         )
 
-        present_days = len({a.date for a in month_attendance})
+        present_days = len(attendance_dates)
         num_days = calendar.monthrange(today.year, today.month)[1]
         working_days = sum(
             1
@@ -399,39 +340,26 @@ class LeaveService:
             and date(today.year, today.month, d) <= today
         )
 
-        # Leave history
-        history = await self._repo.get_employee_leave_history(employee.id)
-        leave_history = [
-            LeaveHistoryItem(
-                id=lr.id,
-                type=lr.leave_type.name if lr.leave_type else "",
-                sub_type=lr.sub_type,
-                from_date=lr.date_from.isoformat(),
-                to_date=lr.date_to.isoformat(),
-                days=lr.days,
-                status=lr.leave_status,
-            )
-            for lr in history
-        ]
+        leave_history = await self._repo.get_employee_leave_history(employee.id)
 
         leave_days = sum(
             lr.days
-            for lr in history
-            if lr.leave_status == "approved"
-            and lr.date_from.month == today.month
-            and lr.date_from.year == today.year
+            for lr in leave_history
+            if lr.status == "approved"
+            and date.fromisoformat(lr.from_date).month == today.month
+            and date.fromisoformat(lr.from_date).year == today.year
         )
 
-        await employee.fetch_related("department")
+        emp_record = await self._repo.get_employee_with_department(employee.id)
 
         return EmployeeLeaveProfileResponse(
             employee=EmployeeProfileInfo(
-                id=str(employee.id),
-                name=employee.name,
-                role=employee.role,
-                department=employee.department.name if employee.department else "",
-                avatar=employee.avatar or "",
-                join_date=employee.join_date.isoformat() if employee.join_date else "",
+                id=str(emp_record.id),
+                name=emp_record.name,
+                role=emp_record.role,
+                department=emp_record.department,
+                avatar=emp_record.avatar,
+                join_date=emp_record.join_date or "",
                 manager="",
             ),
             leave_balance=leave_balance,
@@ -455,8 +383,7 @@ class LeaveService:
 
         Args:
             user (AuthUserSchema): The authenticated user's profile.
-            data (LeaveRequestSchema): The leave request data including type,
-                dates, days, and reason.
+            data (LeaveRequestSchema): The leave request data.
 
         Returns:
             LeaveRequestResponse: The created request's ID and status.
@@ -477,11 +404,7 @@ class LeaveService:
             }
         )
 
-        # Update pending balance
-        year = lr.date_from.year
-        balance = await self._repo.get_or_create_balance(employee.id, leave_type.id, year)
-        balance.pending += data.days
-        await balance.save()
+        await self._repo.add_balance_pending(employee.id, leave_type.id, lr.date_from_year, data.days)
 
         return LeaveRequestResponse(id=lr.id, status="pending")
 
@@ -489,8 +412,7 @@ class LeaveService:
         """Retrieves the current leave policy settings.
 
         Returns:
-            LeaveSettingsResponse: The leave settings including quotas,
-                carry-forward rules, and feature toggles.
+            LeaveSettingsResponse: The leave settings.
         """
         settings = await self._repo.get_settings()
         return LeaveSettingsResponse(
@@ -515,8 +437,19 @@ class LeaveService:
         Returns:
             LeaveSettingsResponse: The updated leave settings.
         """
-        await self._repo.update_settings(data)
-        return await self.get_settings()
+        settings = await self._repo.update_settings(data)
+        return LeaveSettingsResponse(
+            annual_leave_quota=settings.annual_leave_quota,
+            sick_leave_quota=settings.sick_leave_quota,
+            casual_leave_quota=settings.casual_leave_quota,
+            carry_forward_limit=settings.carry_forward_limit,
+            carry_forward_enabled=settings.carry_forward_enabled,
+            half_day_enabled=settings.half_day_enabled,
+            wfh_enabled=settings.wfh_enabled,
+            auto_approve_after_days=settings.auto_approve_after_days,
+            blackout_dates=settings.blackout_dates,
+            leave_year_start=settings.leave_year_start,
+        )
 
     async def get_day_detail(self, target_date_str: str) -> DayDetailResponse:
         """Retrieves per-employee attendance breakdown for a specific date.
@@ -536,29 +469,27 @@ class LeaveService:
         present_ids = set()
         present_list = []
         for a in attendance:
-            emp = a.employee
-            present_ids.add(emp.id)
+            present_ids.add(a.employee_id)
             present_list.append(
                 DayEmployeePresent(
-                    id=emp.id,
-                    name=emp.name,
-                    department=emp.department.name if emp.department else "",
-                    check_in=a.clock_in.strftime("%H:%M") if a.clock_in else "",
+                    id=a.employee_id,
+                    name=a.employee_name,
+                    department=a.employee_department,
+                    check_in=a.clock_in or "",
                 )
             )
 
         on_leave_ids = set()
         on_leave_list = []
         for lr in leave_requests:
-            emp = lr.employee
-            if emp.id not in present_ids:
-                on_leave_ids.add(emp.id)
+            if lr.employee_id not in present_ids:
+                on_leave_ids.add(lr.employee_id)
                 on_leave_list.append(
                     DayEmployeeOnLeave(
-                        id=emp.id,
-                        name=emp.name,
-                        department=emp.department.name if emp.department else "",
-                        leave_type=lr.leave_type.name if lr.leave_type else "",
+                        id=lr.employee_id,
+                        name=lr.employee_name,
+                        department=lr.employee_department,
+                        leave_type=lr.leave_type_name,
                     )
                 )
 
@@ -566,7 +497,7 @@ class LeaveService:
             DayEmployeeAbsent(
                 id=emp.id,
                 name=emp.name,
-                department=emp.department.name if emp.department else "",
+                department=emp.department,
             )
             for emp in employees
             if emp.id not in present_ids and emp.id not in on_leave_ids

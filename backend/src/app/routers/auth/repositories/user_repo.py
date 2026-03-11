@@ -4,7 +4,7 @@ from uuid import UUID
 from injectq import singleton
 
 from src.app.db.tables.erm_tables import EmployeeTable
-from src.app.routers.auth.schemas import UserSchema
+from src.app.routers.auth.schemas import EmployeeRecord, UserSchema
 
 from .abstract_user_repo import UserRepoAbstract
 
@@ -31,20 +31,29 @@ class UserRepo(UserRepoAbstract):
         """
         raise NotImplementedError
 
-    async def get_employee_by_email(self, email: str) -> EmployeeTable | None:
+    async def get_employee_by_email(self, email: str) -> EmployeeRecord | None:
         """Retrieves an active employee record by email address.
 
         Args:
             email (str): The email address to look up.
 
         Returns:
-            EmployeeTable | None: The matching employee record, or None if not found.
+            EmployeeRecord | None: The matching employee record, or None if not found.
         """
-        return await EmployeeTable.filter(email=email, status=True).first()
+        emp = await EmployeeTable.filter(email=email, status=True).first()
+        if not emp:
+            return None
+        return EmployeeRecord(
+            id=emp.id,
+            name=emp.name,
+            email=emp.email,
+            role=emp.role,
+            employee_status=emp.employee_status,
+        )
 
     async def create_employee(
         self, name: str, email: str, role: str, employee_status: str, join_date: date
-    ) -> EmployeeTable:
+    ) -> EmployeeRecord:
         """Creates a new employee record in the database.
 
         Args:
@@ -55,12 +64,19 @@ class UserRepo(UserRepoAbstract):
             join_date (date): The employee's join date.
 
         Returns:
-            EmployeeTable: The newly created employee record.
+            EmployeeRecord: The newly created employee record.
         """
-        return await EmployeeTable.create(
+        emp = await EmployeeTable.create(
             name=name,
             email=email,
             role=role,
             employee_status=employee_status,
             join_date=join_date,
+        )
+        return EmployeeRecord(
+            id=emp.id,
+            name=emp.name,
+            email=emp.email,
+            role=emp.role,
+            employee_status=emp.employee_status,
         )

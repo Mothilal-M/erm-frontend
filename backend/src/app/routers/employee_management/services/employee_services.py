@@ -4,7 +4,6 @@ import os
 from firebase_admin import auth as firebase_auth
 from injectq import inject, singleton
 
-from src.app.db.tables.erm_tables import EmployeeTable
 from src.app.routers.employee_management.repositories import EmployeeRepo
 from src.app.routers.employee_management.schemas import (
     EmployeeCreateSchema,
@@ -19,27 +18,6 @@ from src.app.routers.employee_management.schemas import (
     RecognitionSchema,
     SprintHistoryItemSchema,
 )
-
-
-def _to_employee_schema(emp: EmployeeTable) -> EmployeeResponseSchema:
-    """Converts an EmployeeTable record to an EmployeeResponseSchema.
-
-    Args:
-        emp (EmployeeTable): The employee database record with department prefetched.
-
-    Returns:
-        EmployeeResponseSchema: The serialized employee data.
-    """
-    return EmployeeResponseSchema(
-        id=emp.id,
-        name=emp.name,
-        email=emp.email,
-        phone=emp.phone,
-        department=emp.department.name if emp.department else "",
-        role=emp.role,
-        join_date=emp.join_date.isoformat() if emp.join_date else None,
-        status=emp.employee_status,
-    )
 
 
 @singleton
@@ -63,14 +41,13 @@ class EmployeeService:
                 for total, active, inactive, and invited counts.
         """
         employees = await self._repo.list_employees()
-        serialized = [_to_employee_schema(e) for e in employees]
 
-        active = sum(1 for e in employees if e.employee_status == "active")
-        inactive = sum(1 for e in employees if e.employee_status == "inactive")
-        invited = sum(1 for e in employees if e.employee_status == "invited")
+        active = sum(1 for e in employees if e.status == "active")
+        inactive = sum(1 for e in employees if e.status == "inactive")
+        invited = sum(1 for e in employees if e.status == "invited")
 
         return EmployeeListResponseSchema(
-            employees=serialized,
+            employees=employees,
             stats=EmployeeStatsSchema(
                 total=len(employees),
                 active=active,
@@ -88,8 +65,7 @@ class EmployeeService:
         Returns:
             EmployeeResponseSchema: The employee's details.
         """
-        emp = await self._repo.get_employee(employee_id)
-        return _to_employee_schema(emp)
+        return await self._repo.get_employee(employee_id)
 
     async def create_employee(self, data: EmployeeCreateSchema) -> EmployeeResponseSchema:
         """Creates a new employee record and a corresponding Firebase account.
@@ -102,8 +78,7 @@ class EmployeeService:
             EmployeeResponseSchema: The newly created employee's details.
         """
         self._create_firebase_user(data.email, data.name)
-        emp = await self._repo.create_employee(data.model_dump(by_alias=False))
-        return _to_employee_schema(emp)
+        return await self._repo.create_employee(data.model_dump(by_alias=False))
 
     async def update_employee(
         self, employee_id: int, data: EmployeeUpdateSchema
@@ -117,10 +92,9 @@ class EmployeeService:
         Returns:
             EmployeeResponseSchema: The updated employee's details.
         """
-        emp = await self._repo.update_employee(
+        return await self._repo.update_employee(
             employee_id, data.model_dump(by_alias=False, exclude_none=True)
         )
-        return _to_employee_schema(emp)
 
     async def delete_employee(self, employee_id: int) -> None:
         """Soft-deletes an employee by marking them as inactive.
@@ -141,8 +115,7 @@ class EmployeeService:
             EmployeeResponseSchema: The newly created invited employee's details.
         """
         self._create_firebase_user(data.email)
-        emp = await self._repo.create_invited_employee(data.model_dump(by_alias=False))
-        return _to_employee_schema(emp)
+        return await self._repo.create_invited_employee(data.model_dump(by_alias=False))
 
     @staticmethod
     def _create_firebase_user(email: str, display_name: str | None = None) -> None:

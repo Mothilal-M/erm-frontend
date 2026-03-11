@@ -1,77 +1,74 @@
 from abc import ABC, abstractmethod
 
+from src.app.routers.employee_management.schemas import EmployeeResponseSchema
+
 
 class EmployeeRepoAbstract(ABC):
-    """Abstract base class defining the interface for employee repository operations.
-
-    All concrete employee repository implementations must inherit from this class
-    and provide implementations for each abstract method.
-    """
+    """Abstract base class defining the interface for employee repository operations."""
 
     @abstractmethod
-    async def list_employees(self) -> list:
+    async def list_employees(self) -> list[EmployeeResponseSchema]:
         """Retrieves a list of all active employees.
 
         Returns:
-            list: A list of employee records.
+            list[EmployeeResponseSchema]: A list of employee records.
         """
         raise NotImplementedError
 
     @abstractmethod
-    async def get_employee(self, employee_id: int):
+    async def get_employee(self, employee_id: int) -> EmployeeResponseSchema:
         """Retrieves a single employee by their unique identifier.
 
         Args:
             employee_id (int): The unique identifier of the employee to retrieve.
 
         Returns:
-            The employee record matching the given identifier.
-
-        Raises:
-            NotImplementedError: If the method is not implemented by a subclass.
+            EmployeeResponseSchema: The employee data.
         """
         raise NotImplementedError
 
     @abstractmethod
-    async def create_employee(self, data: dict):
+    async def create_employee(self, data: dict) -> EmployeeResponseSchema:
         """Creates a new employee record from the provided data.
 
         Args:
-            data (dict): A dictionary containing the employee's information
-                (e.g., name, email, phone, department, role, join_date).
+            data (dict): A dictionary containing the employee's information.
 
         Returns:
-            The newly created employee record.
-
-        Raises:
-            NotImplementedError: If the method is not implemented by a subclass.
+            EmployeeResponseSchema: The newly created employee data.
         """
         raise NotImplementedError
 
     @abstractmethod
-    async def update_employee(self, employee_id: int, data: dict):
+    async def update_employee(self, employee_id: int, data: dict) -> EmployeeResponseSchema:
         """Updates an existing employee record with the provided data.
 
         Args:
             employee_id (int): The unique identifier of the employee to update.
-            data (dict): A dictionary containing the fields to update and their new values.
+            data (dict): A dictionary containing the fields to update.
 
         Returns:
-            The updated employee record.
-
-        Raises:
-            NotImplementedError: If the method is not implemented by a subclass.
+            EmployeeResponseSchema: The updated employee data.
         """
         raise NotImplementedError
 
     @abstractmethod
-    async def delete_employee(self, employee_id: int):
+    async def delete_employee(self, employee_id: int) -> None:
         """Deletes (soft-deletes) an employee record by their unique identifier.
 
         Args:
             employee_id (int): The unique identifier of the employee to delete.
+        """
+        raise NotImplementedError
 
-        Raises:
-            NotImplementedError: If the method is not implemented by a subclass.
+    @abstractmethod
+    async def create_invited_employee(self, data: dict) -> EmployeeResponseSchema:
+        """Creates a new employee record with 'invited' status.
+
+        Args:
+            data (dict): A dictionary containing invitation information.
+
+        Returns:
+            EmployeeResponseSchema: The newly created invited employee data.
         """
         raise NotImplementedError

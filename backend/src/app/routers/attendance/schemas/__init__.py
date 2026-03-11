@@ -1,4 +1,5 @@
 from .attendance_schemas import (
+    ActiveSessionRecord,
     AdminAttendanceSummaryResponse,
     AdminEditEntrySchema,
     AdminFlagEntrySchema,
@@ -13,13 +14,20 @@ from .attendance_schemas import (
     ClockInSchema,
     ClockOutResponse,
     ClockOutSchema,
+    CreatedEntryRecord,
+    LiveClockInRecord,
     LiveEmployeeSchema,
     NotClockedInEmployeeSchema,
+    SimpleEmployeeRecord,
     TodayAttendanceResponse,
 )
 
 
 __all__ = [
+    "ActiveSessionRecord",
+    "CreatedEntryRecord",
+    "LiveClockInRecord",
+    "SimpleEmployeeRecord",
     "ClockInSchema",
     "ClockOutSchema",
     "AdminEditEntrySchema",
