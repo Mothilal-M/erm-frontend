@@ -1,58 +1,35 @@
 services:
-  base_app:
+  erm_app:
     build:
-      context: ..
-      dockerfile: Dockerfile
-    container_name: base_app
-    command:
-      [
-        "uvicorn",
-        "src.app.main:app",
-        "--host",
-        "0.0.0.0",
-        "--port",
-        "8082",
-        "--reload",
-      ]
+      dockerfile: docker/Dockerfile
+    container_name: erm_service
+    command: sh -c "aerich upgrade && uvicorn src.app.main:app --host 0.0.0.0 --port 8021 --reload"
     env_file: .env
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS: /app/firebase-credentials.json
     restart: always
     volumes:
-      - ..:/app
-      # Mount SQLite database file to persist data
-      - ./db.sqlite3:/app/db.sqlite3
+      - .:/app
+      - /home/hire10x/configs:/app/configs
     working_dir: /app
     networks:
-      - db_network
+      - apisix-net
       - shared_network
-
-  base_worker:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: base_worker
-    restart: always
-    command:
-      [
-        "taskiq",
-        "worker",
-        "src.app.worker:broker",
-        "-fsd",
-        "-tp",
-        "src/**/*_tasks.py",
-      ]
-    env_file: .env
-    volumes:
-      - ..:/app
-      # Mount SQLite database file to persist data
-      - ./db.sqlite3:/app/db.sqlite3
-    networks:
       - db_network
-      - shared_network
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
 
 networks:
+  apisix-net:
+    external: true
+    name: apache_apisix-net
+
   db_network:
     external: true
     name: db_network
+
   shared_network:
     external: true
-    name: my_shared_network
+
+    name: shared_network

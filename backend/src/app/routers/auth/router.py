@@ -4,8 +4,8 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Request
 from injectq.integrations.fastapi import InjectFastAPI
 
-from src.app.core.auth.authentication import get_current_user
-from src.app.routers.auth.schemas import UserSchema
+from src.app.core.auth.authentication import get_current_user, get_firebase_user
+from src.app.routers.auth.schemas import RegisterSchema, UserSchema
 from src.app.routers.auth.services import UserService
 from src.app.utils import generate_swagger_responses, success_response
 from src.app.utils.schemas.user_schemas import AuthUserSchema
@@ -30,6 +30,26 @@ async def get_me(
     user: AuthUserSchema = Depends(get_current_user),
 ):
     return success_response(user.model_dump(exclude={"firebase"}), request)
+
+
+@router.post(
+    "/v1/auth/register",
+    responses=generate_swagger_responses(AuthUserSchema),
+    summary="Register a new user (self-signup)",
+    description=(
+        "Creates a new employee record for a Firebase-authenticated user "
+        "who signed up directly (not invited). The user is assigned the admin role."
+    ),
+    openapi_extra={},
+)
+async def register(
+    request: Request,
+    body: RegisterSchema,
+    service: Annotated[UserService, InjectFastAPI(UserService)],
+    token: dict = Depends(get_firebase_user),
+):
+    user = await service.register_user(body.name, token)
+    return success_response(user.model_dump(exclude={"firebase"}), request, status_code=201)
 
 
 @router.get(

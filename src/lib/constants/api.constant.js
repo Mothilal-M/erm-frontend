@@ -5,6 +5,7 @@ const ATTENDANCE_ADMIN_LOGS = "v1/attendance/admin/logs"
 const apiConstant = {
   auth: {
     me: "v1/auth/me",
+    register: "v1/auth/register",
   },
   comment: {
     comment: "comments/",
