@@ -18,7 +18,6 @@ python-docx==1.1.2
 python-multipart==0.0.20
 python-dateutil==2.9.0
 redis==5.3.1
-aio-pika==9.4.3
 sentry-sdk==2.10.0
 strawberry-graphql==0.262.5
 snowflakekit==0.1.1

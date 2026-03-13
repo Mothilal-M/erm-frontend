@@ -40,6 +40,7 @@ app = FastAPI(
     summary=settings.SUMMARY,
     docs_url="/docs",
     redoc_url="/redocs",
+    root_path="/erm-service",
     default_response_class=ORJSONResponse,
     lifespan=lifespan,
 )

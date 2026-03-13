@@ -3,6 +3,7 @@ from datetime import UTC, date, datetime
 from injectq import inject, singleton
 
 from src.app.core.auth.employee_resolver import resolve_employee
+from src.app.core.exceptions import InvalidOperationError
 from src.app.db.tables.erm_tables import AttendanceLogTable
 from src.app.routers.attendance.repositories import AttendanceRepo
 from src.app.routers.attendance.schemas import (
@@ -121,7 +122,7 @@ class AttendanceService:
         today = date.today()
         active = await self._repo.get_active_session(employee.id, today)
         if active:
-            raise ValueError("Already clocked in")
+            raise InvalidOperationError("You are already clocked in. Please clock out first.")
 
         now = datetime.now(UTC)
         entry = await self._repo.create_entry(
@@ -144,7 +145,7 @@ class AttendanceService:
         today = date.today()
         active = await self._repo.get_active_session(employee.id, today)
         if not active:
-            raise ValueError("Not clocked in")
+            raise InvalidOperationError("You are not clocked in. Please clock in first.")
 
         now = datetime.now(UTC)
         clock_in_aware = (
