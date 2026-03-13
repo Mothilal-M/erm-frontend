@@ -24,8 +24,6 @@ snowflakekit==0.1.1
 taskiq==0.11.13
 taskiq-dependencies==1.5.7
 taskiq-redis==1.0.2
-pytest-asyncio==0.25.3
-pytest-env==1.2.0
 tortoise==0.1.1
 tortoise-orm==0.25.1
 uvicorn==0.30.1
