@@ -1,7 +1,7 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from injectq.integrations.fastapi import InjectFastAPI
 
 from src.app.core.auth.authentication import get_current_user, get_firebase_user
@@ -38,7 +38,7 @@ async def get_me(
     summary="Register a new user (self-signup)",
     description=(
         "Creates a new employee record for a Firebase-authenticated user "
-        "who signed up directly (not invited). The user is assigned the admin role."
+        "who signed up directly (not invited). Only the first user is assigned admin role."
     ),
     openapi_extra={},
 )
@@ -48,6 +48,12 @@ async def register(
     service: Annotated[UserService, InjectFastAPI(UserService)],
     token: dict = Depends(get_firebase_user),
 ):
+    if not token.get("uid") or not token.get("email"):
+        raise HTTPException(status_code=400, detail="Missing required token claims: uid and email")
+
+    if not token.get("email_verified", False):
+        raise HTTPException(status_code=400, detail="Email must be verified before registration")
+
     user = await service.register_user(body.name, token)
     return success_response(user.model_dump(exclude={"firebase"}), request, status_code=201)
 

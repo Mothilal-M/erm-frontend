@@ -80,3 +80,7 @@ class UserRepo(UserRepoAbstract):
             role=emp.role,
             employee_status=emp.employee_status,
         )
+
+    async def count_active_employees(self) -> int:
+        """Returns the total number of active employee records."""
+        return await EmployeeTable.filter(status=True).count()

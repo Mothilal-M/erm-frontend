@@ -49,3 +49,12 @@ class UserRepoAbstract(ABC):
             EmployeeRecord: The newly created employee record.
         """
         raise NotImplementedError
+
+    @abstractmethod
+    async def count_active_employees(self) -> int:
+        """Counts active employees.
+
+        Returns:
+            int: Number of active employee records.
+        """
+        raise NotImplementedError

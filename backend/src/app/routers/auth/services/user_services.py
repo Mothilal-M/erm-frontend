@@ -40,7 +40,10 @@ class UserService:
         return await self._user_repo.get_user(user_id)
 
     async def register_user(self, name: str, token: dict) -> AuthUserSchema:
-        """Register a new user (self-signup). Creates an employee record with admin role.
+        """Register a new user (self-signup).
+
+        Only the first active employee is assigned admin role; subsequent
+        self-registrations are assigned employee role.
 
         Args:
             name (str): Full name of the user.
@@ -60,10 +63,13 @@ class UserService:
         if existing:
             raise ResourceDuplicationError("Account already registered")
 
+        active_employees_count = await self._user_repo.count_active_employees()
+        assigned_role = "admin" if active_employees_count == 0 else "employee"
+
         employee = await self._user_repo.create_employee(
             name=name,
             email=email,
-            role="admin",
+            role=assigned_role,
             employee_status="active",
             join_date=date.today(),
         )
