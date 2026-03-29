@@ -45,6 +45,14 @@ const apiConstant = {
     adminSummary: "v1/attendance/admin/summary",
     adminLive: "v1/attendance/admin/live",
   },
+  ai: {
+    sprintInsights: "v1/ai/sprint-insights",
+    sprintAnalytics: "v1/ai/sprint-analytics",
+    insights: "v1/ai/insights",
+    recommendations: "v1/ai/recommendations",
+    analytics: "v1/ai/analytics",
+    chat: "v1/ai/chat",
+  },
   project: {
     list: "projects/",
     detail: "projects/", // append {id}/

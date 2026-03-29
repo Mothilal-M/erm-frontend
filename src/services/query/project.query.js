@@ -114,7 +114,7 @@ export const useAddTaskComment = () => {
 export const useGetAIInsights = (projectId, sprintId) => {
   return useQuery({
     queryKey: projectKeys.aiInsights(projectId, sprintId),
-    queryFn: () => getAIInsights(projectId, sprintId),
+    queryFn: ({ signal }) => getAIInsights(projectId, sprintId, { signal }),
     enabled: !!projectId && !!sprintId,
   })
 }
@@ -145,7 +145,8 @@ export const useUpdateWorkflow = () => {
 export const useGetSprintAnalytics = (projectId, sprintId) => {
   return useQuery({
     queryKey: projectKeys.analytics(projectId, sprintId),
-    queryFn: () => getSprintAnalytics(projectId, sprintId),
+    queryFn: ({ signal }) =>
+      getSprintAnalytics(projectId, sprintId, { signal }),
     enabled: !!projectId && !!sprintId,
   })
 }

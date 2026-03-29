@@ -1,5 +1,6 @@
 import { Ellipsis, LogOut } from "lucide-react"
 import PropTypes from "prop-types"
+import { useDispatch } from "react-redux"
 import { Link, useLocation } from "react-router-dom"
 
 import { Button } from "@/components/ui/button"
@@ -12,6 +13,8 @@ import {
 } from "@/components/ui/tooltip"
 import { getMenuList } from "@/lib/menu-list"
 import { cn } from "@/lib/utils"
+import { logoutFirebase } from "@/lib/firebase"
+import { logout } from "@store/slices/user.slice"
 
 import CollapseMenuButton from "./collapse-menu-button"
 
@@ -135,36 +138,48 @@ const MenuItem = ({ href, label, Icon, active, isOpen }) => (
 /**
  * Renders the sign out button at the bottom of the menu.
  */
-const SignOutButton = ({ isOpen }) => (
-  <li className="w-full grow flex items-end relative">
-    <TooltipProvider disableHoverableContent>
-      <Tooltip delayDuration={100}>
-        <TooltipTrigger asChild>
-          <Button
-            onClick={() => {}}
-            variant="outline"
-            className="w-full absolute bottom-0 justify-center h-10 mt-5"
-          >
-            <span className={cn(isOpen === false ? "" : "mr-4")}>
-              <LogOut size={18} />
-            </span>
-            <p
-              className={cn(
-                "whitespace-nowrap",
-                isOpen === false ? "opacity-0 hidden" : "opacity-100"
-              )}
+const SignOutButton = ({ isOpen }) => {
+  const dispatch = useDispatch()
+
+  const handleLogout = async () => {
+    try {
+      await logoutFirebase()
+    } finally {
+      dispatch(logout())
+    }
+  }
+
+  return (
+    <li className="w-full grow flex items-end relative">
+      <TooltipProvider disableHoverableContent>
+        <Tooltip delayDuration={100}>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              className="w-full absolute bottom-0 justify-center h-10 mt-5"
             >
-              Sign out
-            </p>
-          </Button>
-        </TooltipTrigger>
-        {isOpen === false && (
-          <TooltipContent side="right">Sign out</TooltipContent>
-        )}
-      </Tooltip>
-    </TooltipProvider>
-  </li>
-)
+              <span className={cn(isOpen === false ? "" : "mr-4")}>
+                <LogOut size={18} />
+              </span>
+              <p
+                className={cn(
+                  "whitespace-nowrap",
+                  isOpen === false ? "opacity-0 hidden" : "opacity-100"
+                )}
+              >
+                Sign out
+              </p>
+            </Button>
+          </TooltipTrigger>
+          {isOpen === false && (
+            <TooltipContent side="right">Sign out</TooltipContent>
+          )}
+        </Tooltip>
+      </TooltipProvider>
+    </li>
+  )
+}
 
 MenuGroup.propTypes = {
   groupLabel: PropTypes.string.isRequired,

@@ -4,90 +4,26 @@ import { Link } from "react-router"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
+import { toast } from "@/components/ui/use-toast"
+import { useAIAnalyticsPage } from "@/services/query/ai.query"
 
 /**
  * AI Analytics Page - Advanced machine learning analytics
  */
 const AIAnalyticsPage = () => {
-  const metrics = [
-    {
-      title: "Team Velocity",
-      value: "42 points/sprint",
-      trend: "+8%",
-      positive: true,
-      metric: "last sprint vs average",
-    },
-    {
-      title: "Code Quality Index",
-      value: "8.7/10",
-      trend: "+2.1%",
-      positive: true,
-      metric: "based on bug density",
-    },
-    {
-      title: "Delivery Reliability",
-      value: "94%",
-      trend: "+3%",
-      positive: true,
-      metric: "on-time delivery rate",
-    },
-    {
-      title: "Team Satisfaction",
-      value: "4.5/5",
-      trend: "-0.2%",
-      positive: false,
-      metric: "from weekly surveys",
-    },
-  ]
+  const { data, isLoading, isError } = useAIAnalyticsPage({})
+  const metrics = data?.metrics || []
+  const predictions = data?.predictions || []
+  const mlModels = data?.mlModels || []
+  const pipelineStatus = data?.pipelineStatus
 
-  const predictions = [
-    {
-      title: "Sprint 4 Velocity Prediction",
-      prediction: "45-48 points",
-      confidence: "91%",
-      details:
-        "Based on current burn-down rate and historical velocity patterns",
-    },
-    {
-      title: "Bug Count Forecast",
-      prediction: "12-15 bugs",
-      confidence: "87%",
-      details: "Next sprint estimated defects based on code complexity",
-    },
-    {
-      title: "Task Completion Rate",
-      prediction: "96%",
-      confidence: "89%",
-      details: "Predicted % of tasks completed by sprint end",
-    },
-  ]
-
-  const mlModels = [
-    {
-      name: "Velocity Predictor",
-      accuracy: "91%",
-      dataPoints: "48 sprints",
-      lastUpdate: "2 hours ago",
-    },
-    {
-      name: "Bug Detection ML",
-      accuracy: "87%",
-      dataPoints: "1,240 bugs",
-      lastUpdate: "1 hour ago",
-    },
-    {
-      name: "Task Complexity Analyzer",
-      accuracy: "89%",
-      dataPoints: "5,200 tasks",
-      lastUpdate: "30 mins ago",
-    },
-    {
-      name: "Team Performance Index",
-      accuracy: "85%",
-      dataPoints: "2,100 data points",
-      lastUpdate: "45 mins ago",
-    },
-  ]
+  const handleModelDetails = (name) => {
+    toast({
+      title: "Model details",
+      description: `Detailed diagnostics for \"${name}\" are not available yet.`,
+    })
+  }
 
   return (
     <div className="space-y-6 p-6">
@@ -105,132 +41,167 @@ const AIAnalyticsPage = () => {
         </p>
       </div>
 
+      {isLoading && (
+        <div className="grid gap-4 md:grid-cols-2">
+          <Skeleton className="h-40 w-full" />
+          <Skeleton className="h-40 w-full" />
+        </div>
+      )}
+
+      {isError && (
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="pt-6">
+            <p className="text-sm text-red-700">
+              Unable to load AI analytics right now. Please try again.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Key Metrics */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Performance Metrics</h2>
-        <div className="grid gap-4 md:grid-cols-4">
-          {metrics.map((metric) => (
-            <Card key={metric.title}>
-              <CardContent className="pt-6">
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">
-                    {metric.title}
-                  </p>
-                  <p className="text-2xl font-bold">{metric.value}</p>
-                  <div className="flex items-center justify-between pt-2 border-t">
-                    <p className="text-xs text-muted-foreground">
-                      {metric.metric}
+      {!isLoading && !isError && (
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Performance Metrics</h2>
+          <div className="grid gap-4 md:grid-cols-4">
+            {metrics.map((metric) => (
+              <Card key={metric.title}>
+                <CardContent className="pt-6">
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">
+                      {metric.title}
                     </p>
-                    <div className="flex items-center gap-1">
-                      {metric.positive ? (
-                        <TrendingUp className="h-4 w-4 text-green-600" />
-                      ) : (
-                        <TrendingDown className="h-4 w-4 text-red-600" />
-                      )}
-                      <span
-                        className={`text-sm font-semibold ${
-                          metric.positive ? "text-green-600" : "text-red-600"
-                        }`}
-                      >
-                        {metric.trend}
-                      </span>
+                    <p className="text-2xl font-bold">{metric.value}</p>
+                    <div className="flex items-center justify-between pt-2 border-t">
+                      <p className="text-xs text-muted-foreground">
+                        {metric.metric}
+                      </p>
+                      <div className="flex items-center gap-1">
+                        {metric.positive ? (
+                          <TrendingUp className="h-4 w-4 text-green-600" />
+                        ) : (
+                          <TrendingDown className="h-4 w-4 text-red-600" />
+                        )}
+                        <span
+                          className={`text-sm font-semibold ${
+                            metric.positive ? "text-green-600" : "text-red-600"
+                          }`}
+                        >
+                          {metric.trend}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Predictions */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">AI Predictions</h2>
-        <div className="grid gap-4 md:grid-cols-3">
-          {predictions.map((pred) => (
-            <Card key={pred.title} className="border-blue-200 bg-blue-50">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base">{pred.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">
-                    Prediction
+      {!isLoading && !isError && (
+        <div>
+          <h2 className="text-xl font-semibold mb-4">AI Predictions</h2>
+          <div className="grid gap-4 md:grid-cols-3">
+            {predictions.map((pred) => (
+              <Card key={pred.title} className="border-blue-200 bg-blue-50">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">{pred.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      Prediction
+                    </p>
+                    <p className="text-lg font-bold text-blue-600">
+                      {pred.prediction}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      Confidence Level
+                    </p>
+                    <Badge className="bg-blue-100 text-blue-800">
+                      {pred.confidence}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground italic">
+                    {pred.details}
                   </p>
-                  <p className="text-lg font-bold text-blue-600">
-                    {pred.prediction}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">
-                    Confidence Level
-                  </p>
-                  <Badge className="bg-blue-100 text-blue-800">
-                    {pred.confidence}
-                  </Badge>
-                </div>
-                <p className="text-xs text-muted-foreground italic">
-                  {pred.details}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ML Models Status */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Active ML Models</h2>
-        <div className="space-y-3">
-          {mlModels.map((model) => (
-            <Card key={model.name}>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <p className="font-semibold">{model.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Trained on {model.dataPoints} • Updated {model.lastUpdate}
-                    </p>
+      {!isLoading && !isError && (
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Active ML Models</h2>
+          <div className="space-y-3">
+            {mlModels.map((model) => (
+              <Card key={model.name}>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <p className="font-semibold">{model.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Trained on {model.dataPoints} • Updated{" "}
+                        {model.lastUpdate}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-semibold text-green-600">
+                        {model.accuracy} Accuracy
+                      </p>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="mt-2"
+                        onClick={() => handleModelDetails(model.name)}
+                      >
+                        Details
+                      </Button>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-semibold text-green-600">
-                      {model.accuracy} Accuracy
-                    </p>
-                    <Button size="sm" variant="outline" className="mt-2">
-                      Details
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Data Pipeline Status */}
-      <Card className="bg-gradient-to-r from-slate-900 to-slate-800 text-white border-0">
-        <CardHeader>
-          <CardTitle>Data Pipeline Status</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-4">
-          <div>
-            <p className="text-3xl font-bold">847</p>
-            <p className="text-sm text-gray-300 mt-1">Data Records/Hour</p>
-          </div>
-          <div>
-            <p className="text-3xl font-bold">99.2%</p>
-            <p className="text-sm text-gray-300 mt-1">Uptime</p>
-          </div>
-          <div>
-            <p className="text-3xl font-bold">87ms</p>
-            <p className="text-sm text-gray-300 mt-1">Avg Processing Time</p>
-          </div>
-          <div>
-            <p className="text-3xl font-bold">100%</p>
-            <p className="text-sm text-gray-300 mt-1">Data Quality</p>
-          </div>
-        </CardContent>
-      </Card>
+      {!isLoading && !isError && pipelineStatus && (
+        <Card className="bg-gradient-to-r from-slate-900 to-slate-800 text-white border-0">
+          <CardHeader>
+            <CardTitle>Data Pipeline Status</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-4 md:grid-cols-4">
+            <div>
+              <p className="text-3xl font-bold">
+                {pipelineStatus.recordsPerHour}
+              </p>
+              <p className="text-sm text-gray-300 mt-1">Data Records/Hour</p>
+            </div>
+            <div>
+              <p className="text-3xl font-bold">{pipelineStatus.uptime}</p>
+              <p className="text-sm text-gray-300 mt-1">Uptime</p>
+            </div>
+            <div>
+              <p className="text-3xl font-bold">
+                {pipelineStatus.avgProcessingTime}
+              </p>
+              <p className="text-sm text-gray-300 mt-1">Avg Processing Time</p>
+            </div>
+            <div>
+              <p className="text-3xl font-bold">{pipelineStatus.dataQuality}</p>
+              <p className="text-sm text-gray-300 mt-1">Data Quality</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }

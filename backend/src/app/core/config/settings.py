@@ -84,6 +84,14 @@ class Settings(BaseSettings):
     ###############################
     OPENAI_API_KEY: str
 
+    ###############################
+    # GEMINI
+    ###############################
+    GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-2.5-flash"
+    GEMINI_TEMPERATURE: float = 0.4
+    GEMINI_MAX_OUTPUT_TOKENS: int = 2048
+
     #################################
     ###### sentry Config ############
     #################################

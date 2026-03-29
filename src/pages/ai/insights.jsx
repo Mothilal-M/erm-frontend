@@ -9,54 +9,38 @@ import { Link } from "react-router"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
+import { toast } from "@/components/ui/use-toast"
+import { useAIInsightsPage } from "@/services/query/ai.query"
 
 /**
  * AI Insights Page - AI-powered insights and predictions
  */
 const AIInsightsPage = () => {
-  const insights = [
-    {
-      id: 1,
-      title: "Team Productivity Peak",
-      icon: TrendingUp,
-      description:
-        "Your team's productivity peaks on Tuesday and Wednesday mornings. Consider scheduling critical tasks during these times.",
-      confidence: "92%",
-      category: "Productivity",
-      actionable: true,
-    },
-    {
-      id: 2,
-      title: "Bottleneck Detected",
-      icon: AlertCircle,
-      description:
-        "Code review process is taking longer than usual. Average time increased by 35%. Consider pairing reviewers to speed up.",
-      confidence: "88%",
-      category: "Process",
-      actionable: true,
-    },
-    {
-      id: 3,
-      title: "Resource Allocation Opportunity",
-      icon: Zap,
-      description:
-        "Backend team is operating at 65% capacity. Frontend team at 95%. Recommend task rebalancing.",
-      confidence: "85%",
-      category: "Resources",
-      actionable: true,
-    },
-    {
-      id: 4,
-      title: "Quality Trend Analysis",
-      icon: BarChart3,
-      description:
-        "Code quality metrics improved by 22% over the last sprint. Bug detection rate up by 15%.",
-      confidence: "91%",
-      category: "Quality",
-      actionable: false,
-    },
-  ]
+  const { data, isLoading, isError } = useAIInsightsPage({})
+  const insights = data?.insights || []
+  const categoryIconMap = {
+    Productivity: TrendingUp,
+    Process: AlertCircle,
+    Resources: Zap,
+    Quality: BarChart3,
+  }
+
+  const handleInsightAction = (title) => {
+    toast({
+      title: "Insight action recorded",
+      description: `We'll use "${title}" to prioritize the next update.`,
+      variant: "success",
+    })
+  }
+
+  const handleLearnMore = (title) => {
+    toast({
+      title: "Insight details",
+      description: `Detailed recommendations for "${title}" will be available soon.`,
+    })
+  }
 
   const getCategoryColor = (category) => {
     switch (category) {
@@ -85,8 +69,8 @@ const AIInsightsPage = () => {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">AI Insights</h1>
         <p className="mt-2 text-muted-foreground">
-          Machine learning-powered insights about your team's performance and
-          workflows
+          Machine learning-powered insights about your team&apos;s performance
+          and workflows
         </p>
       </div>
 
@@ -95,7 +79,9 @@ const AIInsightsPage = () => {
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
-              <p className="text-3xl font-bold text-blue-600">4</p>
+              <p className="text-3xl font-bold text-blue-600">
+                {insights.length}
+              </p>
               <p className="text-sm text-muted-foreground mt-1">
                 Active Insights
               </p>
@@ -105,7 +91,16 @@ const AIInsightsPage = () => {
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
-              <p className="text-3xl font-bold text-green-600">89%</p>
+              <p className="text-3xl font-bold text-green-600">
+                {insights.length
+                  ? `${Math.round(
+                      insights.reduce((sum, item) => {
+                        const value = Number.parseInt(item.confidence, 10)
+                        return sum + (Number.isNaN(value) ? 0 : value)
+                      }, 0) / insights.length
+                    )}%`
+                  : "0%"}
+              </p>
               <p className="text-sm text-muted-foreground mt-1">
                 Avg Confidence
               </p>
@@ -115,7 +110,9 @@ const AIInsightsPage = () => {
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
-              <p className="text-3xl font-bold text-yellow-600">3</p>
+              <p className="text-3xl font-bold text-yellow-600">
+                {insights.filter((item) => item.actionable).length}
+              </p>
               <p className="text-sm text-muted-foreground mt-1">
                 Actionable Items
               </p>
@@ -137,56 +134,84 @@ const AIInsightsPage = () => {
       {/* Insights Cards */}
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">Your Insights</h2>
+        {isLoading && (
+          <div className="grid gap-4">
+            <Skeleton className="h-40 w-full" />
+            <Skeleton className="h-40 w-full" />
+          </div>
+        )}
+        {isError && (
+          <Card className="border-red-200 bg-red-50">
+            <CardContent className="pt-6">
+              <p className="text-sm text-red-700">
+                Unable to load AI insights right now. Please try again.
+              </p>
+            </CardContent>
+          </Card>
+        )}
         <div className="grid gap-4">
-          {insights.map((insight) => {
-            const IconComponent = insight.icon
-            return (
-              <Card
-                key={insight.id}
-                className="hover:shadow-lg transition-shadow overflow-hidden"
-              >
-                <CardContent className="pt-6">
-                  <div className="flex gap-4">
-                    <div className="flex-shrink-0">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100">
-                        <IconComponent className="h-6 w-6 text-slate-600" />
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <h3 className="font-semibold text-lg">
-                            {insight.title}
-                          </h3>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {insight.description}
-                          </p>
-                        </div>
-                        <div className="text-right flex-shrink-0">
-                          <Badge className={getCategoryColor(insight.category)}>
-                            {insight.category}
-                          </Badge>
-                          <p className="text-sm font-semibold text-gray-600 mt-2">
-                            {insight.confidence} confident
-                          </p>
+          {!isLoading &&
+            !isError &&
+            insights.map((insight) => {
+              const IconComponent =
+                categoryIconMap[insight.category] || BarChart3
+              return (
+                <Card
+                  key={insight.id}
+                  className="hover:shadow-lg transition-shadow overflow-hidden"
+                >
+                  <CardContent className="pt-6">
+                    <div className="flex gap-4">
+                      <div className="flex-shrink-0">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100">
+                          <IconComponent className="h-6 w-6 text-slate-600" />
                         </div>
                       </div>
-                      <div className="mt-4 flex items-center gap-2 pt-4 border-t">
-                        {insight.actionable && (
-                          <Button size="sm" variant="default">
-                            Take Action
+                      <div className="flex-1">
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <h3 className="font-semibold text-lg">
+                              {insight.title}
+                            </h3>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              {insight.description}
+                            </p>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <Badge
+                              className={getCategoryColor(insight.category)}
+                            >
+                              {insight.category}
+                            </Badge>
+                            <p className="text-sm font-semibold text-gray-600 mt-2">
+                              {insight.confidence} confident
+                            </p>
+                          </div>
+                        </div>
+                        <div className="mt-4 flex items-center gap-2 pt-4 border-t">
+                          {insight.actionable && (
+                            <Button
+                              size="sm"
+                              variant="default"
+                              onClick={() => handleInsightAction(insight.title)}
+                            >
+                              Take Action
+                            </Button>
+                          )}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleLearnMore(insight.title)}
+                          >
+                            Learn More
                           </Button>
-                        )}
-                        <Button size="sm" variant="outline">
-                          Learn More
-                        </Button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )
-          })}
+                  </CardContent>
+                </Card>
+              )
+            })}
         </div>
       </div>
     </div>

@@ -5,6 +5,7 @@
  */
 
 import { mockData } from "./project.data"
+import { postSprintAnalytics, postSprintInsights } from "./ai.api"
 
 export const getProjects = async () => {
   return {
@@ -78,10 +79,15 @@ export const addTaskComment = async (projectId, sprintId, taskId, data) => {
   return newComment
 }
 
-export const getAIInsights = async (projectId, sprintId) => {
-  const insights = mockData.aiInsights[sprintId] || null
-  if (!insights) throw new Error("AI insights not found")
-  return insights
+export const getAIInsights = async (projectId, sprintId, { signal } = {}) => {
+  const tasks = mockData.tasks[sprintId] || []
+  const payload = {
+    projectId,
+    sprintId,
+    tasks,
+  }
+  const response = await postSprintInsights(payload, { signal })
+  return response.data
 }
 
 export const getWorkflows = async (projectId) => {
@@ -103,8 +109,17 @@ export const updateWorkflow = async (projectId, workflowId, data) => {
   return updated
 }
 
-export const getSprintAnalytics = async (projectId, sprintId) => {
-  const analytics = mockData.analytics[sprintId] || null
-  if (!analytics) throw new Error("Analytics not found")
-  return analytics
+export const getSprintAnalytics = async (
+  projectId,
+  sprintId,
+  { signal } = {}
+) => {
+  const tasks = mockData.tasks[sprintId] || []
+  const payload = {
+    projectId,
+    sprintId,
+    tasks,
+  }
+  const response = await postSprintAnalytics(payload, { signal })
+  return response.data
 }

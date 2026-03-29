@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { useAIChat } from "@/services/query/ai.query"
 
 const AIAssistantSidebar = ({ isOpen, onClose, sprintId }) => {
   const [messages, setMessages] = useState([
@@ -27,6 +28,7 @@ const AIAssistantSidebar = ({ isOpen, onClose, sprintId }) => {
     },
   ])
   const [inputValue, setInputValue] = useState("")
+  const aiChatMutation = useAIChat()
 
   const handleSend = () => {
     if (!inputValue.trim()) return
@@ -41,18 +43,39 @@ const AIAssistantSidebar = ({ isOpen, onClose, sprintId }) => {
     setMessages((previous) => [...previous, newMessage])
     setInputValue("")
 
-    // Simulate AI response
-    setTimeout(() => {
-      setMessages((previous) => [
-        ...previous,
-        {
-          id: Date.now() + 1,
-          role: "assistant",
-          content: "I'm analyzing the sprint data to help you with that...",
-          type: "text",
+    aiChatMutation.mutate(
+      {
+        payload: {
+          message: newMessage.content,
+          sprintId,
         },
-      ])
-    }, 1000)
+      },
+      {
+        onSuccess: (response) => {
+          setMessages((previous) => [
+            ...previous,
+            {
+              id: Date.now() + 1,
+              role: "assistant",
+              content: response.reply,
+              type: "text",
+            },
+          ])
+        },
+        onError: () => {
+          setMessages((previous) => [
+            ...previous,
+            {
+              id: Date.now() + 1,
+              role: "assistant",
+              content:
+                "Unable to reach AI assistant right now. Please try again.",
+              type: "text",
+            },
+          ])
+        },
+      }
+    )
   }
 
   if (!isOpen) return null
@@ -171,7 +194,7 @@ const AIAssistantSidebar = ({ isOpen, onClose, sprintId }) => {
             type="submit"
             size="icon"
             className="h-9 w-9 shrink-0"
-            disabled={!inputValue.trim()}
+            disabled={!inputValue.trim() || aiChatMutation.isPending}
           >
             <Send className="h-4 w-4" />
           </Button>

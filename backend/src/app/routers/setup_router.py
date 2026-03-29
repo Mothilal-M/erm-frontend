@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from src.app.routers.ai import get_router as get_ai_router
 from src.app.routers.attendance import get_router as get_attendance_router
 from src.app.routers.auth import get_router as get_auth_router
 from src.app.routers.employee_management import get_router as get_employee_router
@@ -18,3 +19,4 @@ def init_routes(app: FastAPI):
     app.include_router(get_employee_router())
     app.include_router(get_attendance_router())
     app.include_router(get_leave_router())
+    app.include_router(get_ai_router())
