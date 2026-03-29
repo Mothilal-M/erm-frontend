@@ -276,7 +276,9 @@ class LeaveService:
             }
         )
 
-        await self._repo.add_balance_used(data.employee_id, leave_type.id, lr.date_from_year, data.days)
+        await self._repo.add_balance_used(
+            data.employee_id, leave_type.id, lr.date_from_year, data.days
+        )
 
         return ManualRecordResponse(id=lr.id, status="approved")
 
@@ -404,7 +406,9 @@ class LeaveService:
             }
         )
 
-        await self._repo.add_balance_pending(employee.id, leave_type.id, lr.date_from_year, data.days)
+        await self._repo.add_balance_pending(
+            employee.id, leave_type.id, lr.date_from_year, data.days
+        )
 
         return LeaveRequestResponse(id=lr.id, status="pending")
 

@@ -2,8 +2,7 @@ from types import SimpleNamespace
 
 from src.app.core.auth.authentication import get_firebase_user
 from src.app.db.tables.erm_tables import EmployeeTable
-from src.tests.integration_tests.test_main import client
-from src.tests.integration_tests.test_main import app
+from src.tests.integration_tests.test_main import app, client
 
 
 # ruff: noqa: PLR2004

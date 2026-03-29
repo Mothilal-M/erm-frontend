@@ -14,10 +14,13 @@ from src.app.routers.ai.schemas import (
     AIInsightsPageResponse,
     AIRecommendationsPageResponse,
     AIRequestContext,
-    PipelineStatus,
     SprintAnalyticsResponse,
     SprintInsightsResponse,
 )
+
+
+PERCENT_SCALE_THRESHOLD = 1
+PERCENT_SCALE_DIVISOR = 100
 
 
 @singleton
@@ -69,7 +72,7 @@ class GeminiAIService:
             SprintAnalyticsResponse: Normalized sprint analytics response payload.
         """
         task_count = len(payload.tasks)
-        default_response = {
+        default_response: dict[str, object] = {
             "sprintId": self._to_int(payload.sprint_id),
             "plannedVelocity": max(20, task_count * 5),
             "actualVelocity": max(10, task_count * 4),
@@ -108,12 +111,14 @@ class GeminiAIService:
         Returns:
             AIInsightsPageResponse: Normalized insights page response.
         """
-        default_response = {
+        default_response: dict[str, object] = {
             "insights": [
                 {
                     "id": 1,
                     "title": "Delivery Trend",
-                    "description": "Current sprint momentum is stable with moderate completion velocity.",
+                    "description": (
+                        "Current sprint momentum is stable with moderate " "completion velocity."
+                    ),
                     "confidence": "84%",
                     "category": "Productivity",
                     "actionable": True,
@@ -140,7 +145,7 @@ class GeminiAIService:
         Returns:
             AIRecommendationsPageResponse: Normalized recommendations payload.
         """
-        default_response = {
+        default_response: dict[str, object] = {
             "recommendations": [
                 {
                     "id": 1,
@@ -174,7 +179,7 @@ class GeminiAIService:
         Returns:
             AIAnalyticsResponse: Normalized analytics page response payload.
         """
-        default_response = {
+        default_response: dict[str, object] = {
             "metrics": [
                 {
                     "title": "Team Velocity",
@@ -334,41 +339,41 @@ class GeminiAIService:
         Returns:
             float: Parsed float value.
         """
-        if value is None:
-            return default
-        if isinstance(value, bool):
-            return 1.0 if value else 0.0
-        if isinstance(value, (int, float)):
-            return float(value)
-
-        text = str(value).strip()
-        if not text:
-            return default
-
-        low = text.lower()
+        result = default
+        low = ""
         label_map = {
             "critical": 0.95,
             "high": 0.9,
             "medium": 0.7,
             "low": 0.5,
         }
-        if low in label_map:
-            return label_map[low]
 
-        if text.endswith("%"):
-            try:
-                return float(text[:-1].strip()) / 100
-            except ValueError:
-                return default
-
-        match = re.search(r"-?\d+(?:\.\d+)?", text)
-        if not match:
-            return default
-
-        number = float(match.group(0))
-        if number > 1 and number <= 100:
-            return number / 100
-        return number
+        if value is None:
+            pass
+        elif isinstance(value, bool):
+            result = 1.0 if value else 0.0
+        elif isinstance(value, int | float):
+            result = float(value)
+        else:
+            text = str(value).strip()
+            if text:
+                low = text.lower()
+                if low in label_map:
+                    result = label_map[low]
+                elif text.endswith("%"):
+                    try:
+                        result = float(text[:-1].strip()) / PERCENT_SCALE_DIVISOR
+                    except ValueError:
+                        result = default
+                else:
+                    match = re.search(r"-?\d+(?:\.\d+)?", text)
+                    if match:
+                        number = float(match.group(0))
+                        if PERCENT_SCALE_THRESHOLD < number <= PERCENT_SCALE_DIVISOR:
+                            result = number / PERCENT_SCALE_DIVISOR
+                        else:
+                            result = number
+        return result
 
     @staticmethod
     def _to_bool(value, default: bool = False) -> bool:
@@ -386,7 +391,7 @@ class GeminiAIService:
         if value is None:
             return default
 
-        if isinstance(value, (int, float)):
+        if isinstance(value, int | float):
             return value != 0
 
         text = str(value).strip().lower()
@@ -492,7 +497,9 @@ class GeminiAIService:
                     "taskId": self._to_str(item.get("taskId"), f"task-{index + 1}"),
                     "suggestedHours": max(0, int(self._to_float(item.get("suggestedHours"), 0))),
                     "confidence": min(max(self._to_float(item.get("confidence"), 0.7), 0.0), 1.0),
-                    "reason": self._to_str(item.get("reason"), "AI estimate based on task context."),
+                    "reason": self._to_str(
+                        item.get("reason"), "AI estimate based on task context."
+                    ),
                 }
             )
         data["autoEstimates"] = auto_estimates
@@ -541,8 +548,12 @@ class GeminiAIService:
         source = self._as_dict(raw)
 
         data["sprintId"] = self._to_int(source.get("sprintId"))
-        data["plannedVelocity"] = max(0, int(self._to_float(source.get("plannedVelocity"), data["plannedVelocity"])))
-        data["actualVelocity"] = max(0, int(self._to_float(source.get("actualVelocity"), data["actualVelocity"])))
+        data["plannedVelocity"] = max(
+            0, int(self._to_float(source.get("plannedVelocity"), data["plannedVelocity"]))
+        )
+        data["actualVelocity"] = max(
+            0, int(self._to_float(source.get("actualVelocity"), data["actualVelocity"]))
+        )
         data["defectRate"] = max(0.0, self._to_float(source.get("defectRate"), data["defectRate"]))
 
         burndown = []
@@ -586,7 +597,10 @@ class GeminiAIService:
             "byAssignee": by_assignee,
         }
 
-        history = [max(0.0, self._to_float(item, 0.0)) for item in self._as_list(source.get("onTimeHistory"))]
+        history = [
+            max(0.0, self._to_float(item, 0.0))
+            for item in self._as_list(source.get("onTimeHistory"))
+        ]
         data["onTimeHistory"] = history if history else data["onTimeHistory"]
 
         return data
@@ -609,8 +623,10 @@ class GeminiAIService:
             if not isinstance(item, dict):
                 continue
             confidence_value = item.get("confidence")
-            if isinstance(confidence_value, (int, float)):
-                confidence = f"{min(max(self._to_float(confidence_value, 0.0), 0.0), 1.0) * 100:.0f}%"
+            if isinstance(confidence_value, int | float):
+                confidence = (
+                    f"{min(max(self._to_float(confidence_value, 0.0), 0.0), 1.0) * 100:.0f}%"
+                )
             else:
                 confidence = self._to_str(confidence_value, "80%")
 
@@ -618,7 +634,9 @@ class GeminiAIService:
                 {
                     "id": self._extract_int(item.get("id"), index + 1),
                     "title": self._to_str(item.get("title"), f"Insight {index + 1}"),
-                    "description": self._to_str(item.get("description"), "No description provided."),
+                    "description": self._to_str(
+                        item.get("description"), "No description provided."
+                    ),
                     "confidence": confidence,
                     "category": self._to_str(item.get("category"), "General"),
                     "actionable": self._to_bool(item.get("actionable"), True),
@@ -662,7 +680,7 @@ class GeminiAIService:
                 status = "pending"
 
             saving_raw = item.get("saving")
-            if isinstance(saving_raw, (int, float)):
+            if isinstance(saving_raw, int | float):
                 saving = f"{saving_raw:g}"
             else:
                 saving = self._to_str(saving_raw, "N/A")
@@ -671,7 +689,9 @@ class GeminiAIService:
                 {
                     "id": self._extract_int(item.get("id"), index + 1),
                     "title": self._to_str(item.get("title"), f"Recommendation {index + 1}"),
-                    "description": self._to_str(item.get("description"), "No description provided."),
+                    "description": self._to_str(
+                        item.get("description"), "No description provided."
+                    ),
                     "impact": impact.capitalize(),
                     "effort": effort.capitalize(),
                     "status": status,
@@ -741,13 +761,17 @@ class GeminiAIService:
 
         pipeline = self._as_dict(source.get("pipelineStatus"))
         data["pipelineStatus"] = {
-            "recordsPerHour": self._to_str(pipeline.get("recordsPerHour"), data["pipelineStatus"]["recordsPerHour"]),
+            "recordsPerHour": self._to_str(
+                pipeline.get("recordsPerHour"), data["pipelineStatus"]["recordsPerHour"]
+            ),
             "uptime": self._to_str(pipeline.get("uptime"), data["pipelineStatus"]["uptime"]),
             "avgProcessingTime": self._to_str(
                 pipeline.get("avgProcessingTime"),
                 data["pipelineStatus"]["avgProcessingTime"],
             ),
-            "dataQuality": self._to_str(pipeline.get("dataQuality"), data["pipelineStatus"]["dataQuality"]),
+            "dataQuality": self._to_str(
+                pipeline.get("dataQuality"), data["pipelineStatus"]["dataQuality"]
+            ),
         }
 
         return data

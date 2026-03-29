@@ -15,9 +15,7 @@ class AttendanceRepoAbstract(ABC):
     """Abstract base class defining the interface for attendance repository operations."""
 
     @abstractmethod
-    async def get_active_session(
-        self, employee_id: int, today: date
-    ) -> ActiveSessionRecord | None:
+    async def get_active_session(self, employee_id: int, today: date) -> ActiveSessionRecord | None:
         """Retrieves the currently active attendance session for an employee.
 
         Args:
@@ -30,9 +28,7 @@ class AttendanceRepoAbstract(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_today_entries(
-        self, employee_id: int, today: date
-    ) -> list[AttendanceEntrySchema]:
+    async def get_today_entries(self, employee_id: int, today: date) -> list[AttendanceEntrySchema]:
         """Retrieves all attendance entries for an employee on a given date.
 
         Args:
@@ -114,7 +110,12 @@ class AttendanceRepoAbstract(ABC):
 
     @abstractmethod
     async def get_history(
-        self, employee_id: int, year: int | None, month: int | None, page: int = 1, page_size: int = 20
+        self,
+        employee_id: int,
+        year: int | None,
+        month: int | None,
+        page: int = 1,
+        page_size: int = 20,
     ) -> tuple[list[AttendanceEntrySchema], int]:
         """Retrieves paginated attendance history for an employee.
 
@@ -132,7 +133,15 @@ class AttendanceRepoAbstract(ABC):
 
     @abstractmethod
     async def get_admin_logs(
-        self, page: int = 1, page_size: int = 20, **filters
+        self,
+        page: int = 1,
+        page_size: int = 20,
+        status: str | None = None,
+        date_filter: str | None = None,
+        date_from: str | None = None,
+        date_to: str | None = None,
+        employee_id: int | None = None,
+        department_id: int | None = None,
     ) -> tuple[list[AttendanceEntryWithEmployeeSchema], int]:
         """Retrieves paginated admin attendance logs with filters.
 

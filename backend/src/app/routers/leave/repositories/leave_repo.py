@@ -254,9 +254,7 @@ class LeaveRepo(LeaveRepoAbstract):
         await settings.save()
         return _to_settings_record(settings)
 
-    async def get_leave_balances(
-        self, employee_id: int, year: int
-    ) -> list[LeaveBalanceRecord]:
+    async def get_leave_balances(self, employee_id: int, year: int) -> list[LeaveBalanceRecord]:
         """Retrieves all leave balances for a specific employee and year.
 
         Args:
@@ -332,17 +330,10 @@ class LeaveRepo(LeaveRepoAbstract):
         """
         month_start = date(year, month, 1)
         month_end = date(year, month, calendar.monthrange(year, month)[1])
-        entries = await AttendanceLogTable.filter(
-            date__gte=month_start, date__lte=month_end
-        ).all()
-        return [
-            MonthAttendanceLogRecord(date=e.date, employee_id=e.employee_id)
-            for e in entries
-        ]
+        entries = await AttendanceLogTable.filter(date__gte=month_start, date__lte=month_end).all()
+        return [MonthAttendanceLogRecord(date=e.date, employee_id=e.employee_id) for e in entries]
 
-    async def get_leave_requests_for_month(
-        self, year: int, month: int
-    ) -> list[LeaveRequestRecord]:
+    async def get_leave_requests_for_month(self, year: int, month: int) -> list[LeaveRequestRecord]:
         """Retrieves approved/pending leave requests that overlap with a given month.
 
         Args:

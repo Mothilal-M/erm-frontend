@@ -136,9 +136,7 @@ class LeaveRepoAbstract(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_leave_requests_for_month(
-        self, year: int, month: int
-    ) -> list[LeaveRequestRecord]:
+    async def get_leave_requests_for_month(self, year: int, month: int) -> list[LeaveRequestRecord]:
         """Retrieves leave requests overlapping a given month.
 
         Returns:

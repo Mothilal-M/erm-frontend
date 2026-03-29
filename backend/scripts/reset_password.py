@@ -11,10 +11,17 @@ from firebase_admin import auth as firebase_auth
 
 from src.app.core.auth.firebase_setup import init_firebase
 
+
 init_firebase()
 
+DEFAULT_PASSWORD_ARG_INDEX = 2
+
 email = sys.argv[1] if len(sys.argv) > 1 else None
-password = sys.argv[2] if len(sys.argv) > 2 else "Change@Me1"
+password = (
+    sys.argv[DEFAULT_PASSWORD_ARG_INDEX]
+    if len(sys.argv) > DEFAULT_PASSWORD_ARG_INDEX
+    else "Change@Me1"
+)
 
 if not email:
     print("Usage: python -m scripts.reset_password <email> [password]")

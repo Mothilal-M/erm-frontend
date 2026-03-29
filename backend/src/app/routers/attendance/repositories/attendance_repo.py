@@ -86,9 +86,7 @@ def _to_entry_with_employee_schema(
 class AttendanceRepo(AttendanceRepoAbstract):
     """Repository class for attendance-related database operations."""
 
-    async def get_active_session(
-        self, employee_id: int, today: date
-    ) -> ActiveSessionRecord | None:
+    async def get_active_session(self, employee_id: int, today: date) -> ActiveSessionRecord | None:
         """Retrieves the currently active attendance session for an employee.
 
         Args:
@@ -108,9 +106,7 @@ class AttendanceRepo(AttendanceRepoAbstract):
             return None
         return ActiveSessionRecord(id=entry.id, clock_in=entry.clock_in)
 
-    async def get_today_entries(
-        self, employee_id: int, today: date
-    ) -> list[AttendanceEntrySchema]:
+    async def get_today_entries(self, employee_id: int, today: date) -> list[AttendanceEntrySchema]:
         """Retrieves all attendance entries for an employee on a given date.
 
         Args:

@@ -326,9 +326,7 @@ class AttendanceService:
         for record in live_records:
             live_ids.add(record.employee_id)
             clock_in_aware = (
-                record.clock_in
-                if record.clock_in.tzinfo
-                else record.clock_in.replace(tzinfo=UTC)
+                record.clock_in if record.clock_in.tzinfo else record.clock_in.replace(tzinfo=UTC)
             )
             elapsed = int((now - clock_in_aware).total_seconds())
             expires_in = max(0, MAX_SESSION_SECONDS - elapsed)
