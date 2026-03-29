@@ -1,5 +1,5 @@
 import PropTypes from "prop-types"
-import { Eye, EyeOff, Lock, Mail } from "lucide-react"
+import { Eye, EyeOff, Lock, Mail, User } from "lucide-react"
 import { useState } from "react"
 import { Link } from "react-router-dom"
 
@@ -35,8 +35,9 @@ const GoogleIcon = () => (
   </svg>
 )
 
-const LoginUI = ({ form, onSubmit, onGoogleLogin, loading }) => {
+const SignupUI = ({ form, onSubmit, onGoogleSignup, loading }) => {
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   return (
     <div className="flex min-h-screen">
@@ -103,9 +104,9 @@ const LoginUI = ({ form, onSubmit, onGoogleLogin, loading }) => {
         </div>
       </div>
 
-      {/* Right Panel - Login Form */}
+      {/* Right Panel - Signup Form */}
       <div className="flex w-full lg:w-1/2 items-center justify-center bg-background px-6 py-12">
-        <div className="w-full max-w-[420px] space-y-8">
+        <div className="w-full max-w-[420px] space-y-6">
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-3 mb-4">
             <div className="h-9 w-9 rounded-lg bg-primary flex items-center justify-center">
@@ -117,18 +118,18 @@ const LoginUI = ({ form, onSubmit, onGoogleLogin, loading }) => {
           {/* Header */}
           <div className="space-y-2">
             <h1 className="text-2xl font-bold tracking-tight text-foreground">
-              Welcome back
+              Create your account
             </h1>
             <p className="text-muted-foreground">
-              Enter your credentials to access your account
+              Fill in your details to get started
             </p>
           </div>
 
-          {/* Google Sign In */}
+          {/* Google Sign Up */}
           <Button
             variant="outline"
             className="w-full h-11 font-medium"
-            onClick={onGoogleLogin}
+            onClick={onGoogleSignup}
             disabled={loading}
             type="button"
           >
@@ -154,6 +155,29 @@ const LoginUI = ({ form, onSubmit, onGoogleLogin, loading }) => {
             >
               <FormField
                 control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">Full Name</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          placeholder="John Doe"
+                          type="text"
+                          autoComplete="name"
+                          disabled={loading}
+                          {...field}
+                          className="pl-10 h-11"
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
@@ -164,7 +188,7 @@ const LoginUI = ({ form, onSubmit, onGoogleLogin, loading }) => {
                         <Input
                           placeholder="name@company.com"
                           type="email"
-                          autoComplete="username"
+                          autoComplete="email"
                           disabled={loading}
                           {...field}
                           className="pl-10 h-11"
@@ -185,9 +209,9 @@ const LoginUI = ({ form, onSubmit, onGoogleLogin, loading }) => {
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
-                          placeholder="Enter your password"
+                          placeholder="Create a password"
                           type={showPassword ? "text" : "password"}
-                          autoComplete="current-password"
+                          autoComplete="new-password"
                           disabled={loading}
                           {...field}
                           className="pl-10 pr-10 h-11"
@@ -199,6 +223,41 @@ const LoginUI = ({ form, onSubmit, onGoogleLogin, loading }) => {
                           tabIndex={-1}
                         >
                           {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">Confirm Password</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          placeholder="Confirm your password"
+                          type={showConfirmPassword ? "text" : "password"}
+                          autoComplete="new-password"
+                          disabled={loading}
+                          {...field}
+                          className="pl-10 pr-10 h-11"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                          tabIndex={-1}
+                        >
+                          {showConfirmPassword ? (
                             <EyeOff className="h-4 w-4" />
                           ) : (
                             <Eye className="h-4 w-4" />
@@ -238,23 +297,23 @@ const LoginUI = ({ form, onSubmit, onGoogleLogin, loading }) => {
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                       />
                     </svg>
-                    Signing in...
+                    Creating account...
                   </span>
                 ) : (
-                  "Sign in"
+                  "Create account"
                 )}
               </Button>
             </form>
           </Form>
 
-          {/* Sign Up link */}
+          {/* Sign In link */}
           <p className="text-center text-sm text-muted-foreground">
-            Don&apos;t have an account?{" "}
+            Already have an account?{" "}
             <Link
-              to="/signup"
+              to="/login"
               className="text-primary font-medium hover:underline"
             >
-              Sign up
+              Sign in
             </Link>
           </p>
 
@@ -268,11 +327,11 @@ const LoginUI = ({ form, onSubmit, onGoogleLogin, loading }) => {
   )
 }
 
-LoginUI.propTypes = {
+SignupUI.propTypes = {
   form: PropTypes.object.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  onGoogleLogin: PropTypes.func.isRequired,
+  onGoogleSignup: PropTypes.func.isRequired,
   loading: PropTypes.bool.isRequired,
 }
 
-export default LoginUI
+export default SignupUI

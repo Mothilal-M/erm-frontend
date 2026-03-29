@@ -1,5 +1,6 @@
 import axios from "axios"
 
+import { toast } from "@/components/ui/use-toast"
 import { config } from "@/lib/config"
 import { getIdToken } from "@/lib/firebase"
 import { reportApiError } from "@/lib/utils/error-handler"
@@ -17,12 +18,12 @@ const instance = axios.create({
 // AbortController management for request cancellation
 const pendingRequests = new Map()
 
-// Common route paths used for redirects
 const PATHS = {
-  NOT_AUTHORIZED: "/misc/not-authorized/",
-  MAINTENANCE: "/misc/maintenance/",
   LOGIN: "/login",
 }
+
+// Auth pages handle their own error toasts — skip global toasts for them
+const AUTH_PATHS = new Set([PATHS.LOGIN, "/signup"])
 
 /**
  * Generate a unique key for each request
@@ -113,42 +114,85 @@ const reportToMonitoring = (error) => {
   })
 }
 
+// Common messages reused across error maps
+const MSG_NO_PERMISSION = "You don't have permission to perform this action."
+const MSG_NOT_FOUND = "The requested data could not be found."
+const MSG_INVALID_INPUT =
+  "The submitted data is invalid. Please check and try again."
+const MSG_SESSION_EXPIRED = "Your session has expired. Please sign in again."
+const MSG_SERVER_ERROR =
+  "Something went wrong on the server. Please try again later."
+
 /**
- * Handle HTTP status specific actions
- * @param {number} status - HTTP status code
- * @param {object} error - Axios error object
- * @returns {void}
+ * Map known backend error codes to user-friendly messages
+ */
+const ERROR_CODE_MESSAGES = {
+  PERMISSION_ERROR: MSG_NO_PERMISSION,
+  RESOURCE_NOT_FOUND: MSG_NOT_FOUND,
+  DUPLICATE_REQUEST: "This record already exists.",
+  VALIDATION_ERROR: MSG_INVALID_INPUT,
+  INTEGRITY_ERROR: "This operation conflicts with existing data.",
+  INVALID_TOKEN: MSG_SESSION_EXPIRED,
+  USER_ACCOUNT_DISABLE:
+    "Your account has been disabled. Please contact your administrator.",
+  EMPLOYEE_NOT_FOUND:
+    "No employee profile found for your account. Please contact your administrator.",
+  MULTIPLE_OBJECTS_RETURNED:
+    "An unexpected data conflict occurred. Please contact support.",
+  InvalidOperationError: "This operation is not allowed.",
+}
+
+/**
+ * Fallback messages by HTTP status code
+ */
+const STATUS_MESSAGES = {
+  400: "The request was invalid. Please check your input.",
+  401: MSG_SESSION_EXPIRED,
+  403: MSG_NO_PERMISSION,
+  404: MSG_NOT_FOUND,
+  422: MSG_INVALID_INPUT,
+  429: "Too many requests. Please wait a moment and try again.",
+  500: MSG_SERVER_ERROR,
+  502: "The server is temporarily unavailable. Please try again.",
+  503: "The service is under maintenance. Please try again later.",
+  504: "The server took too long to respond. Please try again.",
+}
+
+/**
+ * Handle HTTP errors — show toast messages instead of redirecting.
+ * Only redirect to /login on 401 (expired session).
  */
 const handleHttpStatus = (status, error) => {
-  const serverStatuses = new Set([500, 502, 503, 504])
+  const isAuthPage = AUTH_PATHS.has(window.location.pathname)
 
-  const handlers = {
-    400: (error_) => console.error("Bad request:", error_.response.data),
-    401: () => {
-      if (window.location.pathname !== PATHS.LOGIN) {
-        window.location.href = PATHS.LOGIN
-      }
-    },
-    403: () => {
-      if (window.location.pathname !== PATHS.NOT_AUTHORIZED) {
-        window.location.href = PATHS.NOT_AUTHORIZED
-      }
-    },
-    404: (error_) => console.error("Resource not found:", error_.config?.url),
-    429: () => console.error("Rate limit exceeded"),
-  }
+  // Auth pages handle their own error toasts
+  if (isAuthPage) return
 
-  if (serverStatuses.has(status)) {
-    console.error(`Server error (${status}):`, error.response.data)
+  // On 401, redirect to login (session expired)
+  if (status === 401) {
+    if (window.location.pathname !== PATHS.LOGIN) {
+      toast({
+        title: "Session expired",
+        description: "Please sign in again to continue.",
+        variant: "destructive",
+      })
+      window.location.href = PATHS.LOGIN
+    }
     return
   }
 
-  if (handlers[status]) {
-    handlers[status](error)
-    return
-  }
+  // For all other errors, show a toast with a friendly message
+  const errorCode = error.response?.data?.error?.code
+  const friendlyMessage =
+    ERROR_CODE_MESSAGES[errorCode] ||
+    STATUS_MESSAGES[status] ||
+    "Something went wrong. Please try again later."
 
-  console.error(`API error (${status}):`, error.response.data)
+  toast({
+    title: "Error",
+    description: friendlyMessage,
+    variant: "destructive",
+  })
 }
 
 instance.interceptors.response.use(
@@ -187,7 +231,6 @@ instance.interceptors.response.use(
 
     // Handle request cancellation (don't report to monitoring)
     if (axios.isCancel(error)) {
-      console.warn("Request cancelled:", originalRequest?.url)
       return Promise.reject(error)
     }
 
@@ -196,7 +239,15 @@ instance.interceptors.response.use(
 
     // Handle specific HTTP status codes
     if (!error.response) {
-      console.error("Network error:", error.message)
+      // Network error — no response from server
+      const isAuthPage = AUTH_PATHS.has(window.location.pathname)
+      if (!isAuthPage) {
+        toast({
+          title: "Connection error",
+          description: "Unable to reach the server. Please check your internet connection.",
+          variant: "destructive",
+        })
+      }
     } else {
       const { status } = error.response
       handleHttpStatus(status, error)

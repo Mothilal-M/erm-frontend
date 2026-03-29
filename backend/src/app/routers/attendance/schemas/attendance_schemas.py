@@ -1,4 +1,46 @@
+from datetime import datetime as dt
+
+from pydantic import BaseModel
+
 from src.app.utils.schemas.camel_schema import CamelModel
+
+
+# --- Repo-level intermediate models ---
+
+
+class ActiveSessionRecord(BaseModel):
+    """Repo-level model for an active attendance session."""
+
+    id: int
+    clock_in: dt
+
+
+class CreatedEntryRecord(BaseModel):
+    """Repo-level model for a newly created attendance entry."""
+
+    id: int
+    clock_in: dt
+    note: str | None = None
+
+
+class LiveClockInRecord(BaseModel):
+    """Repo-level model for a live clocked-in entry with employee info."""
+
+    employee_id: int
+    employee_name: str
+    department: str
+    clock_in: dt
+
+
+class SimpleEmployeeRecord(BaseModel):
+    """Repo-level model for a simplified employee record."""
+
+    id: int
+    name: str
+    department: str
+
+
+# --- Request Schemas ---
 
 
 class ClockInSchema(CamelModel):

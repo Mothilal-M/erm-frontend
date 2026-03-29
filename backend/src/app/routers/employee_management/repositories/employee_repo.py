@@ -3,8 +3,30 @@ from datetime import date
 from injectq import singleton
 
 from src.app.db.tables.erm_tables import DepartmentTable, EmployeeTable
+from src.app.routers.employee_management.schemas import EmployeeResponseSchema
 
 from .abstract_employee_repo import EmployeeRepoAbstract
+
+
+def _to_schema(emp: EmployeeTable) -> EmployeeResponseSchema:
+    """Converts an EmployeeTable record to an EmployeeResponseSchema.
+
+    Args:
+        emp (EmployeeTable): The employee database record with department prefetched.
+
+    Returns:
+        EmployeeResponseSchema: The serialized employee data.
+    """
+    return EmployeeResponseSchema(
+        id=emp.id,
+        name=emp.name,
+        email=emp.email,
+        phone=emp.phone,
+        department=emp.department.name if emp.department else "",
+        role=emp.role,
+        join_date=emp.join_date.isoformat() if emp.join_date else None,
+        status=emp.employee_status,
+    )
 
 
 @singleton
@@ -27,36 +49,33 @@ class EmployeeRepo(EmployeeRepoAbstract):
         dept, _ = await DepartmentTable.get_or_create(name=dept_name)
         return dept
 
-    async def list_employees(self) -> list[EmployeeTable]:
+    async def list_employees(self) -> list[EmployeeResponseSchema]:
         """Retrieves all active employees with their related department data.
 
         Returns:
-            list[EmployeeTable]: A list of active EmployeeTable instances
-                with prefetched department relations.
+            list[EmployeeResponseSchema]: A list of active employees serialized
+                as Pydantic models.
         """
-        return await EmployeeTable.filter(status=True).prefetch_related("department").all()
+        employees = await EmployeeTable.filter(status=True).prefetch_related("department").all()
+        return [_to_schema(e) for e in employees]
 
-    async def get_employee(self, employee_id: int) -> EmployeeTable:
+    async def get_employee(self, employee_id: int) -> EmployeeResponseSchema:
         """Retrieves a single active employee by their unique identifier.
 
         Args:
             employee_id (int): The unique identifier of the employee to retrieve.
 
         Returns:
-            EmployeeTable: The matching EmployeeTable instance with prefetched
-                department relation.
+            EmployeeResponseSchema: The employee data.
 
         Raises:
             DoesNotExist: If no active employee with the given ID is found.
         """
-        return await EmployeeTable.get(id=employee_id, status=True).prefetch_related("department")
+        emp = await EmployeeTable.get(id=employee_id, status=True).prefetch_related("department")
+        return _to_schema(emp)
 
-    async def create_employee(self, data: dict) -> EmployeeTable:
+    async def create_employee(self, data: dict) -> EmployeeResponseSchema:
         """Creates a new employee record in the database.
-
-        Extracts department name and join date from the data dictionary,
-        resolves the department, and creates the employee with the
-        remaining fields.
 
         Args:
             data (dict): A dictionary containing employee information. Expected keys:
@@ -68,8 +87,7 @@ class EmployeeRepo(EmployeeRepoAbstract):
                 - join_date (str, optional): ISO-format date string for the join date.
 
         Returns:
-            EmployeeTable: The newly created EmployeeTable instance with
-                prefetched department relation.
+            EmployeeResponseSchema: The newly created employee data.
         """
         dept_name = data.pop("department", None)
         dept = await self._resolve_department(dept_name) if dept_name else None
@@ -87,24 +105,17 @@ class EmployeeRepo(EmployeeRepoAbstract):
             employee_status="active",
         )
         await employee.fetch_related("department")
-        return employee
+        return _to_schema(employee)
 
-    async def update_employee(self, employee_id: int, data: dict) -> EmployeeTable:
+    async def update_employee(self, employee_id: int, data: dict) -> EmployeeResponseSchema:
         """Updates an existing active employee record with the provided data.
-
-        Handles department reassignment and join date parsing separately,
-        then applies any remaining fields dynamically via setattr.
 
         Args:
             employee_id (int): The unique identifier of the employee to update.
-            data (dict): A dictionary of fields to update. Supported keys include:
-                - department (str, optional): New department name to assign.
-                - join_date (str, optional): New ISO-format join date string.
-                - Any other valid EmployeeTable attribute.
+            data (dict): A dictionary of fields to update.
 
         Returns:
-            EmployeeTable: The updated EmployeeTable instance with
-                prefetched department relation.
+            EmployeeResponseSchema: The updated employee data.
 
         Raises:
             DoesNotExist: If no active employee with the given ID is found.
@@ -124,7 +135,7 @@ class EmployeeRepo(EmployeeRepoAbstract):
 
         await employee.save()
         await employee.fetch_related("department")
-        return employee
+        return _to_schema(employee)
 
     async def delete_employee(self, employee_id: int) -> None:
         """Soft-deletes an employee by setting their status to inactive.
@@ -139,10 +150,8 @@ class EmployeeRepo(EmployeeRepoAbstract):
         employee.status = False
         await employee.save()
 
-    async def create_invited_employee(self, data: dict) -> EmployeeTable:
+    async def create_invited_employee(self, data: dict) -> EmployeeResponseSchema:
         """Creates a new employee record with an 'invited' status.
-
-        The employee's name is derived from the email address prefix (before the @ symbol).
 
         Args:
             data (dict): A dictionary containing invitation information. Expected keys:
@@ -151,8 +160,7 @@ class EmployeeRepo(EmployeeRepoAbstract):
                 - role (str, optional): The employee's role. Defaults to "employee".
 
         Returns:
-            EmployeeTable: The newly created EmployeeTable instance with
-                employee_status set to "invited" and prefetched department relation.
+            EmployeeResponseSchema: The newly created invited employee data.
         """
         dept_name = data.get("department")
         dept = await self._resolve_department(dept_name) if dept_name else None
@@ -166,4 +174,4 @@ class EmployeeRepo(EmployeeRepoAbstract):
             employee_status="invited",
         )
         await employee.fetch_related("department")
-        return employee
+        return _to_schema(employee)

@@ -7,6 +7,7 @@ import { z } from "zod"
 
 import { toast } from "@/components/ui/use-toast"
 import { loginWithEmail, loginWithGoogle } from "@/lib/firebase"
+import { getErrorMessage } from "@/lib/utils/auth-errors"
 import ct from "@constants/"
 import api from "@/services/api"
 import { login } from "@store/slices/user.slice"
@@ -48,16 +49,25 @@ const Login = () => {
       )
       toast({
         title: "Welcome back!",
-        description: "Login successful",
+        description: "You have signed in successfully.",
         variant: "success",
       })
       navigate(ct.route.ROOT)
-    } catch {
-      toast({
-        title: "Login failed",
-        description: "Your account may not be registered in the system. Contact your admin.",
-        variant: "destructive",
-      })
+    } catch (error) {
+      if (error.response?.status === 404) {
+        toast({
+          title: "Account not found",
+          description: "No account found with this email. Redirecting to sign up...",
+        })
+        navigate("/signup")
+      } else {
+        const message = getErrorMessage(error, "Unable to sign in. Please try again.")
+        toast({
+          title: "Sign in failed",
+          description: message,
+          variant: "destructive",
+        })
+      }
     }
   }
 
@@ -71,15 +81,10 @@ const Login = () => {
       const result = await loginWithEmail(data.email, data.password)
       await handlePostLogin(result.user)
     } catch (error) {
-      const message =
-        error.code === "auth/invalid-credential"
-          ? "Invalid email or password"
-          : error.code === "auth/user-not-found"
-            ? "No account found with this email"
-            : error.code === "auth/too-many-requests"
-              ? "Too many attempts. Please try again later."
-              : "Login failed. Please try again."
-      toast({ title: "Login failed", description: message, variant: "destructive" })
+      const message = getErrorMessage(error, "Unable to sign in. Please check your credentials and try again.")
+      if (message) {
+        toast({ title: "Sign in failed", description: message, variant: "destructive" })
+      }
     } finally {
       setLoading(false)
     }
@@ -94,10 +99,11 @@ const Login = () => {
       const result = await loginWithGoogle()
       await handlePostLogin(result.user)
     } catch (error) {
-      if (error.code !== "auth/popup-closed-by-user") {
+      const message = getErrorMessage(error, "Google sign-in failed. Please try again.")
+      if (message) {
         toast({
           title: "Google sign-in failed",
-          description: "Something went wrong. Please try again.",
+          description: message,
           variant: "destructive",
         })
       }

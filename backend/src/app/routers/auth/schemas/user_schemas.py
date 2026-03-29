@@ -16,6 +16,16 @@ class UserSchema(BaseModel):
     type: int = Field(..., ge=0, description="Type of the user (e.g., admin = 0, regular user = 1)")
 
 
+class EmployeeRecord(BaseModel):
+    """Pydantic model returned by the auth repository for employee data."""
+
+    id: int
+    name: str
+    email: str
+    role: str
+    employee_status: str
+
+
 class RegisterSchema(BaseModel):
     """Schema for self-registration request body."""
 

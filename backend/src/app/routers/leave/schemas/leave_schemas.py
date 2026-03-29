@@ -1,6 +1,108 @@
-from pydantic import Field
+from datetime import date as date_type
+
+from pydantic import BaseModel, Field
 
 from src.app.utils.schemas.camel_schema import CamelModel
+
+
+# --- Repo-level intermediate models ---
+
+
+class LeaveTypeRecord(BaseModel):
+    """Repo-level model for a leave type."""
+
+    id: int
+    name: str
+
+
+class LeaveRequestRecord(BaseModel):
+    """Repo-level model for a leave request with related data flattened."""
+
+    id: int
+    employee_id: int
+    employee_name: str
+    employee_avatar: str
+    employee_department: str
+    leave_type_name: str
+    leave_type_id: int
+    sub_type: str
+    date_from: date_type
+    date_to: date_type
+    days: float
+    leave_status: str
+    reason: str | None = None
+    applied_on: date_type | None = None
+
+
+class CreatedLeaveRequestRecord(BaseModel):
+    """Repo-level model for a newly created leave request."""
+
+    id: int
+    date_from_year: int
+
+
+class LeaveSettingsRecord(BaseModel):
+    """Repo-level model for leave settings."""
+
+    annual_leave_quota: int
+    sick_leave_quota: int
+    casual_leave_quota: int
+    carry_forward_limit: int
+    carry_forward_enabled: bool
+    half_day_enabled: bool
+    wfh_enabled: bool
+    auto_approve_after_days: int | None = None
+    blackout_dates: list[str]
+    leave_year_start: str
+
+
+class LeaveBalanceRecord(BaseModel):
+    """Repo-level model for a leave balance."""
+
+    leave_type_name: str
+    allocated: float
+    used: float
+    pending: float
+
+
+class LeaveEmployeeRecord(BaseModel):
+    """Repo-level model for employee data used in leave operations."""
+
+    id: int
+    name: str
+    department: str
+    avatar: str
+    role: str
+    join_date: str | None = None
+    employee_status: str
+
+
+class MonthAttendanceLogRecord(BaseModel):
+    """Repo-level model for a monthly attendance log entry."""
+
+    date: date_type
+    employee_id: int
+
+
+class DayAttendanceRecord(BaseModel):
+    """Repo-level model for a day's attendance entry with employee info."""
+
+    employee_id: int
+    employee_name: str
+    employee_department: str
+    clock_in: str | None = None
+
+
+class DayLeaveRecord(BaseModel):
+    """Repo-level model for a day's leave request with employee info."""
+
+    employee_id: int
+    employee_name: str
+    employee_department: str
+    leave_type_name: str
+
+
+# --- Request Schemas ---
 
 
 class LeaveRequestSchema(CamelModel):
