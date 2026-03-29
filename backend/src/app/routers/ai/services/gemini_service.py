@@ -23,9 +23,22 @@ from src.app.routers.ai.schemas import (
 @singleton
 class GeminiAIService:
     def __init__(self):
+        """Initialize the Gemini AI service with application settings.
+
+        The service reads model/config values from central settings and uses
+        them for all downstream AI generation requests.
+        """
         self._settings = get_settings()
 
     async def get_sprint_insights(self, payload: AIRequestContext) -> SprintInsightsResponse:
+        """Generate sprint insights from task context using Gemini.
+
+        Args:
+            payload (AIRequestContext): Project/sprint metadata and task context.
+
+        Returns:
+            SprintInsightsResponse: Normalized sprint insight response payload.
+        """
         default_response = {
             "sprintId": self._to_int(payload.sprint_id),
             "autoEstimates": [],
@@ -47,6 +60,14 @@ class GeminiAIService:
         return SprintInsightsResponse.model_validate(result)
 
     async def get_sprint_analytics(self, payload: AIRequestContext) -> SprintAnalyticsResponse:
+        """Generate sprint analytics metrics from sprint context.
+
+        Args:
+            payload (AIRequestContext): Project/sprint metadata and task context.
+
+        Returns:
+            SprintAnalyticsResponse: Normalized sprint analytics response payload.
+        """
         task_count = len(payload.tasks)
         default_response = {
             "sprintId": self._to_int(payload.sprint_id),
@@ -79,6 +100,14 @@ class GeminiAIService:
         return SprintAnalyticsResponse.model_validate(result)
 
     async def get_insights_page(self, payload: AIRequestContext) -> AIInsightsPageResponse:
+        """Generate portfolio-level insight cards for the AI insights page.
+
+        Args:
+            payload (AIRequestContext): Project/sprint metadata and task context.
+
+        Returns:
+            AIInsightsPageResponse: Normalized insights page response.
+        """
         default_response = {
             "insights": [
                 {
@@ -103,6 +132,14 @@ class GeminiAIService:
     async def get_recommendations_page(
         self, payload: AIRequestContext
     ) -> AIRecommendationsPageResponse:
+        """Generate recommendation cards for AI recommendations page.
+
+        Args:
+            payload (AIRequestContext): Project/sprint metadata and task context.
+
+        Returns:
+            AIRecommendationsPageResponse: Normalized recommendations payload.
+        """
         default_response = {
             "recommendations": [
                 {
@@ -129,6 +166,14 @@ class GeminiAIService:
         return AIRecommendationsPageResponse.model_validate(result)
 
     async def get_analytics_page(self, payload: AIRequestContext) -> AIAnalyticsResponse:
+        """Generate AI analytics page sections and pipeline metrics.
+
+        Args:
+            payload (AIRequestContext): Project/sprint metadata and task context.
+
+        Returns:
+            AIAnalyticsResponse: Normalized analytics page response payload.
+        """
         default_response = {
             "metrics": [
                 {
@@ -174,6 +219,14 @@ class GeminiAIService:
         return AIAnalyticsResponse.model_validate(result)
 
     async def chat(self, payload: AIChatRequest) -> AIChatResponse:
+        """Generate a conversational AI reply for sprint assistant chat.
+
+        Args:
+            payload (AIChatRequest): User message and optional sprint context.
+
+        Returns:
+            AIChatResponse: Chat response with assistant reply text.
+        """
         fallback = {
             "reply": (
                 "I could not reach Gemini right now. Please try again in a moment, "
@@ -192,6 +245,15 @@ class GeminiAIService:
         return AIChatResponse.model_validate({"reply": reply or fallback["reply"]})
 
     async def _generate_json(self, prompt: str, fallback: dict) -> dict:
+        """Call Gemini generateContent API and parse a JSON object response.
+
+        Args:
+            prompt (str): Prompt text instructing response structure.
+            fallback (dict): Fallback payload when API/parsing fails.
+
+        Returns:
+            dict: Parsed JSON response or fallback payload.
+        """
         api_key = self._settings.GEMINI_API_KEY
         model = self._settings.GEMINI_MODEL
 
@@ -229,6 +291,14 @@ class GeminiAIService:
 
     @staticmethod
     def _extract_json_text(text: str) -> str:
+        """Extract raw JSON text from plain or fenced markdown content.
+
+        Args:
+            text (str): Candidate text returned by model.
+
+        Returns:
+            str: Clean JSON string content.
+        """
         candidate = text.strip()
         if candidate.startswith("```"):
             candidate = re.sub(r"^```(?:json)?", "", candidate)
@@ -238,6 +308,14 @@ class GeminiAIService:
 
     @staticmethod
     def _to_int(value: int | str | None) -> int | None:
+        """Safely coerce a value to integer.
+
+        Args:
+            value (int | str | None): Value to convert.
+
+        Returns:
+            int | None: Converted integer or None when conversion fails.
+        """
         if value is None:
             return None
         try:
@@ -247,6 +325,15 @@ class GeminiAIService:
 
     @staticmethod
     def _to_float(value, default: float = 0.0) -> float:
+        """Safely coerce free-form model output into a float.
+
+        Args:
+            value: Incoming value from model response.
+            default (float): Default number when conversion fails.
+
+        Returns:
+            float: Parsed float value.
+        """
         if value is None:
             return default
         if isinstance(value, bool):
@@ -285,6 +372,15 @@ class GeminiAIService:
 
     @staticmethod
     def _to_bool(value, default: bool = False) -> bool:
+        """Safely coerce free-form model output into a boolean.
+
+        Args:
+            value: Incoming value from model response.
+            default (bool): Default boolean when conversion fails.
+
+        Returns:
+            bool: Parsed boolean value.
+        """
         if isinstance(value, bool):
             return value
         if value is None:
@@ -302,6 +398,15 @@ class GeminiAIService:
 
     @staticmethod
     def _to_str(value, default: str = "") -> str:
+        """Safely coerce a value to non-empty string.
+
+        Args:
+            value: Incoming value from model response.
+            default (str): Default string when value is empty/None.
+
+        Returns:
+            str: Sanitized string value.
+        """
         if value is None:
             return default
         text = str(value).strip()
@@ -309,6 +414,15 @@ class GeminiAIService:
 
     @staticmethod
     def _extract_int(value, default: int) -> int:
+        """Extract integer from scalar or tokenized string identifiers.
+
+        Args:
+            value: Incoming value, such as "REC-001".
+            default (int): Default integer when extraction fails.
+
+        Returns:
+            int: Parsed integer token or default.
+        """
         if isinstance(value, int):
             return value
         if isinstance(value, float):
@@ -321,10 +435,26 @@ class GeminiAIService:
 
     @staticmethod
     def _as_list(value):
+        """Return value when it is a list, otherwise empty list.
+
+        Args:
+            value: Candidate object.
+
+        Returns:
+            list: Original list or empty list fallback.
+        """
         return value if isinstance(value, list) else []
 
     @staticmethod
     def _as_dict(value):
+        """Return value when it is a dict, otherwise empty dict.
+
+        Args:
+            value: Candidate object.
+
+        Returns:
+            dict: Original dict or empty dict fallback.
+        """
         return value if isinstance(value, dict) else {}
 
     def _normalize_sprint_insights(
@@ -333,6 +463,16 @@ class GeminiAIService:
         payload: AIRequestContext,
         fallback: dict,
     ) -> dict:
+        """Normalize sprint insights payload into schema-safe response shape.
+
+        Args:
+            raw (dict): Raw model response payload.
+            payload (AIRequestContext): Request context used for fallback values.
+            fallback (dict): Default payload template.
+
+        Returns:
+            dict: Normalized sprint insights payload.
+        """
         data = deepcopy(fallback)
         source = self._as_dict(raw)
 
@@ -388,6 +528,15 @@ class GeminiAIService:
         return data
 
     def _normalize_sprint_analytics(self, raw: dict, fallback: dict) -> dict:
+        """Normalize sprint analytics payload into schema-safe response shape.
+
+        Args:
+            raw (dict): Raw model response payload.
+            fallback (dict): Default payload template.
+
+        Returns:
+            dict: Normalized sprint analytics payload.
+        """
         data = deepcopy(fallback)
         source = self._as_dict(raw)
 
@@ -443,6 +592,15 @@ class GeminiAIService:
         return data
 
     def _normalize_insights_page(self, raw: dict, fallback: dict) -> dict:
+        """Normalize AI insights page payload into schema-safe response shape.
+
+        Args:
+            raw (dict): Raw model response payload.
+            fallback (dict): Default payload template.
+
+        Returns:
+            dict: Normalized insights page payload.
+        """
         data = deepcopy(fallback)
         source = self._as_dict(raw)
 
@@ -471,6 +629,15 @@ class GeminiAIService:
         return data
 
     def _normalize_recommendations_page(self, raw: dict, fallback: dict) -> dict:
+        """Normalize recommendations payload into schema-safe response shape.
+
+        Args:
+            raw (dict): Raw model response payload.
+            fallback (dict): Default payload template.
+
+        Returns:
+            dict: Normalized recommendations payload.
+        """
         data = deepcopy(fallback)
         source = self._as_dict(raw)
 
@@ -517,6 +684,15 @@ class GeminiAIService:
         return data
 
     def _normalize_analytics_page(self, raw: dict, fallback: dict) -> dict:
+        """Normalize analytics page payload into schema-safe response shape.
+
+        Args:
+            raw (dict): Raw model response payload.
+            fallback (dict): Default payload template.
+
+        Returns:
+            dict: Normalized analytics page payload.
+        """
         data = deepcopy(fallback)
         source = self._as_dict(raw)
 
