@@ -6,11 +6,11 @@ import {
   Trash2,
   Users,
 } from "lucide-react"
+import { motion } from "framer-motion"
 import PropTypes from "prop-types"
 
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { CardContent } from "@/components/ui/card"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,6 +36,16 @@ import {
 } from "@/components/ui/sheet"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
+import {
+  AnimatedCard,
+  BlurText,
+  FadeIn,
+  NumberTicker,
+  PulseBadge,
+  ShimmerButton,
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/magicui"
 
 // ─── Color map ───────────────────────────────────────────────────────────────
 
@@ -64,94 +74,107 @@ const COLOR_DOT = {
   slate: "bg-slate-400",
 }
 
+const PULSE_COLOR_MAP = {
+  blue: "blue",
+  purple: "purple",
+  green: "emerald",
+  yellow: "amber",
+  orange: "amber",
+  red: "red",
+  slate: "blue",
+}
+
 const COLORS = Object.keys(COLOR_MAP)
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 
 const DeptCardSkeleton = () => (
-  <Card className="animate-pulse">
-    <CardContent className="pt-6 space-y-3">
-      <div className="flex items-center gap-3">
-        <Skeleton className="h-10 w-10 rounded-lg" />
-        <div className="space-y-1.5 flex-1">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-3 w-24" />
-        </div>
+  <div className="animate-pulse rounded-2xl border bg-card p-6 space-y-3">
+    <div className="flex items-center gap-3">
+      <Skeleton className="h-10 w-10 rounded-lg" />
+      <div className="space-y-1.5 flex-1">
+        <Skeleton className="h-4 w-32" />
+        <Skeleton className="h-3 w-24" />
       </div>
-      <Skeleton className="h-3 w-full" />
-      <Skeleton className="h-3 w-3/4" />
-    </CardContent>
-  </Card>
+    </div>
+    <Skeleton className="h-3 w-full" />
+    <Skeleton className="h-3 w-3/4" />
+  </div>
 )
 
 // ─── Department card ──────────────────────────────────────────────────────────
 
 const DeptCard = ({ dept, onEdit, onDelete }) => {
   const colorCls = COLOR_MAP[dept.color] ?? COLOR_MAP.slate
-  const dotCls = COLOR_DOT[dept.color] ?? COLOR_DOT.slate
+  const pulseColor = PULSE_COLOR_MAP[dept.color] ?? "blue"
 
   return (
-    <Card className="group hover:shadow-md transition-shadow">
-      <CardContent className="pt-5 pb-4 space-y-3">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-3 min-w-0">
-            <div
-              className={`flex items-center justify-center h-10 w-10 rounded-lg border shrink-0 ${colorCls}`}
-            >
-              <Building2 className="h-5 w-5" />
+    <motion.div
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.2 }}
+      className="group"
+    >
+      <AnimatedCard delay={0} className="border-0 shadow-sm">
+        <CardContent className="pt-5 pb-4 space-y-3">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-center gap-3 min-w-0">
+              <div
+                className={`flex items-center justify-center h-10 w-10 rounded-lg border shrink-0 ${colorCls}`}
+              >
+                <Building2 className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <p className="font-semibold text-sm truncate">{dept.name}</p>
+                {dept.head && (
+                  <p className="text-xs text-muted-foreground truncate">
+                    Lead: {dept.head}
+                  </p>
+                )}
+              </div>
             </div>
-            <div className="min-w-0">
-              <p className="font-semibold text-sm truncate">{dept.name}</p>
-              {dept.head && (
-                <p className="text-xs text-muted-foreground truncate">
-                  Lead: {dept.head}
-                </p>
-              )}
-            </div>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => onEdit(dept)}>
+                  <Edit className="mr-2 h-4 w-4" />
+                  Edit
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive"
+                  onClick={() => onDelete(dept.id)}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onEdit(dept)}>
-                <Edit className="mr-2 h-4 w-4" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="text-destructive focus:text-destructive"
-                onClick={() => onDelete(dept.id)}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+          {dept.description && (
+            <p className="text-xs text-muted-foreground line-clamp-2">
+              {dept.description}
+            </p>
+          )}
 
-        {dept.description && (
-          <p className="text-xs text-muted-foreground line-clamp-2">
-            {dept.description}
-          </p>
-        )}
-
-        <div className="flex items-center gap-2 pt-1">
-          <div className={`h-2 w-2 rounded-full ${dotCls}`} />
-          <Badge variant="secondary" className="text-xs gap-1">
-            <Users className="h-3 w-3" />
-            {dept.employeeCount} employees
-          </Badge>
-        </div>
-      </CardContent>
-    </Card>
+          <div className="flex items-center gap-2 pt-1">
+            <PulseBadge color={pulseColor} className="text-xs gap-1">
+              <Users className="h-3 w-3" />
+              {dept.employeeCount} employees
+            </PulseBadge>
+          </div>
+        </CardContent>
+      </AnimatedCard>
+    </motion.div>
   )
 }
 
@@ -200,7 +223,11 @@ const DeptSheet = ({
               <FormItem>
                 <FormLabel>Department Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="e.g. Engineering" {...field} />
+                  <Input
+                    placeholder="e.g. Engineering"
+                    className="rounded-xl"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -220,8 +247,8 @@ const DeptSheet = ({
                 </FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder="Brief description of what this department does…"
-                    className="resize-none"
+                    placeholder="Brief description of what this department does..."
+                    className="resize-none rounded-xl"
                     rows={3}
                     {...field}
                   />
@@ -243,7 +270,11 @@ const DeptSheet = ({
                   </span>
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="e.g. Sarah Mitchell" {...field} />
+                  <Input
+                    placeholder="e.g. Sarah Mitchell"
+                    className="rounded-xl"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -288,13 +319,17 @@ const DeptSheet = ({
             >
               Cancel
             </Button>
-            <Button type="submit" className="flex-1" disabled={isSubmitting}>
+            <ShimmerButton
+              type="submit"
+              className="flex-1 disabled:opacity-50 disabled:pointer-events-none"
+              disabled={isSubmitting}
+            >
               {isSubmitting
-                ? "Saving…"
+                ? "Saving..."
                 : editingDept
                   ? "Save Changes"
                   : "Create"}
-            </Button>
+            </ShimmerButton>
           </div>
         </form>
       </Form>
@@ -319,32 +354,44 @@ DeptSheet.propTypes = {
  */
 const DeptStatsCards = ({ isLoading, stats }) => (
   <div className="grid grid-cols-2 gap-4">
-    <Card>
+    <AnimatedCard delay={0.1} className="border-0 shadow-sm">
       <CardContent className="flex items-center gap-3 pt-5 pb-4">
-        <Building2 className="h-8 w-8 text-primary/60" />
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/5">
+          <Building2 className="h-6 w-6 text-primary" />
+        </div>
         <div>
           {isLoading ? (
             <Skeleton className="h-7 w-8 mb-1" />
           ) : (
-            <p className="text-2xl font-bold">{stats?.total ?? 0}</p>
+            <NumberTicker
+              value={stats?.total ?? 0}
+              className="text-2xl font-bold"
+              delay={0.2}
+            />
           )}
           <p className="text-xs text-muted-foreground">Departments</p>
         </div>
       </CardContent>
-    </Card>
-    <Card>
+    </AnimatedCard>
+    <AnimatedCard delay={0.2} className="border-0 shadow-sm">
       <CardContent className="flex items-center gap-3 pt-5 pb-4">
-        <Users className="h-8 w-8 text-primary/60" />
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-500/5">
+          <Users className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+        </div>
         <div>
           {isLoading ? (
             <Skeleton className="h-7 w-12 mb-1" />
           ) : (
-            <p className="text-2xl font-bold">{stats?.totalEmployees ?? 0}</p>
+            <NumberTicker
+              value={stats?.totalEmployees ?? 0}
+              className="text-2xl font-bold"
+              delay={0.3}
+            />
           )}
           <p className="text-xs text-muted-foreground">Total Employees</p>
         </div>
       </CardContent>
-    </Card>
+    </AnimatedCard>
   </div>
 )
 
@@ -371,9 +418,11 @@ const DeptGridSection = ({
 }) => {
   if (isError) {
     return (
-      <p className="text-sm text-center text-destructive py-10">
-        Failed to load departments. Please try again.
-      </p>
+      <FadeIn delay={0.1}>
+        <p className="text-sm text-center text-destructive py-10">
+          Failed to load departments. Please try again.
+        </p>
+      </FadeIn>
     )
   }
 
@@ -389,21 +438,22 @@ const DeptGridSection = ({
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <StaggerContainer className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {departments?.map((dept) => (
-        <DeptCard
-          key={dept.id}
-          dept={dept}
-          onEdit={onEdit}
-          onDelete={onDelete}
-        />
+        <StaggerItem key={dept.id}>
+          <DeptCard
+            dept={dept}
+            onEdit={onEdit}
+            onDelete={onDelete}
+          />
+        </StaggerItem>
       ))}
       {!departments?.length && (
         <div className="col-span-full py-16 text-center text-muted-foreground text-sm">
           No departments yet. Click &quot;New Department&quot; to get started.
         </div>
       )}
-    </div>
+    </StaggerContainer>
   )
 }
 
@@ -434,30 +484,50 @@ const DepartmentListUI = ({
 }) => (
   <div className="space-y-6 p-6">
     {/* Header */}
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Departments</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Manage your organisation&apos;s departments
-        </p>
+    <FadeIn delay={0} direction="up">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3">
+          <motion.div
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+            className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/25"
+          >
+            <Building2 className="h-5 w-5" />
+          </motion.div>
+          <div>
+            <BlurText
+              text="Departments"
+              className="text-2xl font-bold tracking-tight"
+              delay={0.1}
+            />
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Manage your organisation&apos;s departments
+            </p>
+          </div>
+        </div>
+        <ShimmerButton onClick={onNew}>
+          <Plus className="mr-1.5 h-4 w-4" />
+          New Department
+        </ShimmerButton>
       </div>
-      <Button size="sm" onClick={onNew}>
-        <Plus className="mr-1.5 h-4 w-4" />
-        New Department
-      </Button>
-    </div>
+    </FadeIn>
 
     {/* Stats */}
-    <DeptStatsCards isLoading={isLoading} stats={stats} />
+    <FadeIn delay={0.1} direction="up">
+      <DeptStatsCards isLoading={isLoading} stats={stats} />
+    </FadeIn>
 
     {/* Grid */}
-    <DeptGridSection
-      isLoading={isLoading}
-      isError={isError}
-      departments={departments}
-      onEdit={onEdit}
-      onDelete={onDelete}
-    />
+    <FadeIn delay={0.2} direction="up">
+      <DeptGridSection
+        isLoading={isLoading}
+        isError={isError}
+        departments={departments}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
+    </FadeIn>
 
     {/* Add / Edit Sheet */}
     <DeptSheet

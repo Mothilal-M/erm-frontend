@@ -1,7 +1,25 @@
+import { motion } from "framer-motion"
+import {
+  AlertTriangle,
+  BarChart3,
+  CheckCircle2,
+  Flag,
+  Users,
+} from "lucide-react"
 import PropTypes from "prop-types"
 
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  AnimatedCard,
+  BlurText,
+  FadeIn,
+  NumberTicker,
+  PulseBadge,
+} from "@/components/magicui"
+import {
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/magicui/stagger-container"
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /**
@@ -10,7 +28,7 @@ import { Skeleton } from "@/components/ui/skeleton"
  * @returns {string} Formatted duration string.
  */
 const formatDuration = (minutes) => {
-  if (minutes == null) return "—"
+  if (minutes == null) return "\u2014"
   const h = Math.floor(minutes / 60)
   const m = minutes % 60
   return h > 0 ? `${h}h ${m}m` : `${m}m`
@@ -24,6 +42,22 @@ const colorMap = {
   default: "text-foreground",
 }
 
+const iconMap = {
+  green: CheckCircle2,
+  amber: AlertTriangle,
+  red: Users,
+  blue: Flag,
+  default: BarChart3,
+}
+
+const gradientMap = {
+  green: "from-green-500 to-emerald-600",
+  amber: "from-amber-500 to-orange-600",
+  red: "from-red-500 to-rose-600",
+  blue: "from-blue-500 to-indigo-600",
+  default: "from-gray-500 to-gray-600",
+}
+
 /**
  * Stat card widget.
  * @param {object} props - Component props.
@@ -31,20 +65,43 @@ const colorMap = {
  * @param {string|number} props.value - Displayed value.
  * @param {string} props.variant - Color variant key.
  */
-const StatCard = ({ title, value, variant }) => (
-  <Card>
-    <CardHeader className="pb-2">
-      <CardTitle className="text-sm font-medium text-muted-foreground">
-        {title}
-      </CardTitle>
-    </CardHeader>
-    <CardContent>
-      <span className={`text-3xl font-bold ${colorMap[variant ?? "default"]}`}>
-        {value}
-      </span>
-    </CardContent>
-  </Card>
-)
+const StatCard = ({ title, value, variant }) => {
+  const Icon = iconMap[variant ?? "default"]
+  const gradient = gradientMap[variant ?? "default"]
+  const numericValue = typeof value === "number" ? value : null
+
+  return (
+    <AnimatedCard className="border-0 shadow-sm">
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm font-medium text-muted-foreground">
+            {title}
+          </CardTitle>
+          <div
+            className={`flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br ${gradient} text-white shadow-sm`}
+          >
+            <Icon className="h-4 w-4" />
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {numericValue !== null ? (
+          <NumberTicker
+            value={numericValue}
+            className={`text-3xl font-bold ${colorMap[variant ?? "default"]}`}
+            duration={1}
+          />
+        ) : (
+          <span
+            className={`text-3xl font-bold ${colorMap[variant ?? "default"]}`}
+          >
+            {value}
+          </span>
+        )}
+      </CardContent>
+    </AnimatedCard>
+  )
+}
 
 StatCard.propTypes = {
   title: PropTypes.string.isRequired,
@@ -57,7 +114,7 @@ StatCard.defaultProps = {
 }
 
 /**
- * Daily bar chart — a minimal CSS-driven bar chart for the week view.
+ * Daily bar chart — animated bar chart for the week view.
  * @param {object} props - Component props.
  * @param {Array<{date: string, count: number}>} props.days - Daily attendance data.
  */
@@ -66,18 +123,39 @@ const DailyBarChart = ({ days }) => {
   const max = Math.max(...days.map((d) => d.count), 1)
   return (
     <div className="flex items-end gap-2 h-32">
-      {days.map((day) => (
-        <div key={day.date} className="flex flex-col items-center gap-1 flex-1">
-          <span className="text-xs text-muted-foreground">{day.count}</span>
-          <div
-            className="w-full rounded-t bg-primary/70"
-            style={{ height: `${(day.count / max) * 96}px` }}
+      {days.map((day, index) => (
+        <div
+          key={day.date}
+          className="flex flex-col items-center gap-1 flex-1"
+        >
+          <motion.span
+            className="text-xs font-medium text-muted-foreground"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.4 + index * 0.08 }}
+          >
+            {day.count}
+          </motion.span>
+          <motion.div
+            className="w-full rounded-t bg-gradient-to-t from-blue-500 to-indigo-500"
+            initial={{ height: 0 }}
+            animate={{ height: `${(day.count / max) * 96}px` }}
+            transition={{
+              duration: 0.6,
+              delay: 0.2 + index * 0.08,
+              ease: [0.25, 0.4, 0.25, 1],
+            }}
           />
-          <span className="text-xs text-muted-foreground truncate w-full text-center">
+          <motion.span
+            className="text-xs text-muted-foreground truncate w-full text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, delay: 0.5 + index * 0.08 }}
+          >
             {new Date(day.date).toLocaleDateString(undefined, {
               weekday: "short",
             })}
-          </span>
+          </motion.span>
         </div>
       ))}
     </div>
@@ -97,39 +175,55 @@ DailyBarChart.defaultProps = {
   days: [],
 }
 
+const rowVariants = {
+  hidden: { opacity: 0, x: -16 },
+  visible: (i) => ({
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.35,
+      delay: i * 0.06,
+      ease: [0.25, 0.4, 0.25, 1],
+    },
+  }),
+}
+
 /**
  * Metric row in the employee metrics table.
  * @param {object} props - Component props.
  * @param {object} props.employee - Employee metric data.
+ * @param {number} props.index - Row index for stagger animation.
  */
-const MetricRow = ({ employee }) => (
-  <tr className="border-b last:border-0">
+const MetricRow = ({ employee, index = 0 }) => (
+  <motion.tr
+    className="border-b last:border-0"
+    variants={rowVariants}
+    initial="hidden"
+    animate="visible"
+    custom={index}
+  >
     <td className="px-3 py-2 text-sm font-medium">{employee.employeeName}</td>
     <td className="px-3 py-2 text-sm text-center">
-      {employee.daysPresent ?? "—"}
+      {employee.daysPresent ?? "\u2014"}
     </td>
     <td className="px-3 py-2 text-sm text-center">
       {formatDuration(employee.avgMinutesPerDay)}
     </td>
     <td className="px-3 py-2 text-sm text-center">
       {employee.lateArrivals > 0 ? (
-        <Badge variant="outline" className="text-amber-600 border-amber-400">
-          {employee.lateArrivals}
-        </Badge>
+        <PulseBadge color="amber">{employee.lateArrivals}</PulseBadge>
       ) : (
         <span className="text-muted-foreground">0</span>
       )}
     </td>
     <td className="px-3 py-2 text-sm text-center">
       {employee.earlyDepartures > 0 ? (
-        <Badge variant="outline" className="text-red-600 border-red-400">
-          {employee.earlyDepartures}
-        </Badge>
+        <PulseBadge color="red">{employee.earlyDepartures}</PulseBadge>
       ) : (
         <span className="text-muted-foreground">0</span>
       )}
     </td>
-  </tr>
+  </motion.tr>
 )
 
 MetricRow.propTypes = {
@@ -141,6 +235,7 @@ MetricRow.propTypes = {
     lateArrivals: PropTypes.number,
     earlyDepartures: PropTypes.number,
   }).isRequired,
+  index: PropTypes.number,
 }
 
 const SKELETON_COUNT = 4
@@ -150,15 +245,15 @@ const SKELETON_COUNT = 4
  */
 const SummarySkeleton = () => (
   <div className="p-6 space-y-6">
-    <Skeleton className="h-8 w-48" />
+    <Skeleton className="h-8 w-48 rounded-2xl" />
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {Array.from({ length: SKELETON_COUNT }).map((_, index) => (
         // eslint-disable-next-line react/no-array-index-key
-        <Skeleton key={index} className="h-24" />
+        <Skeleton key={index} className="h-24 rounded-2xl" />
       ))}
     </div>
-    <Skeleton className="h-48" />
-    <Skeleton className="h-64" />
+    <Skeleton className="h-48 rounded-2xl" />
+    <Skeleton className="h-64 rounded-2xl" />
   </div>
 )
 
@@ -168,28 +263,36 @@ const SummarySkeleton = () => (
  * @param {object} props.stats - Summary stats object.
  */
 const StatCards = ({ stats }) => (
-  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-    <StatCard
-      title="Present Today"
-      value={stats.presentToday ?? 0}
-      variant="green"
-    />
-    <StatCard
-      title="Auto-Expired"
-      value={stats.autoExpiredToday ?? 0}
-      variant="amber"
-    />
-    <StatCard
-      title="Absent Today"
-      value={stats.absentToday ?? 0}
-      variant="red"
-    />
-    <StatCard
-      title="Flagged Entries"
-      value={stats.flaggedEntries ?? 0}
-      variant="blue"
-    />
-  </div>
+  <StaggerContainer className="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <StaggerItem>
+      <StatCard
+        title="Present Today"
+        value={stats.presentToday ?? 0}
+        variant="green"
+      />
+    </StaggerItem>
+    <StaggerItem>
+      <StatCard
+        title="Auto-Expired"
+        value={stats.autoExpiredToday ?? 0}
+        variant="amber"
+      />
+    </StaggerItem>
+    <StaggerItem>
+      <StatCard
+        title="Absent Today"
+        value={stats.absentToday ?? 0}
+        variant="red"
+      />
+    </StaggerItem>
+    <StaggerItem>
+      <StatCard
+        title="Flagged Entries"
+        value={stats.flaggedEntries ?? 0}
+        variant="blue"
+      />
+    </StaggerItem>
+  </StaggerContainer>
 )
 
 StatCards.propTypes = {
@@ -207,7 +310,7 @@ StatCards.propTypes = {
  * @param {Array} props.employeeMetrics - List of employee metric objects.
  */
 const EmployeeMetricsTable = ({ employeeMetrics }) => (
-  <Card>
+  <AnimatedCard className="border-0 shadow-sm" delay={0.3}>
     <CardHeader>
       <CardTitle className="text-base">Employee Metrics (This Month)</CardTitle>
     </CardHeader>
@@ -234,17 +337,18 @@ const EmployeeMetricsTable = ({ employeeMetrics }) => (
             </tr>
           </thead>
           <tbody>
-            {employeeMetrics.map((emp) => (
+            {employeeMetrics.map((emp, index) => (
               <MetricRow
                 key={emp.employeeId ?? emp.employeeName}
                 employee={emp}
+                index={index}
               />
             ))}
           </tbody>
         </table>
       </div>
     </CardContent>
-  </Card>
+  </AnimatedCard>
 )
 
 EmployeeMetricsTable.propTypes = {
@@ -287,12 +391,23 @@ const summaryShape = PropTypes.shape({
  */
 const SummaryContent = ({ stats, dailyData, employeeMetrics }) => (
   <div className="p-6 space-y-6">
-    <h1 className="text-2xl font-semibold">Attendance Summary</h1>
+    <FadeIn delay={0} duration={0.5} direction="up">
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-md">
+          <BarChart3 className="h-5 w-5" />
+        </div>
+        <BlurText
+          text="Attendance Summary"
+          className="text-2xl font-semibold"
+          delay={0.1}
+        />
+      </div>
+    </FadeIn>
 
     <StatCards stats={stats} />
 
     {dailyData.length > 0 && (
-      <Card>
+      <AnimatedCard className="border-0 shadow-sm" delay={0.2}>
         <CardHeader>
           <CardTitle className="text-base">
             Daily Attendance (Last 7 Days)
@@ -301,7 +416,7 @@ const SummaryContent = ({ stats, dailyData, employeeMetrics }) => (
         <CardContent>
           <DailyBarChart days={dailyData} />
         </CardContent>
-      </Card>
+      </AnimatedCard>
     )}
 
     {employeeMetrics.length > 0 && (
@@ -309,9 +424,11 @@ const SummaryContent = ({ stats, dailyData, employeeMetrics }) => (
     )}
 
     {!dailyData.length && !employeeMetrics.length && (
-      <p className="text-muted-foreground text-sm">
-        No summary data available.
-      </p>
+      <FadeIn delay={0.3}>
+        <p className="text-muted-foreground text-sm">
+          No summary data available.
+        </p>
+      </FadeIn>
     )}
   </div>
 )

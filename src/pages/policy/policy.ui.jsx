@@ -1,3 +1,4 @@
+import { motion } from "framer-motion"
 import {
   FileText,
   Pencil,
@@ -10,6 +11,16 @@ import {
 import PropTypes from "prop-types"
 import { useState } from "react"
 
+import {
+  AnimatedCard,
+  BlurText,
+  FadeIn,
+  NumberTicker,
+  PulseBadge,
+  ShimmerButton,
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/magicui"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -50,10 +61,10 @@ const CATEGORIES = [
 ]
 
 const CATEGORY_META = {
-  hr: { label: "HR", variant: "default", icon: Users },
-  leave: { label: "Leave", variant: "secondary", icon: FileText },
-  security: { label: "Security", variant: "destructive", icon: ShieldCheck },
-  general: { label: "General", variant: "outline", icon: FileText },
+  hr: { label: "HR", color: "blue", icon: Users },
+  leave: { label: "Leave", color: "amber", icon: FileText },
+  security: { label: "Security", color: "red", icon: ShieldCheck },
+  general: { label: "General", color: "purple", icon: FileText },
 }
 
 const SHARE_SCOPES = [
@@ -71,7 +82,7 @@ const SHARE_SCOPE_LABELS = {
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 
 const PolicyCardSkeleton = () => (
-  <Card>
+  <Card className="border-0 shadow-sm rounded-xl">
     <CardHeader className="pb-2">
       <Skeleton className="h-5 w-2/3" />
       <Skeleton className="h-4 w-16 rounded-full" />
@@ -115,7 +126,7 @@ const PolicyForm = ({ initial, onSubmit, onClose, isLoading, title }) => {
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg rounded-xl">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
@@ -239,7 +250,7 @@ PolicyForm.defaultProps = {
 
 const DeleteConfirmDialog = ({ onConfirm, onClose, isLoading }) => (
   <Dialog open onOpenChange={onClose}>
-    <DialogContent className="max-w-sm">
+    <DialogContent className="max-w-sm rounded-xl">
       <DialogHeader>
         <DialogTitle>Delete Policy</DialogTitle>
         <DialogDescription>
@@ -287,54 +298,59 @@ const PolicyCard = ({ policy, onEdit, onDelete, isDeleting }) => {
 
   return (
     <>
-      <Card className="flex flex-col">
-        <CardHeader className="pb-2">
-          <div className="flex items-start justify-between gap-2">
-            <CardTitle className="text-base leading-snug">
-              {policy.title}
-            </CardTitle>
-            <Badge variant={meta.variant} className="shrink-0 capitalize gap-1">
-              <Icon className="h-3 w-3" />
-              {meta.label}
-            </Badge>
-          </div>
-        </CardHeader>
-        <CardContent className="flex-1">
-          <p className="text-sm text-muted-foreground line-clamp-3">
-            {policy.content}
-          </p>
-        </CardContent>
-        <CardFooter className="flex items-center justify-between pt-2">
-          <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">
-              {effectiveDate
-                ? `Effective: ${effectiveDate}`
-                : "No effective date"}
+      <motion.div
+        whileHover={{ y: -4, scale: 1.02 }}
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      >
+        <Card className="flex flex-col border-0 shadow-sm rounded-xl">
+          <CardHeader className="pb-2">
+            <div className="flex items-start justify-between gap-2">
+              <CardTitle className="text-base leading-snug">
+                {policy.title}
+              </CardTitle>
+              <PulseBadge color={meta.color}>
+                <Icon className="h-3 w-3 mr-1" />
+                {meta.label}
+              </PulseBadge>
+            </div>
+          </CardHeader>
+          <CardContent className="flex-1">
+            <p className="text-sm text-muted-foreground line-clamp-3">
+              {policy.content}
             </p>
-            <Badge variant="outline" className="text-[10px] h-5">
-              Share: {shareScopeLabel}
-            </Badge>
-          </div>
-          <div className="flex gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => onEdit(policy)}
-            >
-              <Pencil className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-destructive hover:text-destructive"
-              onClick={() => setShowDeleteConfirm(true)}
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </Button>
-          </div>
-        </CardFooter>
-      </Card>
+          </CardContent>
+          <CardFooter className="flex items-center justify-between pt-2">
+            <div className="space-y-1">
+              <p className="text-xs text-muted-foreground">
+                {effectiveDate
+                  ? `Effective: ${effectiveDate}`
+                  : "No effective date"}
+              </p>
+              <Badge variant="outline" className="text-[10px] h-5 rounded-lg">
+                Share: {shareScopeLabel}
+              </Badge>
+            </div>
+            <div className="flex gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => onEdit(policy)}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-destructive hover:text-destructive"
+                onClick={() => setShowDeleteConfirm(true)}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          </CardFooter>
+        </Card>
+      </motion.div>
 
       {showDeleteConfirm && (
         <DeleteConfirmDialog
@@ -388,49 +404,64 @@ const PolicyUI = ({
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Page header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Policy Management</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            {totalCount} {totalCount === 1 ? "policy" : "policies"} total
-          </p>
+      <FadeIn direction="down">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/20">
+                <FileText className="h-5 w-5 text-white" />
+              </div>
+              <BlurText
+                text="Policy Management"
+                className="text-2xl font-bold"
+                delay={0.1}
+              />
+            </div>
+            <p className="text-sm text-muted-foreground mt-0.5 ml-13">
+              <NumberTicker value={totalCount} /> {totalCount === 1 ? "policy" : "policies"} total
+            </p>
+          </div>
+          <ShimmerButton className="shrink-0" onClick={onOpenCreate}>
+            <Plus className="h-4 w-4 mr-2" />
+            New Policy
+          </ShimmerButton>
         </div>
-        <Button onClick={onOpenCreate} className="shrink-0">
-          <Plus className="h-4 w-4 mr-2" />
-          New Policy
-        </Button>
-      </div>
+      </FadeIn>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search policies…"
-            value={search}
-            onChange={(event) => onSearchChange(event.target.value)}
-            className="pl-9"
-          />
+      <FadeIn delay={0.2}>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search policies…"
+              value={search}
+              onChange={(event) => onSearchChange(event.target.value)}
+              className="pl-9 rounded-xl"
+            />
+          </div>
+          <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
+            <SelectTrigger className="w-full sm:w-44 rounded-xl">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {CATEGORIES.map((c) => (
+                <SelectItem key={c.value} value={c.value}>
+                  {c.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-        <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>
-          <SelectTrigger className="w-full sm:w-44">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {CATEGORIES.map((c) => (
-              <SelectItem key={c.value} value={c.value}>
-                {c.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      </FadeIn>
 
       {/* Content */}
       {isError ? (
-        <div className="text-center py-12 text-muted-foreground">
-          Failed to load policies. Please try again.
-        </div>
+        <FadeIn>
+          <div className="text-center py-12 text-muted-foreground">
+            Failed to load policies. Please try again.
+          </div>
+        </FadeIn>
       ) : isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {["sk-1", "sk-2", "sk-3", "sk-4"].map((key) => (
@@ -438,27 +469,30 @@ const PolicyUI = ({
           ))}
         </div>
       ) : policies.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground">
-          <FileText className="h-12 w-12 mx-auto mb-3 opacity-30" />
-          <p className="font-medium">No policies found</p>
-          <p className="text-sm mt-1">
-            {search || categoryFilter !== "all"
-              ? "Try adjusting your filters."
-              : "Click 'New Policy' to create one."}
-          </p>
-        </div>
+        <FadeIn>
+          <div className="text-center py-16 text-muted-foreground">
+            <FileText className="h-12 w-12 mx-auto mb-3 opacity-30" />
+            <p className="font-medium">No policies found</p>
+            <p className="text-sm mt-1">
+              {search || categoryFilter !== "all"
+                ? "Try adjusting your filters."
+                : "Click 'New Policy' to create one."}
+            </p>
+          </div>
+        </FadeIn>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {policies.map((policy) => (
-            <PolicyCard
-              key={policy.id}
-              policy={policy}
-              onEdit={onEditPolicy}
-              onDelete={onDeletePolicy}
-              isDeleting={deletingId === policy.id}
-            />
+            <StaggerItem key={policy.id}>
+              <PolicyCard
+                policy={policy}
+                onEdit={onEditPolicy}
+                onDelete={onDeletePolicy}
+                isDeleting={deletingId === policy.id}
+              />
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       )}
 
       {/* Create dialog */}

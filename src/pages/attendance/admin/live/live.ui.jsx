@@ -1,8 +1,14 @@
+import { motion } from "framer-motion"
+import { Activity } from "lucide-react"
 import PropTypes from "prop-types"
 import { useMemo, useRef } from "react"
 
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import AnimatedCard from "@/components/magicui/animated-card"
+import BlurText from "@/components/magicui/blur-text"
+import FadeIn from "@/components/magicui/fade-in"
+import NumberTicker from "@/components/magicui/number-ticker"
+import PulseBadge from "@/components/magicui/pulse-badge"
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
@@ -32,16 +38,27 @@ const statusBadge = (status) => {
     EDITED: "secondary",
     MANUAL: "secondary",
     FLAGGED: "destructive",
+    NOT_CLOCKED: "red",
   }
-  return <Badge variant={map[status] ?? "outline"}>{status}</Badge>
+
+  if (status === "NOT_CLOCKED") {
+    return <PulseBadge color="red">NOT_CLOCKED</PulseBadge>
+  }
+
+  return (
+    <PulseBadge color={map[status] === "destructive" ? "red" : "blue"}>
+      {status}
+    </PulseBadge>
+  )
 }
 
 /**
  * LiveRow — one row of the live status table.
  * @param {object} props - Component props.
  * @param {object} props.entry - Attendance entry data.
+ * @param {number} props.index - Row index for stagger animation.
  */
-const LiveRow = ({ entry }) => {
+const LiveRow = ({ entry, index = 0 }) => {
   const clockedInAt = useMemo(
     () => new Date(entry.clockedInAt),
     [entry.clockedInAt]
@@ -60,7 +77,16 @@ const LiveRow = ({ entry }) => {
     : ""
 
   return (
-    <tr className={rowClassName}>
+    <motion.tr
+      className={rowClassName}
+      initial={{ opacity: 0, x: -8 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{
+        duration: 0.35,
+        delay: index * 0.05,
+        ease: [0.25, 0.4, 0.25, 1],
+      }}
+    >
       <td className="px-3 py-2 text-sm font-medium">{entry.employeeName}</td>
       <td className="px-3 py-2 text-sm text-muted-foreground">
         {entry.department ?? "—"}
@@ -72,12 +98,7 @@ const LiveRow = ({ entry }) => {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
-                <Badge
-                  variant="outline"
-                  className="border-amber-400 text-amber-600"
-                >
-                  Expiring soon
-                </Badge>
+                <PulseBadge color="amber">Expiring soon</PulseBadge>
               </TooltipTrigger>
               <TooltipContent>
                 Auto-expiry in ~{Math.ceil((entry.expiresInSeconds ?? 0) / 60)}{" "}
@@ -89,7 +110,7 @@ const LiveRow = ({ entry }) => {
           <span className="text-xs text-muted-foreground">—</span>
         )}
       </td>
-    </tr>
+    </motion.tr>
   )
 }
 
@@ -102,6 +123,7 @@ LiveRow.propTypes = {
     willAutoExpire: PropTypes.bool,
     expiresInSeconds: PropTypes.number,
   }).isRequired,
+  index: PropTypes.number,
 }
 
 /**
@@ -119,22 +141,45 @@ const AdminLiveUI = ({ liveData, isLoading }) => {
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6">
       {/* Page header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold">Live Attendance</h1>
-          <p className="text-sm text-muted-foreground">
-            Real-time view of who is currently clocked in. Refreshes every 30 s.
-          </p>
+      <FadeIn delay={0} duration={0.5} direction="up">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-md">
+              <Activity className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <BlurText
+                text="Live Attendance"
+                className="text-xl font-semibold"
+                delay={0.1}
+              />
+              <p className="text-sm text-muted-foreground">
+                Real-time view of who is currently clocked in. Refreshes every
+                30 s.
+              </p>
+            </div>
+          </div>
+          {!isLoading && (
+            <PulseBadge color="emerald">
+              <NumberTicker
+                value={active.length}
+                className="font-semibold"
+                duration={0.8}
+                delay={0.3}
+              />{" "}
+              clocked in
+            </PulseBadge>
+          )}
         </div>
-        {!isLoading && (
-          <Badge variant="default">{active.length} clocked in</Badge>
-        )}
-      </div>
+      </FadeIn>
 
       <Separator />
 
       {/* Clocked-in table */}
-      <Card>
+      <AnimatedCard
+        delay={0.15}
+        className="rounded-xl border-0 shadow-sm"
+      >
         <CardHeader className="pb-2">
           <CardTitle className="text-base">Currently Clocked In</CardTitle>
         </CardHeader>
@@ -142,7 +187,7 @@ const AdminLiveUI = ({ liveData, isLoading }) => {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b text-left text-xs text-muted-foreground">
+                <tr className="border-b text-left text-xs uppercase tracking-wider text-muted-foreground">
                   <th className="px-3 py-2 font-medium">Employee</th>
                   <th className="px-3 py-2 font-medium">Department</th>
                   <th className="px-3 py-2 font-medium">Clocked In At</th>
@@ -180,19 +225,26 @@ const AdminLiveUI = ({ liveData, isLoading }) => {
                     </td>
                   </tr>
                 ) : (
-                  active.map((entry) => (
-                    <LiveRow key={entry.employeeId} entry={entry} />
+                  active.map((entry, index) => (
+                    <LiveRow
+                      key={entry.employeeId}
+                      entry={entry}
+                      index={index}
+                    />
                   ))
                 )}
               </tbody>
             </table>
           </div>
         </CardContent>
-      </Card>
+      </AnimatedCard>
 
       {/* Not clocked in */}
       {!isLoading && notClocked.length > 0 && (
-        <Card>
+        <AnimatedCard
+          delay={0.3}
+          className="rounded-xl border-0 shadow-sm"
+        >
           <CardHeader className="pb-2">
             <CardTitle className="text-base text-muted-foreground">
               Not Clocked In Today
@@ -202,15 +254,24 @@ const AdminLiveUI = ({ liveData, isLoading }) => {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b text-left text-xs text-muted-foreground">
+                  <tr className="border-b text-left text-xs uppercase tracking-wider text-muted-foreground">
                     <th className="px-3 py-2 font-medium">Employee</th>
                     <th className="px-3 py-2 font-medium">Department</th>
                     <th className="px-3 py-2 font-medium">Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {notClocked.map((emp) => (
-                    <tr key={emp.id}>
+                  {notClocked.map((emp, index) => (
+                    <motion.tr
+                      key={emp.id}
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{
+                        duration: 0.35,
+                        delay: index * 0.05,
+                        ease: [0.25, 0.4, 0.25, 1],
+                      }}
+                    >
                       <td className="px-3 py-2 text-sm">{emp.name}</td>
                       <td className="px-3 py-2 text-sm text-muted-foreground">
                         {emp.department ?? "—"}
@@ -218,13 +279,13 @@ const AdminLiveUI = ({ liveData, isLoading }) => {
                       <td className="px-3 py-2">
                         {statusBadge("NOT_CLOCKED")}
                       </td>
-                    </tr>
+                    </motion.tr>
                   ))}
                 </tbody>
               </table>
             </div>
           </CardContent>
-        </Card>
+        </AnimatedCard>
       )}
     </div>
   )

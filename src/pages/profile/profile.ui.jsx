@@ -14,9 +14,14 @@ import {
   UserRound,
   Users,
 } from "lucide-react"
+import { motion } from "framer-motion"
 import PropTypes from "prop-types"
 import { useState } from "react"
 
+import { AnimatedCard } from "@/components/magicui"
+import { BlurText } from "@/components/magicui"
+import { FadeIn } from "@/components/magicui"
+import { PulseBadge } from "@/components/magicui"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -63,7 +68,7 @@ const getInitials = (name = "") =>
 
 const ProfileSkeleton = () => (
   <div className="space-y-6">
-    <Card>
+    <Card className="rounded-xl border-0 shadow-sm">
       <CardContent className="pt-6">
         <div className="flex flex-col sm:flex-row items-center gap-6">
           <Skeleton className="h-24 w-24 rounded-full" />
@@ -77,7 +82,7 @@ const ProfileSkeleton = () => (
     </Card>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {["contact", "work", "extra-1", "extra-2"].map((key) => (
-        <Card key={key}>
+        <Card key={key} className="rounded-xl border-0 shadow-sm">
           <CardContent className="pt-6 space-y-2">
             <Skeleton className="h-4 w-24" />
             <Skeleton className="h-5 w-40" />
@@ -315,41 +320,63 @@ const ProfileHeaderCard = ({
   onOpenEdit,
   onOpenPassword,
 }) => (
-  <Card>
+  <AnimatedCard delay={0} className="rounded-xl border-0 shadow-sm">
     <CardContent className="pt-6">
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-        <Avatar className="h-24 w-24 text-2xl">
-          <AvatarFallback className="bg-primary/10 text-primary">
-            {getInitials(displayName)}
-          </AvatarFallback>
-        </Avatar>
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.1 }}
+        >
+          <Avatar className="h-24 w-24 text-2xl">
+            <AvatarFallback className="bg-primary/10 text-primary">
+              {getInitials(displayName)}
+            </AvatarFallback>
+          </Avatar>
+        </motion.div>
         <div className="flex-1 text-center sm:text-left space-y-1">
-          <h1 className="text-2xl font-bold">{displayName}</h1>
-          <p className="text-muted-foreground text-sm">
-            {profile?.jobTitle || profile?.department || "—"}
-          </p>
-          <Badge variant="outline" className="capitalize">
-            {userRole || profile?.role || "employee"}
-          </Badge>
-          {profile?.bio && (
-            <p className="text-sm text-muted-foreground mt-2 max-w-md">
-              {profile.bio}
+          <BlurText
+            text={displayName}
+            className="text-2xl font-bold"
+            delay={0.15}
+          />
+          <FadeIn delay={0.2} direction="up">
+            <p className="text-muted-foreground text-sm">
+              {profile?.jobTitle || profile?.department || "—"}
             </p>
+          </FadeIn>
+          <FadeIn delay={0.25} direction="up">
+            <PulseBadge color="indigo">
+              {userRole || profile?.role || "employee"}
+            </PulseBadge>
+          </FadeIn>
+          {profile?.bio && (
+            <FadeIn delay={0.3} direction="up">
+              <p className="text-sm text-muted-foreground mt-2 max-w-md">
+                {profile.bio}
+              </p>
+            </FadeIn>
           )}
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={onOpenEdit}>
-            <Pencil className="h-4 w-4 mr-1.5" />
-            Edit
-          </Button>
-          <Button variant="outline" size="sm" onClick={onOpenPassword}>
-            <Key className="h-4 w-4 mr-1.5" />
-            Password
-          </Button>
-        </div>
+        <FadeIn delay={0.35} direction="left">
+          <div className="flex gap-2">
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button variant="outline" size="sm" onClick={onOpenEdit}>
+                <Pencil className="h-4 w-4 mr-1.5" />
+                Edit
+              </Button>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button variant="outline" size="sm" onClick={onOpenPassword}>
+                <Key className="h-4 w-4 mr-1.5" />
+                Password
+              </Button>
+            </motion.div>
+          </div>
+        </FadeIn>
       </div>
     </CardContent>
-  </Card>
+  </AnimatedCard>
 )
 
 ProfileHeaderCard.propTypes = {
@@ -369,33 +396,63 @@ ProfileHeaderCard.defaultProps = {
 
 const ProfileInfoGrid = ({ profile, joinDate }) => (
   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <Card>
+    <AnimatedCard delay={0.1} className="rounded-xl border-0 shadow-sm">
       <CardHeader className="pb-3">
         <CardTitle className="text-base">Contact Information</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <InfoRow icon={Mail} label="Email" value={profile?.email} />
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2, duration: 0.4 }}
+        >
+          <InfoRow icon={Mail} label="Email" value={profile?.email} />
+        </motion.div>
         <Separator />
-        <InfoRow icon={Phone} label="Phone" value={profile?.phone} />
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3, duration: 0.4 }}
+        >
+          <InfoRow icon={Phone} label="Phone" value={profile?.phone} />
+        </motion.div>
       </CardContent>
-    </Card>
+    </AnimatedCard>
 
-    <Card>
+    <AnimatedCard delay={0.2} className="rounded-xl border-0 shadow-sm">
       <CardHeader className="pb-3">
         <CardTitle className="text-base">Work Details</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <InfoRow
-          icon={Building2}
-          label="Department"
-          value={profile?.department}
-        />
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3, duration: 0.4 }}
+        >
+          <InfoRow
+            icon={Building2}
+            label="Department"
+            value={profile?.department}
+          />
+        </motion.div>
         <Separator />
-        <InfoRow icon={UserRound} label="Role" value={profile?.role} />
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.4, duration: 0.4 }}
+        >
+          <InfoRow icon={UserRound} label="Role" value={profile?.role} />
+        </motion.div>
         <Separator />
-        <InfoRow icon={Calendar} label="Joined" value={joinDate} />
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.5, duration: 0.4 }}
+        >
+          <InfoRow icon={Calendar} label="Joined" value={joinDate} />
+        </motion.div>
       </CardContent>
-    </Card>
+    </AnimatedCard>
   </div>
 )
 
@@ -501,7 +558,7 @@ const AssetsSection = ({ assets }) => {
   const items = assets ?? []
 
   return (
-    <Card>
+    <AnimatedCard delay={0.1} className="rounded-xl border-0 shadow-sm">
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
           <Briefcase className="h-4 w-4" /> Assigned Assets
@@ -515,9 +572,12 @@ const AssetsSection = ({ assets }) => {
           <p className="text-sm text-muted-foreground">No assets assigned.</p>
         ) : (
           <div className="space-y-2">
-            {items.map((asset) => (
-              <div
+            {items.map((asset, index) => (
+              <motion.div
                 key={asset.id}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 + index * 0.08, duration: 0.35 }}
                 className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/50"
               >
                 <div className="flex items-center gap-3">
@@ -531,15 +591,15 @@ const AssetsSection = ({ assets }) => {
                     </p>
                   </div>
                 </div>
-                <Badge variant="outline" className="text-xs">
+                <PulseBadge color="blue">
                   {asset.condition}
-                </Badge>
-              </div>
+                </PulseBadge>
+              </motion.div>
             ))}
           </div>
         )}
       </CardContent>
-    </Card>
+    </AnimatedCard>
   )
 }
 
@@ -563,7 +623,7 @@ const DocumentsSection = ({ documents }) => {
   const docs = documents ?? []
 
   return (
-    <Card>
+    <AnimatedCard delay={0.2} className="rounded-xl border-0 shadow-sm">
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
           <FileText className="h-4 w-4" /> My Documents
@@ -577,9 +637,12 @@ const DocumentsSection = ({ documents }) => {
           </p>
         ) : (
           <div className="space-y-2">
-            {docs.map((document_) => (
-              <div
+            {docs.map((document_, index) => (
+              <motion.div
                 key={document_.id}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 + index * 0.08, duration: 0.35 }}
                 className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/50"
               >
                 <div className="flex items-center gap-3">
@@ -593,15 +656,17 @@ const DocumentsSection = ({ documents }) => {
                     </p>
                   </div>
                 </div>
-                <Button variant="ghost" size="sm" className="text-xs">
-                  View
-                </Button>
-              </div>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button variant="ghost" size="sm" className="text-xs">
+                    View
+                  </Button>
+                </motion.div>
+              </motion.div>
             ))}
           </div>
         )}
       </CardContent>
-    </Card>
+    </AnimatedCard>
   )
 }
 
@@ -646,7 +711,7 @@ const TimelineContent = ({ timeline }) => {
 
   return (
     <div className="p-4 md:p-6">
-      <Card>
+      <AnimatedCard delay={0.1} className="rounded-xl border-0 shadow-sm">
         <CardHeader className="pb-3">
           <CardTitle className="text-base">Career Timeline</CardTitle>
           <CardDescription className="text-xs">
@@ -661,7 +726,13 @@ const TimelineContent = ({ timeline }) => {
           ) : (
             <div className="relative space-y-4 pl-6 before:absolute before:left-2 before:top-2 before:h-[calc(100%-16px)] before:w-0.5 before:bg-border">
               {events.map((event, index) => (
-                <div key={index} className="relative">
+                <motion.div
+                  key={index}
+                  className="relative"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 + index * 0.1, duration: 0.4 }}
+                >
                   <div
                     className={`absolute -left-6 top-1 w-4 h-4 rounded-full ${
                       TIMELINE_ICON_STYLE[event.type] ??
@@ -681,12 +752,12 @@ const TimelineContent = ({ timeline }) => {
                       </p>
                     )}
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           )}
         </CardContent>
-      </Card>
+      </AnimatedCard>
     </div>
   )
 }
@@ -749,7 +820,7 @@ const MODULE_ROLE_CONFIG = [
 ]
 
 const renderAdminNotice = () => (
-  <Card>
+  <AnimatedCard delay={0.1} className="rounded-xl border-0 shadow-sm">
     <CardHeader>
       <CardTitle className="text-base flex items-center gap-2">
         <ShieldCheck className="h-4 w-4" />
@@ -765,7 +836,7 @@ const renderAdminNotice = () => (
         admins.
       </p>
     </CardContent>
-  </Card>
+  </AnimatedCard>
 )
 
 const renderTeamSetup = ({
@@ -775,7 +846,7 @@ const renderTeamSetup = ({
   onToggleTeamMember,
   onCreateTeam,
 }) => (
-  <Card>
+  <AnimatedCard delay={0.1} className="rounded-xl border-0 shadow-sm">
     <CardHeader>
       <CardTitle className="text-base flex items-center gap-2">
         <Users className="h-4 w-4" />
@@ -831,9 +902,9 @@ const renderTeamSetup = ({
                 >
                   <span className="text-xs font-medium">{employee.name}</span>
                   {teamDraft.memberIds.includes(String(employee.id)) && (
-                    <Badge variant="secondary" className="text-[10px]">
+                    <PulseBadge color="emerald">
                       Added
-                    </Badge>
+                    </PulseBadge>
                   )}
                 </button>
               ))
@@ -842,17 +913,19 @@ const renderTeamSetup = ({
         </div>
       </div>
       <div className="flex justify-end">
-        <Button onClick={onCreateTeam} className="gap-1.5">
-          <Plus className="h-3.5 w-3.5" />
-          Create Team
-        </Button>
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <Button onClick={onCreateTeam} className="gap-1.5">
+            <Plus className="h-3.5 w-3.5" />
+            Create Team
+          </Button>
+        </motion.div>
       </div>
     </CardContent>
-  </Card>
+  </AnimatedCard>
 )
 
 const renderTeamDirectory = ({ teams, selectedTeamId, onTeamSelect }) => (
-  <Card className="lg:col-span-1">
+  <AnimatedCard delay={0.15} className="lg:col-span-1 rounded-xl border-0 shadow-sm">
     <CardHeader>
       <CardTitle className="text-base">Teams</CardTitle>
       <CardDescription>
@@ -860,13 +933,18 @@ const renderTeamDirectory = ({ teams, selectedTeamId, onTeamSelect }) => (
       </CardDescription>
     </CardHeader>
     <CardContent className="space-y-2">
-      {teams.map((team) => {
+      {teams.map((team, index) => {
         const isSelected = team.id === selectedTeamId
         return (
-          <button
+          <motion.button
             type="button"
             key={team.id}
             onClick={() => onTeamSelect(team.id)}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 + index * 0.06 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             className={`w-full text-left rounded-lg border px-3 py-2.5 transition-colors ${
               isSelected
                 ? "bg-primary text-primary-foreground border-primary"
@@ -883,11 +961,11 @@ const renderTeamDirectory = ({ teams, selectedTeamId, onTeamSelect }) => (
             >
               {team.memberIds.length} members
             </p>
-          </button>
+          </motion.button>
         )
       })}
     </CardContent>
-  </Card>
+  </AnimatedCard>
 )
 
 const renderResponsibilityPanel = ({
@@ -901,7 +979,7 @@ const renderResponsibilityPanel = ({
       ?.name ?? "Not assigned"
 
   return (
-    <Card className="lg:col-span-2">
+    <AnimatedCard delay={0.2} className="lg:col-span-2 rounded-xl border-0 shadow-sm">
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
           <ShieldCheck className="h-4 w-4" />
@@ -914,17 +992,26 @@ const renderResponsibilityPanel = ({
       <CardContent className="space-y-4">
         {selectedTeam ? (
           <>
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="outline">{selectedTeam.name}</Badge>
-              <Badge variant="secondary">Lead: {leadName}</Badge>
-              <Badge variant="secondary">
-                Members: {selectedTeam.memberIds.length}
-              </Badge>
-            </div>
+            <FadeIn delay={0.1} direction="up">
+              <div className="flex flex-wrap items-center gap-2">
+                <PulseBadge color="purple">
+                  {selectedTeam.name}
+                </PulseBadge>
+                <PulseBadge color="blue">
+                  Lead: {leadName}
+                </PulseBadge>
+                <PulseBadge color="amber">
+                  Members: {selectedTeam.memberIds.length}
+                </PulseBadge>
+              </div>
+            </FadeIn>
 
-            {MODULE_ROLE_CONFIG.map((module) => (
-              <div
+            {MODULE_ROLE_CONFIG.map((module, index) => (
+              <motion.div
                 key={module.key}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 + index * 0.07, duration: 0.35 }}
                 className="rounded-lg border p-3.5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4"
               >
                 <div className="flex-1 space-y-1">
@@ -957,11 +1044,13 @@ const renderResponsibilityPanel = ({
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
+              </motion.div>
             ))}
 
             <div className="flex justify-end">
-              <Button onClick={onSaveRoles}>Save Team Responsibilities</Button>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button onClick={onSaveRoles}>Save Team Responsibilities</Button>
+              </motion.div>
             </div>
           </>
         ) : (
@@ -970,7 +1059,7 @@ const renderResponsibilityPanel = ({
           </p>
         )}
       </CardContent>
-    </Card>
+    </AnimatedCard>
   )
 }
 
@@ -1082,9 +1171,11 @@ const ProfileUI = ({
     }
     if (isError) {
       return (
-        <div className="p-6 text-center text-muted-foreground">
-          Failed to load profile. Please try again.
-        </div>
+        <FadeIn delay={0.1} direction="up">
+          <div className="p-6 text-center text-muted-foreground">
+            Failed to load profile. Please try again.
+          </div>
+        </FadeIn>
       )
     }
     return (
@@ -1108,83 +1199,89 @@ const ProfileUI = ({
 
   return (
     <div className="p-4 md:p-6 max-w-4xl mx-auto space-y-4">
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex flex-col gap-2">
-            <p className="text-sm text-muted-foreground">Account Center</p>
-            <h1 className="text-2xl font-semibold tracking-tight">
-              My Account
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Manage profile details, workspace preferences, and module
-              responsibilities from one place.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      <FadeIn delay={0} direction="down">
+        <AnimatedCard delay={0} className="rounded-xl border-0 shadow-sm">
+          <CardContent className="pt-6">
+            <div className="flex flex-col gap-2">
+              <p className="text-sm text-muted-foreground">Account Center</p>
+              <BlurText
+                text="My Account"
+                className="text-2xl font-semibold tracking-tight"
+                delay={0.1}
+              />
+              <p className="text-sm text-muted-foreground">
+                Manage profile details, workspace preferences, and module
+                responsibilities from one place.
+              </p>
+            </div>
+          </CardContent>
+        </AnimatedCard>
+      </FadeIn>
 
-      <Tabs defaultValue="profile" className="space-y-4">
-        <TabsList className="grid grid-cols-2 sm:grid-cols-5 h-auto gap-1 w-full">
-          <TabsTrigger value="profile" className="gap-2 justify-center py-2">
-            <UserRound className="h-4 w-4" />
-            Profile
-          </TabsTrigger>
-          <TabsTrigger value="assets" className="gap-2 justify-center py-2">
-            <Briefcase className="h-4 w-4" />
-            Assets
-          </TabsTrigger>
-          <TabsTrigger value="timeline" className="gap-2 justify-center py-2">
-            <Calendar className="h-4 w-4" />
-            Timeline
-          </TabsTrigger>
-          <TabsTrigger value="settings" className="gap-2 justify-center py-2">
-            <Cog className="h-4 w-4" />
-            Settings
-          </TabsTrigger>
-          <TabsTrigger value="roles" className="gap-2 justify-center py-2">
-            <BriefcaseBusiness className="h-4 w-4" />
-            Teams & Roles
-          </TabsTrigger>
-        </TabsList>
+      <FadeIn delay={0.15} direction="up">
+        <Tabs defaultValue="profile" className="space-y-4">
+          <TabsList className="grid grid-cols-2 sm:grid-cols-5 h-auto gap-1 w-full rounded-lg">
+            <TabsTrigger value="profile" className="gap-2 justify-center py-2 rounded-lg">
+              <UserRound className="h-4 w-4" />
+              Profile
+            </TabsTrigger>
+            <TabsTrigger value="assets" className="gap-2 justify-center py-2 rounded-lg">
+              <Briefcase className="h-4 w-4" />
+              Assets
+            </TabsTrigger>
+            <TabsTrigger value="timeline" className="gap-2 justify-center py-2 rounded-lg">
+              <Calendar className="h-4 w-4" />
+              Timeline
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="gap-2 justify-center py-2 rounded-lg">
+              <Cog className="h-4 w-4" />
+              Settings
+            </TabsTrigger>
+            <TabsTrigger value="roles" className="gap-2 justify-center py-2 rounded-lg">
+              <BriefcaseBusiness className="h-4 w-4" />
+              Teams & Roles
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="profile" className="mt-0">
-          {profileContent()}
-        </TabsContent>
-        <TabsContent value="assets" className="mt-0">
-          <AssetsAndDocsContent
-            assets={profile?.assets}
-            documents={profile?.documents}
-          />
-        </TabsContent>
-        <TabsContent value="timeline" className="mt-0">
-          <TimelineContent timeline={profile?.timeline} />
-        </TabsContent>
-        <TabsContent value="settings" className="mt-0">
-          <SettingsUI
-            theme={theme}
-            currentLanguage={currentLanguage}
-            notifications={notifications}
-            onThemeChange={onThemeChange}
-            onLanguageChange={onLanguageChange}
-            onNotificationToggle={onNotificationToggle}
-          />
-        </TabsContent>
-        <TabsContent value="roles" className="mt-0">
-          <RolesAndResponsibilities
-            isAdmin={isAdmin}
-            teams={teams}
-            selectedTeamId={selectedTeamId}
-            teamDraft={teamDraft}
-            employees={employees}
-            onTeamSelect={onTeamSelect}
-            onTeamDraftChange={onTeamDraftChange}
-            onToggleTeamMember={onToggleTeamMember}
-            onCreateTeam={onCreateTeam}
-            onTeamResponsibilityChange={onTeamResponsibilityChange}
-            onSaveRoles={onSaveRoles}
-          />
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="profile" className="mt-0">
+            {profileContent()}
+          </TabsContent>
+          <TabsContent value="assets" className="mt-0">
+            <AssetsAndDocsContent
+              assets={profile?.assets}
+              documents={profile?.documents}
+            />
+          </TabsContent>
+          <TabsContent value="timeline" className="mt-0">
+            <TimelineContent timeline={profile?.timeline} />
+          </TabsContent>
+          <TabsContent value="settings" className="mt-0">
+            <SettingsUI
+              theme={theme}
+              currentLanguage={currentLanguage}
+              notifications={notifications}
+              onThemeChange={onThemeChange}
+              onLanguageChange={onLanguageChange}
+              onNotificationToggle={onNotificationToggle}
+            />
+          </TabsContent>
+          <TabsContent value="roles" className="mt-0">
+            <RolesAndResponsibilities
+              isAdmin={isAdmin}
+              teams={teams}
+              selectedTeamId={selectedTeamId}
+              teamDraft={teamDraft}
+              employees={employees}
+              onTeamSelect={onTeamSelect}
+              onTeamDraftChange={onTeamDraftChange}
+              onToggleTeamMember={onToggleTeamMember}
+              onCreateTeam={onCreateTeam}
+              onTeamResponsibilityChange={onTeamResponsibilityChange}
+              onSaveRoles={onSaveRoles}
+            />
+          </TabsContent>
+        </Tabs>
+      </FadeIn>
     </div>
   )
 }

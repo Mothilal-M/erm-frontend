@@ -1,3 +1,4 @@
+import { motion } from "framer-motion"
 import {
   ArrowLeft,
   Award,
@@ -9,10 +10,21 @@ import {
   MapPin,
   Phone,
   User,
+  UserCircle,
 } from "lucide-react"
 import PropTypes from "prop-types"
 import { Link } from "react-router-dom"
 
+import {
+  AnimatedCard,
+  AnimatedProgress,
+  BlurText,
+  FadeIn,
+  NumberTicker,
+  PulseBadge,
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/magicui"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -23,13 +35,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ct from "@constants/"
 
 // ─── Constants ────────────────────────────────────────────────────────────────
+
+const STATUS_COLOR_MAP = {
+  active: "emerald",
+  inactive: "red",
+  onLeave: "amber",
+}
 
 const STATUS_STYLE = {
   active: "bg-emerald-500/15 text-emerald-700 border-emerald-500/30",
@@ -51,10 +68,10 @@ const TIMELINE_ICON_STYLE = {
 const ProfileSkeleton = () => (
   <div className="space-y-6 p-6">
     <div className="flex items-center gap-4">
-      <Skeleton className="h-10 w-10 rounded" />
+      <Skeleton className="h-10 w-10 rounded-xl" />
       <Skeleton className="h-8 w-48" />
     </div>
-    <Card>
+    <Card className="border-0 shadow-sm rounded-xl">
       <CardContent className="p-6">
         <div className="flex gap-6">
           <Skeleton className="h-24 w-24 rounded-full" />
@@ -78,7 +95,7 @@ const ProfileSkeleton = () => (
 
 const InfoRow = ({ icon: Icon, label, value }) => (
   <div className="flex items-center gap-3 py-2">
-    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+    <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
       <Icon className="h-4 w-4 text-primary" />
     </div>
     <div className="min-w-0">
@@ -99,20 +116,26 @@ InfoRow.defaultProps = { value: null }
 // ─── Stat Card Component ──────────────────────────────────────────────────────
 
 const StatCard = ({ icon: Icon, label, value, subtext, accent }) => (
-  <Card className={`border-0 shadow-sm ${accent}`}>
+  <AnimatedCard delay={0.1} className={`border-0 shadow-sm rounded-xl ${accent}`}>
     <CardContent className="flex items-center gap-3 p-4">
-      <div className="w-10 h-10 rounded-lg bg-white/50 dark:bg-white/10 flex items-center justify-center">
+      <div className="w-10 h-10 rounded-xl bg-white/50 dark:bg-white/10 flex items-center justify-center">
         <Icon className="h-5 w-5" />
       </div>
       <div>
-        <p className="text-2xl font-bold leading-none">{value}</p>
+        <p className="text-2xl font-bold leading-none">
+          {typeof value === "number" ? (
+            <NumberTicker value={value} />
+          ) : (
+            value
+          )}
+        </p>
         <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
         {subtext && (
           <p className="text-[10px] text-muted-foreground">{subtext}</p>
         )}
       </div>
     </CardContent>
-  </Card>
+  </AnimatedCard>
 )
 
 StatCard.propTypes = {
@@ -128,7 +151,7 @@ StatCard.defaultProps = { subtext: null, accent: "bg-muted/30" }
 // ─── Personal Info Section ────────────────────────────────────────────────────
 
 const PersonalInfoSection = ({ personal }) => (
-  <Card className="shadow-sm">
+  <AnimatedCard delay={0.2} className="border-0 shadow-sm rounded-xl">
     <CardHeader className="pb-3">
       <CardTitle className="text-base flex items-center gap-2">
         <User className="h-4 w-4" /> Personal Information
@@ -150,7 +173,7 @@ const PersonalInfoSection = ({ personal }) => (
         value={personal?.employmentType}
       />
     </CardContent>
-  </Card>
+  </AnimatedCard>
 )
 
 PersonalInfoSection.propTypes = {
@@ -172,7 +195,7 @@ const AttendanceSection = ({ attendance }) => {
   const logs = attendance?.recentLogs ?? []
 
   return (
-    <Card className="shadow-sm">
+    <AnimatedCard delay={0.3} className="border-0 shadow-sm rounded-xl">
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
           <Clock className="h-4 w-4" /> Attendance Summary
@@ -183,7 +206,7 @@ const AttendanceSection = ({ attendance }) => {
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Stats */}
-        <div className="grid grid-cols-4 gap-3 text-center">
+        <StaggerContainer className="grid grid-cols-4 gap-3 text-center">
           {[
             {
               label: "Present",
@@ -202,12 +225,20 @@ const AttendanceSection = ({ attendance }) => {
             },
             { label: "WFH", value: attendance?.wfhDays, cls: "text-blue-600" },
           ].map(({ label, value, cls }) => (
-            <div key={label} className="p-3 rounded-lg bg-muted/40">
-              <p className={`text-xl font-bold ${cls}`}>{value ?? 0}</p>
-              <p className="text-xs text-muted-foreground">{label}</p>
-            </div>
+            <StaggerItem key={label}>
+              <div className="p-3 rounded-xl bg-muted/40">
+                <p className={`text-xl font-bold ${cls}`}>
+                  {typeof value === "number" ? (
+                    <NumberTicker value={value} />
+                  ) : (
+                    (value ?? 0)
+                  )}
+                </p>
+                <p className="text-xs text-muted-foreground">{label}</p>
+              </div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
 
         {/* Attendance percentage */}
         <div className="space-y-1.5">
@@ -217,7 +248,12 @@ const AttendanceSection = ({ attendance }) => {
               {attendance?.attendanceRate ?? 0}%
             </span>
           </div>
-          <Progress value={attendance?.attendanceRate ?? 0} className="h-2" />
+          <AnimatedProgress
+            value={attendance?.attendanceRate ?? 0}
+            max={100}
+            height="h-2"
+            delay={0.4}
+          />
         </div>
 
         <Separator />
@@ -230,9 +266,12 @@ const AttendanceSection = ({ attendance }) => {
               <p className="text-sm text-muted-foreground">No recent logs.</p>
             ) : (
               logs.map((log, index) => (
-                <div
+                <motion.div
                   key={index}
-                  className="flex items-center justify-between text-sm p-2 rounded-lg bg-muted/30"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 * index }}
+                  className="flex items-center justify-between text-sm p-2 rounded-xl bg-muted/30"
                 >
                   <div>
                     <p className="font-medium">{log.date}</p>
@@ -240,16 +279,16 @@ const AttendanceSection = ({ attendance }) => {
                       {log.clockIn} – {log.clockOut || "—"}
                     </p>
                   </div>
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant="outline" className="text-xs rounded-lg">
                     {log.duration}
                   </Badge>
-                </div>
+                </motion.div>
               ))
             )}
           </div>
         </div>
       </CardContent>
-    </Card>
+    </AnimatedCard>
   )
 }
 
@@ -280,7 +319,7 @@ const LeaveSection = ({ leave }) => {
   const history = leave?.history ?? []
 
   return (
-    <Card className="shadow-sm">
+    <AnimatedCard delay={0.35} className="border-0 shadow-sm rounded-xl">
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
           <Calendar className="h-4 w-4" /> Leave Summary
@@ -289,8 +328,10 @@ const LeaveSection = ({ leave }) => {
       <CardContent className="space-y-4">
         {/* Balances */}
         <div className="space-y-3">
-          {balances.map((bal) => {
-            const usedPct = Math.round((bal.used / bal.allocated) * 100)
+          {balances.map((bal, index) => {
+            const remainingPct = Math.round(
+              (bal.remaining / bal.allocated) * 100
+            )
             return (
               <div key={bal.type} className="space-y-1">
                 <div className="flex justify-between text-sm">
@@ -299,12 +340,12 @@ const LeaveSection = ({ leave }) => {
                     {bal.remaining}/{bal.allocated} days
                   </span>
                 </div>
-                <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-primary rounded-full transition-all"
-                    style={{ width: `${100 - usedPct}%` }}
-                  />
-                </div>
+                <AnimatedProgress
+                  value={remainingPct}
+                  max={100}
+                  height="h-2"
+                  delay={0.1 * index}
+                />
               </div>
             )
           })}
@@ -319,10 +360,13 @@ const LeaveSection = ({ leave }) => {
             {history.length === 0 ? (
               <p className="text-sm text-muted-foreground">No leave history.</p>
             ) : (
-              history.slice(0, 5).map((item) => (
-                <div
+              history.slice(0, 5).map((item, index) => (
+                <motion.div
                   key={item.id}
-                  className="flex items-center justify-between text-sm p-2 rounded-lg bg-muted/30"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.08 * index }}
+                  className="flex items-center justify-between text-sm p-2 rounded-xl bg-muted/30"
                 >
                   <div>
                     <p className="font-medium">{item.type}</p>
@@ -330,25 +374,24 @@ const LeaveSection = ({ leave }) => {
                       {item.from} → {item.to}
                     </p>
                   </div>
-                  <Badge
-                    variant="outline"
-                    className={`text-xs capitalize ${
+                  <PulseBadge
+                    color={
                       item.status === "approved"
-                        ? "text-emerald-600"
+                        ? "emerald"
                         : item.status === "pending"
-                          ? "text-amber-600"
-                          : "text-red-500"
-                    }`}
+                          ? "amber"
+                          : "red"
+                    }
                   >
                     {item.status}
-                  </Badge>
-                </div>
+                  </PulseBadge>
+                </motion.div>
               ))
             )}
           </div>
         </div>
       </CardContent>
-    </Card>
+    </AnimatedCard>
   )
 }
 
@@ -383,7 +426,7 @@ const PerformanceSection = ({ performance }) => {
   const awards = performance?.awards ?? []
 
   return (
-    <Card className="shadow-sm">
+    <AnimatedCard delay={0.2} className="border-0 shadow-sm rounded-xl">
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
           <Award className="h-4 w-4" /> Performance
@@ -391,7 +434,7 @@ const PerformanceSection = ({ performance }) => {
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Metrics */}
-        <div className="grid grid-cols-3 gap-3 text-center">
+        <StaggerContainer className="grid grid-cols-3 gap-3 text-center">
           {[
             {
               label: "Tasks Completed",
@@ -400,12 +443,17 @@ const PerformanceSection = ({ performance }) => {
             { label: "On-Time %", value: `${performance?.onTimeRate ?? 0}%` },
             { label: "Rating", value: performance?.rating ?? "—" },
           ].map(({ label, value }) => (
-            <div key={label} className="p-3 rounded-lg bg-muted/40">
-              <p className="text-lg font-bold">{value}</p>
-              <p className="text-xs text-muted-foreground">{label}</p>
-            </div>
+            <StaggerItem key={label}>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="p-3 rounded-xl bg-muted/40"
+              >
+                <p className="text-lg font-bold">{value}</p>
+                <p className="text-xs text-muted-foreground">{label}</p>
+              </motion.div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
 
         {/* Recent tasks */}
         {tasks.length > 0 && (
@@ -414,16 +462,17 @@ const PerformanceSection = ({ performance }) => {
             <div>
               <p className="text-sm font-medium mb-2">Recent Tasks</p>
               <div className="space-y-2">
-                {tasks.slice(0, 3).map((task) => (
-                  <div
+                {tasks.slice(0, 3).map((task, index) => (
+                  <motion.div
                     key={task.id}
-                    className="flex items-center justify-between text-sm p-2 rounded-lg bg-muted/30"
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.08 * index }}
+                    className="flex items-center justify-between text-sm p-2 rounded-xl bg-muted/30"
                   >
                     <span className="truncate">{task.title}</span>
-                    <Badge variant="outline" className="text-xs capitalize">
-                      {task.status}
-                    </Badge>
-                  </div>
+                    <PulseBadge color="blue">{task.status}</PulseBadge>
+                  </motion.div>
                 ))}
               </div>
             </div>
@@ -438,19 +487,16 @@ const PerformanceSection = ({ performance }) => {
               <p className="text-sm font-medium mb-2">Recognition</p>
               <div className="flex flex-wrap gap-2">
                 {awards.map((award, index) => (
-                  <Badge
-                    key={index}
-                    className="bg-purple-500/15 text-purple-700 border-purple-500/30"
-                  >
-                    🏆 {award}
-                  </Badge>
+                  <PulseBadge key={index} color="purple">
+                    {award}
+                  </PulseBadge>
                 ))}
               </div>
             </div>
           </>
         )}
       </CardContent>
-    </Card>
+    </AnimatedCard>
   )
 }
 
@@ -478,7 +524,7 @@ const AssetsSection = ({ assets }) => {
   const items = assets ?? []
 
   return (
-    <Card className="shadow-sm">
+    <AnimatedCard delay={0.25} className="border-0 shadow-sm rounded-xl">
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
           <Briefcase className="h-4 w-4" /> Assigned Assets
@@ -488,27 +534,28 @@ const AssetsSection = ({ assets }) => {
         {items.length === 0 ? (
           <p className="text-sm text-muted-foreground">No assets assigned.</p>
         ) : (
-          <div className="space-y-2">
+          <StaggerContainer className="space-y-2">
             {items.map((asset) => (
-              <div
-                key={asset.id}
-                className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/50"
-              >
-                <div>
-                  <p className="text-sm font-medium">{asset.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {asset.type} · {asset.serialNumber}
-                  </p>
-                </div>
-                <Badge variant="outline" className="text-xs">
-                  {asset.condition}
-                </Badge>
-              </div>
+              <StaggerItem key={asset.id}>
+                <motion.div
+                  whileHover={{ x: 4 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-border/50"
+                >
+                  <div>
+                    <p className="text-sm font-medium">{asset.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {asset.type} · {asset.serialNumber}
+                    </p>
+                  </div>
+                  <PulseBadge color="blue">{asset.condition}</PulseBadge>
+                </motion.div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         )}
       </CardContent>
-    </Card>
+    </AnimatedCard>
   )
 }
 
@@ -532,7 +579,7 @@ const DocumentsSection = ({ documents }) => {
   const docs = documents ?? []
 
   return (
-    <Card className="shadow-sm">
+    <AnimatedCard delay={0.3} className="border-0 shadow-sm rounded-xl">
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
           <FileText className="h-4 w-4" /> Documents
@@ -544,32 +591,35 @@ const DocumentsSection = ({ documents }) => {
             No documents uploaded.
           </p>
         ) : (
-          <div className="space-y-2">
+          <StaggerContainer className="space-y-2">
             {docs.map((document_) => (
-              <div
-                key={document_.id}
-                className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/50"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center">
-                    <FileText className="h-4 w-4 text-primary" />
+              <StaggerItem key={document_.id}>
+                <motion.div
+                  whileHover={{ x: 4 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border border-border/50"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
+                      <FileText className="h-4 w-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{document_.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {document_.category} · {document_.uploadedAt}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium">{document_.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {document_.category} · {document_.uploadedAt}
-                    </p>
-                  </div>
-                </div>
-                <Button variant="ghost" size="sm" className="text-xs">
-                  View
-                </Button>
-              </div>
+                  <Button variant="ghost" size="sm" className="text-xs">
+                    View
+                  </Button>
+                </motion.div>
+              </StaggerItem>
             ))}
-          </div>
+          </StaggerContainer>
         )}
       </CardContent>
-    </Card>
+    </AnimatedCard>
   )
 }
 
@@ -592,7 +642,7 @@ const TimelineSection = ({ timeline }) => {
   const events = timeline ?? []
 
   return (
-    <Card className="shadow-sm">
+    <AnimatedCard delay={0.2} className="border-0 shadow-sm rounded-xl">
       <CardHeader className="pb-3">
         <CardTitle className="text-base">Timeline</CardTitle>
         <CardDescription className="text-xs">
@@ -605,14 +655,24 @@ const TimelineSection = ({ timeline }) => {
         ) : (
           <div className="relative space-y-4 pl-6 before:absolute before:left-2 before:top-2 before:h-[calc(100%-16px)] before:w-0.5 before:bg-border">
             {events.map((event, index) => (
-              <div key={index} className="relative">
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 * index }}
+                className="relative"
+              >
                 <div
                   className={`absolute -left-6 top-1 w-4 h-4 rounded-full ${
                     TIMELINE_ICON_STYLE[event.type] ??
                     TIMELINE_ICON_STYLE.default
                   }`}
                 />
-                <div className="p-3 rounded-lg bg-muted/30">
+                <motion.div
+                  whileHover={{ x: 4 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="p-3 rounded-xl bg-muted/30"
+                >
                   <div className="flex items-center justify-between mb-1">
                     <p className="text-sm font-medium">{event.title}</p>
                     <span className="text-xs text-muted-foreground">
@@ -624,13 +684,13 @@ const TimelineSection = ({ timeline }) => {
                       {event.description}
                     </p>
                   )}
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             ))}
           </div>
         )}
       </CardContent>
-    </Card>
+    </AnimatedCard>
   )
 }
 
@@ -686,131 +746,157 @@ const Employee360UI = ({ data, isLoading, isError }) => {
   return (
     <div className="space-y-6 p-4 md:p-6">
       {/* Back link + page title */}
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" asChild>
-          <Link to={ct.route.employeeManagement.LIST}>
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-        </Button>
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            Employee Profile
-          </h1>
-          <p className="text-sm text-muted-foreground">360° view</p>
+      <FadeIn direction="down">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" asChild>
+            <Link to={ct.route.employeeManagement.LIST}>
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 shadow-lg shadow-violet-500/20">
+              <UserCircle className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <BlurText
+                text="Employee Profile"
+                className="text-2xl font-bold tracking-tight"
+                delay={0.1}
+              />
+              <p className="text-sm text-muted-foreground">360° view</p>
+            </div>
+          </div>
         </div>
-      </div>
+      </FadeIn>
 
       {/* Hero Card */}
-      <Card className="shadow-sm border-0 bg-linear-to-r from-blue-600/10 via-indigo-500/10 to-purple-600/10">
-        <CardContent className="p-6">
-          <div className="flex flex-wrap items-center gap-6">
-            <Avatar className="w-20 h-20 border-2 border-white/30 shadow-lg">
-              <AvatarImage src={employee?.avatar} alt={employee?.name} />
-              <AvatarFallback className="text-xl font-bold">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="text-xl font-bold">{employee?.name}</h2>
-                <Badge
-                  variant="outline"
-                  className={
-                    STATUS_STYLE[employee?.status] ?? STATUS_STYLE.active
-                  }
-                >
-                  {employee?.status ?? "Active"}
-                </Badge>
+      <FadeIn delay={0.15}>
+        <AnimatedCard delay={0.2} className="border-0 shadow-sm rounded-xl bg-linear-to-r from-blue-600/10 via-indigo-500/10 to-purple-600/10">
+          <CardContent className="p-6">
+            <div className="flex flex-wrap items-center gap-6">
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.3 }}
+              >
+                <Avatar className="w-20 h-20 border-2 border-white/30 shadow-lg">
+                  <AvatarImage src={employee?.avatar} alt={employee?.name} />
+                  <AvatarFallback className="text-xl font-bold">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
+              </motion.div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h2 className="text-xl font-bold">{employee?.name}</h2>
+                  <PulseBadge
+                    color={
+                      STATUS_COLOR_MAP[employee?.status] ?? "emerald"
+                    }
+                  >
+                    {employee?.status ?? "Active"}
+                  </PulseBadge>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {employee?.role} · {employee?.department}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  ID: {employee?.id} · Manager: {employee?.manager} · Joined{" "}
+                  {employee?.joinDate}
+                </p>
               </div>
-              <p className="text-sm text-muted-foreground">
-                {employee?.role} · {employee?.department}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                ID: {employee?.id} · Manager: {employee?.manager} · Joined{" "}
-                {employee?.joinDate}
-              </p>
+              <div className="shrink-0 flex gap-2">
+                <Button variant="outline" size="sm" asChild className="rounded-xl">
+                  <Link
+                    to={ct.route.employeeManagement.EDIT.replace(
+                      ":id",
+                      employee?.id
+                    )}
+                  >
+                    Edit Profile
+                  </Link>
+                </Button>
+              </div>
             </div>
-            <div className="shrink-0 flex gap-2">
-              <Button variant="outline" size="sm" asChild>
-                <Link
-                  to={ct.route.employeeManagement.EDIT.replace(
-                    ":id",
-                    employee?.id
-                  )}
-                >
-                  Edit Profile
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </AnimatedCard>
+      </FadeIn>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatCard
-          icon={Clock}
-          label="Attendance Rate"
-          value={`${attendance?.attendanceRate ?? 0}%`}
-          accent="bg-emerald-500/10"
-        />
-        <StatCard
-          icon={Calendar}
-          label="Leave Balance"
-          value={leave?.totalRemaining ?? 0}
-          subtext="days remaining"
-          accent="bg-blue-500/10"
-        />
-        <StatCard
-          icon={Award}
-          label="Tasks Completed"
-          value={performance?.tasksCompleted ?? 0}
-          accent="bg-purple-500/10"
-        />
-        <StatCard
-          icon={Briefcase}
-          label="Assets Assigned"
-          value={assets?.length ?? 0}
-          accent="bg-amber-500/10"
-        />
-      </div>
+      <StaggerContainer className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <StaggerItem>
+          <StatCard
+            icon={Clock}
+            label="Attendance Rate"
+            value={`${attendance?.attendanceRate ?? 0}%`}
+            accent="bg-emerald-500/10"
+          />
+        </StaggerItem>
+        <StaggerItem>
+          <StatCard
+            icon={Calendar}
+            label="Leave Balance"
+            value={leave?.totalRemaining ?? 0}
+            subtext="days remaining"
+            accent="bg-blue-500/10"
+          />
+        </StaggerItem>
+        <StaggerItem>
+          <StatCard
+            icon={Award}
+            label="Tasks Completed"
+            value={performance?.tasksCompleted ?? 0}
+            accent="bg-purple-500/10"
+          />
+        </StaggerItem>
+        <StaggerItem>
+          <StatCard
+            icon={Briefcase}
+            label="Assets Assigned"
+            value={assets?.length ?? 0}
+            accent="bg-amber-500/10"
+          />
+        </StaggerItem>
+      </StaggerContainer>
 
       {/* Tabbed Content */}
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-flex">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="work">Work</TabsTrigger>
-          <TabsTrigger value="assets">Assets</TabsTrigger>
-          <TabsTrigger value="timeline">Timeline</TabsTrigger>
-        </TabsList>
+      <FadeIn delay={0.4}>
+        <Tabs defaultValue="overview" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-flex rounded-xl">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="work">Work</TabsTrigger>
+            <TabsTrigger value="assets">Assets</TabsTrigger>
+            <TabsTrigger value="timeline">Timeline</TabsTrigger>
+          </TabsList>
 
-        {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <PersonalInfoSection personal={personal} />
-            <AttendanceSection attendance={attendance} />
-          </div>
-          <LeaveSection leave={leave} />
-        </TabsContent>
+          {/* Overview Tab */}
+          <TabsContent value="overview" className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <PersonalInfoSection personal={personal} />
+              <AttendanceSection attendance={attendance} />
+            </div>
+            <LeaveSection leave={leave} />
+          </TabsContent>
 
-        {/* Work Tab */}
-        <TabsContent value="work" className="space-y-4">
-          <PerformanceSection performance={performance} />
-        </TabsContent>
+          {/* Work Tab */}
+          <TabsContent value="work" className="space-y-4">
+            <PerformanceSection performance={performance} />
+          </TabsContent>
 
-        {/* Assets Tab */}
-        <TabsContent value="assets" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <AssetsSection assets={assets} />
-            <DocumentsSection documents={documents} />
-          </div>
-        </TabsContent>
+          {/* Assets Tab */}
+          <TabsContent value="assets" className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <AssetsSection assets={assets} />
+              <DocumentsSection documents={documents} />
+            </div>
+          </TabsContent>
 
-        {/* Timeline Tab */}
-        <TabsContent value="timeline">
-          <TimelineSection timeline={timeline} />
-        </TabsContent>
-      </Tabs>
+          {/* Timeline Tab */}
+          <TabsContent value="timeline">
+            <TimelineSection timeline={timeline} />
+          </TabsContent>
+        </Tabs>
+      </FadeIn>
     </div>
   )
 }

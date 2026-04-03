@@ -1,3 +1,4 @@
+import { motion } from "framer-motion"
 import {
   Award,
   Gift,
@@ -10,6 +11,16 @@ import {
 import PropTypes from "prop-types"
 import { useState } from "react"
 
+import {
+  AnimatedCard,
+  BlurText,
+  FadeIn,
+  NumberTicker,
+  PulseBadge,
+  ShimmerButton,
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/magicui"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -61,21 +72,27 @@ const getInitials = (name = "") =>
 // ─── Stat card ────────────────────────────────────────────────────────────────
 
 const StatCard = ({ icon: Icon, iconColor, label, value, isLoading }) => (
-  <Card>
+  <AnimatedCard delay={0.1} className="border-0 shadow-sm rounded-xl">
     <CardContent className="flex items-center gap-4 pt-6">
-      <div className="rounded-lg bg-muted p-2.5">
+      <div className="rounded-xl bg-muted p-2.5">
         <Icon className={`h-5 w-5 ${iconColor}`} />
       </div>
       <div>
         {isLoading ? (
           <Skeleton className="h-7 w-12 mb-1" />
         ) : (
-          <p className="text-2xl font-bold">{value ?? 0}</p>
+          <p className="text-2xl font-bold">
+            {typeof value === "number" ? (
+              <NumberTicker value={value} />
+            ) : (
+              (value ?? 0)
+            )}
+          </p>
         )}
         <p className="text-xs text-muted-foreground">{label}</p>
       </div>
     </CardContent>
-  </Card>
+  </AnimatedCard>
 )
 
 StatCard.propTypes = {
@@ -103,43 +120,46 @@ const RewardCard = ({ reward }) => {
   })
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardContent className="pt-5">
-        <div className="flex items-start gap-4">
-          {/* Reward icon */}
-          <div className="rounded-full bg-muted p-3 shrink-0">
-            <Icon className={`h-6 w-6 ${meta.color}`} />
-          </div>
-          {/* Content */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-2">
-              <p className="font-semibold text-sm leading-snug">
-                {reward.title}
+    <motion.div
+      whileHover={{ y: -4, scale: 1.02 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+    >
+      <Card className="border-0 shadow-sm rounded-xl hover:shadow-lg transition-shadow">
+        <CardContent className="pt-5">
+          <div className="flex items-start gap-4">
+            <div className="rounded-full bg-muted p-3 shrink-0">
+              <Icon className={`h-6 w-6 ${meta.color}`} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-2">
+                <p className="font-semibold text-sm leading-snug">
+                  {reward.title}
+                </p>
+                {reward.points != null && (
+                  <PulseBadge color="purple">+{reward.points} pts</PulseBadge>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                {reward.description}
               </p>
-              {reward.points != null && (
-                <Badge variant="secondary" className="shrink-0 text-xs">
-                  +{reward.points} pts
-                </Badge>
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-              {reward.description}
-            </p>
-            <div className="flex items-center gap-2 mt-3">
-              <Avatar className="h-6 w-6 text-xs">
-                <AvatarFallback className="bg-primary/10 text-primary text-[10px]">
-                  {getInitials(reward.employeeName)}
-                </AvatarFallback>
-              </Avatar>
-              <span className="text-xs font-medium">{reward.employeeName}</span>
-              <span className="text-xs text-muted-foreground">
-                · {grantedAt}
-              </span>
+              <div className="flex items-center gap-2 mt-3">
+                <Avatar className="h-6 w-6 text-xs">
+                  <AvatarFallback className="bg-primary/10 text-primary text-[10px]">
+                    {getInitials(reward.employeeName)}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="text-xs font-medium">
+                  {reward.employeeName}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  · {grantedAt}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </motion.div>
   )
 }
 
@@ -150,7 +170,7 @@ RewardCard.propTypes = {
 // ─── Reward card skeleton ─────────────────────────────────────────────────────
 
 const RewardCardSkeleton = () => (
-  <Card>
+  <Card className="border-0 shadow-sm rounded-xl">
     <CardContent className="pt-5">
       <div className="flex items-start gap-4">
         <Skeleton className="h-12 w-12 rounded-full" />
@@ -195,7 +215,7 @@ const GrantRewardDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md rounded-xl">
         <DialogHeader>
           <DialogTitle>Grant Reward</DialogTitle>
         </DialogHeader>
@@ -226,13 +246,15 @@ const GrantRewardDialog = ({
             <Label>Reward Type</Label>
             <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
               {REWARD_TYPES.map(({ value, label, icon: Icon, color }) => (
-                <button
+                <motion.button
                   key={value}
                   type="button"
+                  whileHover={{ scale: 1.08 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() =>
                     setForm((previous) => ({ ...previous, type: value }))
                   }
-                  className={`flex flex-col items-center gap-1 rounded-lg border p-2.5 text-xs transition-colors ${
+                  className={`flex flex-col items-center gap-1 rounded-xl border p-2.5 text-xs transition-colors ${
                     form.type === value
                       ? "border-primary bg-primary/5"
                       : "border-input hover:bg-muted"
@@ -240,7 +262,7 @@ const GrantRewardDialog = ({
                 >
                   <Icon className={`h-5 w-5 ${color}`} />
                   {label}
-                </button>
+                </motion.button>
               ))}
             </div>
           </div>
@@ -329,91 +351,120 @@ const RewardsUI = ({
   return (
     <div className="p-4 md:p-6 space-y-6">
       {/* Page header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Rewards</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Recognize and celebrate employee achievements.
-          </p>
+      <FadeIn direction="down">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-yellow-600 shadow-lg shadow-amber-500/20">
+                <Trophy className="h-5 w-5 text-white" />
+              </div>
+              <BlurText
+                text="Rewards"
+                className="text-2xl font-bold"
+                delay={0.1}
+              />
+            </div>
+            <p className="text-sm text-muted-foreground mt-0.5 ml-13">
+              Recognize and celebrate employee achievements.
+            </p>
+          </div>
+          {isAdmin && (
+            <ShimmerButton className="shrink-0" onClick={onOpenGrant}>
+              <Award className="h-4 w-4 mr-2" />
+              Grant Reward
+            </ShimmerButton>
+          )}
         </div>
-        {isAdmin && (
-          <Button onClick={onOpenGrant} className="shrink-0">
-            <Award className="h-4 w-4 mr-2" />
-            Grant Reward
-          </Button>
-        )}
-      </div>
+      </FadeIn>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          icon={Trophy}
-          iconColor="text-amber-600"
-          label="Total Rewards"
-          value={stats.totalRewards}
-          isLoading={isLoading}
-        />
-        <StatCard
-          icon={TrendingUp}
-          iconColor="text-green-500"
-          label="Total Points"
-          value={stats.totalPoints?.toLocaleString()}
-          isLoading={isLoading}
-        />
-        <StatCard
-          icon={Star}
-          iconColor="text-yellow-500"
-          label="Stars Given"
-          value={stats.rewardsByType?.star}
-          isLoading={isLoading}
-        />
-        <StatCard
-          icon={Medal}
-          iconColor="text-purple-500"
-          label="Medals Given"
-          value={stats.rewardsByType?.medal}
-          isLoading={isLoading}
-        />
-      </div>
+      <StaggerContainer className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StaggerItem>
+          <StatCard
+            icon={Trophy}
+            iconColor="text-amber-600"
+            label="Total Rewards"
+            value={stats.totalRewards}
+            isLoading={isLoading}
+          />
+        </StaggerItem>
+        <StaggerItem>
+          <StatCard
+            icon={TrendingUp}
+            iconColor="text-green-500"
+            label="Total Points"
+            value={stats.totalPoints?.toLocaleString()}
+            isLoading={isLoading}
+          />
+        </StaggerItem>
+        <StaggerItem>
+          <StatCard
+            icon={Star}
+            iconColor="text-yellow-500"
+            label="Stars Given"
+            value={stats.rewardsByType?.star}
+            isLoading={isLoading}
+          />
+        </StaggerItem>
+        <StaggerItem>
+          <StatCard
+            icon={Medal}
+            iconColor="text-purple-500"
+            label="Medals Given"
+            value={stats.rewardsByType?.medal}
+            isLoading={isLoading}
+          />
+        </StaggerItem>
+      </StaggerContainer>
 
       {/* Search */}
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search rewards…"
-          value={search}
-          onChange={(event) => onSearchChange(event.target.value)}
-          className="pl-9"
-        />
-      </div>
+      <FadeIn delay={0.3}>
+        <div className="relative max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search rewards…"
+            value={search}
+            onChange={(event) => onSearchChange(event.target.value)}
+            className="pl-9 rounded-xl"
+          />
+        </div>
+      </FadeIn>
 
       {/* Rewards grid */}
       {isError ? (
-        <div className="text-center py-12 text-muted-foreground">
-          Failed to load rewards. Please try again.
-        </div>
+        <FadeIn>
+          <div className="text-center py-12 text-muted-foreground">
+            Failed to load rewards. Please try again.
+          </div>
+        </FadeIn>
       ) : isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {["rsk-1", "rsk-2", "rsk-3", "rsk-4", "rsk-5", "rsk-6"].map((key) => (
-            <RewardCardSkeleton key={key} />
-          ))}
-        </div>
-      ) : rewards.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground">
-          <Trophy className="h-12 w-12 mx-auto mb-3 opacity-30" />
-          <p className="font-medium">No rewards yet</p>
-          {isAdmin && (
-            <p className="text-sm mt-1">
-              Click &quot;Grant Reward&quot; to recognize an employee.
-            </p>
+          {["rsk-1", "rsk-2", "rsk-3", "rsk-4", "rsk-5", "rsk-6"].map(
+            (key) => (
+              <RewardCardSkeleton key={key} />
+            )
           )}
         </div>
+      ) : rewards.length === 0 ? (
+        <FadeIn>
+          <div className="text-center py-16 text-muted-foreground">
+            <Trophy className="h-12 w-12 mx-auto mb-3 opacity-30" />
+            <p className="font-medium">No rewards yet</p>
+            {isAdmin && (
+              <p className="text-sm mt-1">
+                Click &quot;Grant Reward&quot; to recognize an employee.
+              </p>
+            )}
+          </div>
+        </FadeIn>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {rewards.map((reward) => (
-            <RewardCard key={reward.id} reward={reward} />
+            <StaggerItem key={reward.id}>
+              <RewardCard reward={reward} />
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       )}
 
       {/* Grant dialog */}

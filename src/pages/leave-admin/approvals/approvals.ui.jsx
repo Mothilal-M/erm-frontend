@@ -1,11 +1,19 @@
+import { motion } from "framer-motion"
 import PropTypes from "prop-types"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
+
+import { AnimatedCard } from "@/components/magicui"
+import { BlurText } from "@/components/magicui"
+import { FadeIn } from "@/components/magicui"
+import { PulseBadge } from "@/components/magicui"
+import { ShimmerButton } from "@/components/magicui"
+import { StaggerContainer, StaggerItem } from "@/components/magicui"
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -24,6 +32,12 @@ const STATUS_STYLE = {
     "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30",
 }
 
+const STATUS_PULSE_COLOR = {
+  approved: "emerald",
+  rejected: "red",
+  pending: "amber",
+}
+
 const SUBTYPE_STYLE = {
   wfh: "bg-cyan-500/15 text-cyan-700 dark:text-cyan-400 border-cyan-500/30",
   halfday:
@@ -40,8 +54,8 @@ const SUBTYPE_LABEL = {
 // ─── Request Card ─────────────────────────────────────────────────────────────
 
 const RequestCard = ({ item, isActing, note, onNoteChange, onAction }) => (
-  <Card className="shadow-sm border border-border/60">
-    <CardContent className="p-4 space-y-3">
+  <AnimatedCard className="rounded-xl border border-border/60 hover:bg-muted/30 transition-colors">
+    <div className="p-4 space-y-3">
       {/* Top row: avatar + info + status badge */}
       <div className="flex items-start gap-3">
         <Avatar className="w-10 h-10 shrink-0 border">
@@ -64,12 +78,9 @@ const RequestCard = ({ item, isActing, note, onNoteChange, onAction }) => (
             Applied: {item.appliedOn}
           </p>
         </div>
-        <Badge
-          variant="outline"
-          className={`text-xs shrink-0 ${STATUS_STYLE[item.status]}`}
-        >
+        <PulseBadge color={STATUS_PULSE_COLOR[item.status] ?? "blue"}>
           {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-        </Badge>
+        </PulseBadge>
       </div>
 
       {/* Leave details */}
@@ -90,7 +101,7 @@ const RequestCard = ({ item, isActing, note, onNoteChange, onAction }) => (
       </div>
 
       {/* Reason */}
-      <p className="text-sm text-muted-foreground bg-muted/40 rounded-md px-3 py-2 border border-border/40">
+      <p className="text-sm text-muted-foreground bg-muted/40 rounded-xl px-3 py-2 border border-border/40">
         <span className="font-medium text-foreground">Reason:</span>{" "}
         {item.reason}
       </p>
@@ -102,32 +113,36 @@ const RequestCard = ({ item, isActing, note, onNoteChange, onAction }) => (
             placeholder="Add a note (optional)…"
             value={note ?? ""}
             onChange={(event) => onNoteChange(item.id, event.target.value)}
-            className="text-sm flex-1"
+            className="text-sm flex-1 rounded-xl"
             disabled={isActing}
           />
           <div className="flex gap-2 shrink-0">
-            <Button
-              size="sm"
-              className="bg-emerald-600 hover:bg-emerald-700 text-white flex-1 sm:flex-none"
-              onClick={() => onAction(item.id, "approved")}
-              disabled={isActing}
-            >
-              Approve
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="border-red-400 text-red-600 hover:bg-red-50 dark:hover:bg-red-950 flex-1 sm:flex-none"
-              onClick={() => onAction(item.id, "rejected")}
-              disabled={isActing}
-            >
-              Reject
-            </Button>
+            <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.97 }}>
+              <Button
+                size="sm"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white flex-1 sm:flex-none rounded-xl"
+                onClick={() => onAction(item.id, "approved")}
+                disabled={isActing}
+              >
+                Approve
+              </Button>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.97 }}>
+              <Button
+                size="sm"
+                variant="outline"
+                className="border-red-400 text-red-600 hover:bg-red-50 dark:hover:bg-red-950 flex-1 sm:flex-none rounded-xl"
+                onClick={() => onAction(item.id, "rejected")}
+                disabled={isActing}
+              >
+                Reject
+              </Button>
+            </motion.div>
           </div>
         </div>
       )}
-    </CardContent>
-  </Card>
+    </div>
+  </AnimatedCard>
 )
 
 RequestCard.propTypes = {
@@ -181,88 +196,100 @@ const ApprovalsUI = ({
 
   if (isError) {
     return (
-      <div className="flex items-center justify-center h-64 text-destructive">
-        Failed to load approval requests. Please try again.
-      </div>
+      <FadeIn direction="up" delay={0.1}>
+        <div className="flex items-center justify-center h-64 text-destructive">
+          Failed to load approval requests. Please try again.
+        </div>
+      </FadeIn>
     )
   }
 
   return (
     <div className="p-4 md:p-6 space-y-5">
       {/* Header */}
-      <div className="flex items-start justify-between gap-3 flex-wrap">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Leave Approvals</h1>
-          <p className="text-muted-foreground text-sm mt-0.5">
-            Review and act on employee leave, WFH, and half-day requests.
-          </p>
+      <FadeIn direction="up" delay={0}>
+        <div className="flex items-start justify-between gap-3 flex-wrap">
+          <div>
+            <BlurText
+              text="Leave Approvals"
+              className="text-2xl font-bold tracking-tight"
+              delay={0.05}
+            />
+            <p className="text-muted-foreground text-sm mt-0.5">
+              Review and act on employee leave, WFH, and half-day requests.
+            </p>
+          </div>
+          <ShimmerButton
+            onClick={onManualRecord}
+            className="shrink-0 px-4 py-2 text-sm rounded-xl"
+          >
+            ✏️ Manual Record
+          </ShimmerButton>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onManualRecord}
-          className="shrink-0"
-        >
-          ✏️ Manual Record
-        </Button>
-      </div>
+      </FadeIn>
 
       {/* Summary count chips */}
       {!isLoading && (
-        <div className="flex flex-wrap gap-2">
-          {FILTER_TABS.map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => onFilterChange(key)}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
-                filter === key
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-background border-border text-muted-foreground hover:border-primary/50"
-              }`}
-            >
-              {label}
-              <span
-                className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full ${
-                  filter === key ? "bg-primary-foreground/20" : "bg-muted"
+        <FadeIn direction="up" delay={0.15}>
+          <div className="flex flex-wrap gap-2">
+            {FILTER_TABS.map(({ key, label }) => (
+              <motion.button
+                key={key}
+                onClick={() => onFilterChange(key)}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`px-3 py-1.5 rounded-xl text-sm font-medium border transition-colors ${
+                  filter === key
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-background border-border text-muted-foreground hover:border-primary/50 hover:bg-muted/30"
                 }`}
               >
-                {counts[key]}
-              </span>
-            </button>
-          ))}
-        </div>
+                {label}
+                <span
+                  className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full ${
+                    filter === key ? "bg-primary-foreground/20" : "bg-muted"
+                  }`}
+                >
+                  {counts[key]}
+                </span>
+              </motion.button>
+            ))}
+          </div>
+        </FadeIn>
       )}
 
       {/* Request list */}
       {isLoading ? (
         <div className="space-y-3">
-          {}
           {Array.from({ length: 4 }).map((_, index) => (
             // eslint-disable-next-line react/no-array-index-key
             <Skeleton key={`skeleton-${index}`} className="h-36 rounded-xl" />
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <Card className="shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-base text-muted-foreground text-center py-8">
-              No {filter === "all" ? "" : filter} requests found.
-            </CardTitle>
-          </CardHeader>
-        </Card>
+        <FadeIn direction="up" delay={0.2}>
+          <Card className="shadow-sm rounded-xl">
+            <CardHeader>
+              <CardTitle className="text-base text-muted-foreground text-center py-8">
+                No {filter === "all" ? "" : filter} requests found.
+              </CardTitle>
+            </CardHeader>
+          </Card>
+        </FadeIn>
       ) : (
-        <div className="space-y-3">
+        <StaggerContainer className="space-y-3">
           {filtered.map((item) => (
-            <RequestCard
-              key={item.id}
-              item={item}
-              isActing={isActing}
-              note={noteMap[item.id]}
-              onNoteChange={onNoteChange}
-              onAction={onAction}
-            />
+            <StaggerItem key={item.id}>
+              <RequestCard
+                item={item}
+                isActing={isActing}
+                note={noteMap[item.id]}
+                onNoteChange={onNoteChange}
+                onAction={onAction}
+              />
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       )}
     </div>
   )

@@ -1,9 +1,14 @@
 import { Bell, Check, Trash2 } from "lucide-react"
+import { motion } from "framer-motion"
 import PropTypes from "prop-types"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { CardContent, CardHeader } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { AnimatedCard } from "@/components/magicui"
+import { BlurText } from "@/components/magicui"
+import { FadeIn } from "@/components/magicui"
+import { PulseBadge } from "@/components/magicui"
 
 const NotificationsUI = ({
   notifications,
@@ -15,36 +20,61 @@ const NotificationsUI = ({
 
   return (
     <div className="container mx-auto p-4 max-w-4xl">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <div className="flex items-center gap-2">
-            <Bell className="h-5 w-5" />
-            <CardTitle className="text-xl font-bold">Notifications</CardTitle>
+      <AnimatedCard delay={0.1} className="border-0 shadow-sm rounded-xl">
+        <FadeIn delay={0.15} direction="down">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 shadow-sm">
+                <Bell className="h-5 w-5 text-white" />
+              </div>
+              <BlurText
+                text="Notifications"
+                className="text-xl font-bold"
+                delay={0.2}
+              />
+              {unreadCount > 0 && (
+                <PulseBadge color="blue">
+                  {unreadCount} new
+                </PulseBadge>
+              )}
+            </div>
             {unreadCount > 0 && (
-              <span className="bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded-full">
-                {unreadCount} new
-              </span>
+              <motion.div
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+              >
+                <Button variant="outline" size="sm" onClick={onMarkAllAsRead}>
+                  <Check className="mr-2 h-4 w-4" />
+                  Mark all as read
+                </Button>
+              </motion.div>
             )}
-          </div>
-          {unreadCount > 0 && (
-            <Button variant="outline" size="sm" onClick={onMarkAllAsRead}>
-              <Check className="mr-2 h-4 w-4" />
-              Mark all as read
-            </Button>
-          )}
-        </CardHeader>
+          </CardHeader>
+        </FadeIn>
         <CardContent>
           {notifications.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
+            <motion.div
+              className="text-center py-8 text-muted-foreground"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+            >
               No notifications to display.
-            </div>
+            </motion.div>
           ) : (
             <ScrollArea className="h-[600px] pr-4">
               <div className="space-y-4">
-                {notifications.map((notification) => (
-                  <div
+                {notifications.map((notification, index) => (
+                  <motion.div
                     key={notification.id}
-                    className={`flex items-start justify-between p-4 rounded-lg border transition-colors ${
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.3,
+                      delay: index * 0.06,
+                      ease: "easeOut",
+                    }}
+                    className={`flex items-start justify-between p-4 rounded-xl border transition-colors ${
                       notification.read
                         ? "bg-background"
                         : "bg-muted/50 border-primary/20"
@@ -68,32 +98,42 @@ const NotificationsUI = ({
                     </div>
                     <div className="flex items-center gap-2">
                       {!notification.read && (
+                        <motion.div
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => onMarkAsRead(notification.id)}
+                            title="Mark as read"
+                          >
+                            <Check className="h-4 w-4" />
+                          </Button>
+                        </motion.div>
+                      )}
+                      <motion.div
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                      >
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => onMarkAsRead(notification.id)}
-                          title="Mark as read"
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          onClick={() => onDelete(notification.id)}
+                          title="Delete notification"
                         >
-                          <Check className="h-4 w-4" />
+                          <Trash2 className="h-4 w-4" />
                         </Button>
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                        onClick={() => onDelete(notification.id)}
-                        title="Delete notification"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      </motion.div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </ScrollArea>
           )}
         </CardContent>
-      </Card>
+      </AnimatedCard>
     </div>
   )
 }

@@ -1,3 +1,4 @@
+import { motion } from "framer-motion"
 import {
   Edit,
   Mail,
@@ -14,7 +15,6 @@ import PropTypes from "prop-types"
 import { Link } from "react-router-dom"
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -32,20 +32,29 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
+import {
+  AnimatedCard,
+  BlurText,
+  FadeIn,
+  NumberTicker,
+  PulseBadge,
+  ShimmerButton,
+} from "@/components/magicui"
+import { StaggerContainer, StaggerItem } from "@/components/magicui/stagger-container"
 import ct from "@constants/"
 
 // ─── Status badge helper ──────────────────────────────────────────────────────
 
-const statusVariant = {
-  active: "default",
-  inactive: "secondary",
-  invited: "outline",
+const statusColorMap = {
+  active: "emerald",
+  inactive: "red",
+  invited: "amber",
 }
 
 const StatusBadge = ({ status }) => (
-  <Badge variant={statusVariant[status] ?? "secondary"} className="capitalize">
+  <PulseBadge color={statusColorMap[status] ?? "blue"} className="capitalize">
     {status}
-  </Badge>
+  </PulseBadge>
 )
 
 StatusBadge.propTypes = { status: PropTypes.string.isRequired }
@@ -66,22 +75,34 @@ const EmployeeRowSkeleton = () => (
 
 // ─── Stats card ───────────────────────────────────────────────────────────────
 
-const StatsCard = ({ icon: Icon, label, value, isLoading }) => (
-  <Card>
+const statsGradients = {
+  total: "from-indigo-500 to-purple-600",
+  active: "from-emerald-500 to-teal-600",
+  invited: "from-amber-500 to-orange-600",
+}
+
+const StatsCard = ({ icon: Icon, label, value, isLoading, variant = "total", delay = 0 }) => (
+  <AnimatedCard delay={delay} className="rounded-xl border-0 shadow-sm">
     <CardContent className="flex items-center gap-4 pt-6">
-      <div className="rounded-lg bg-primary/10 p-2.5 text-primary">
+      <div
+        className={`rounded-lg bg-gradient-to-br ${statsGradients[variant]} p-2.5 text-white shadow-md`}
+      >
         <Icon className="h-5 w-5" />
       </div>
       <div>
         {isLoading ? (
           <Skeleton className="h-7 w-12 mb-1" />
         ) : (
-          <p className="text-2xl font-bold">{value}</p>
+          <NumberTicker
+            value={typeof value === "number" ? value : 0}
+            className="text-2xl font-bold"
+            delay={delay + 0.2}
+          />
         )}
         <p className="text-xs text-muted-foreground">{label}</p>
       </div>
     </CardContent>
-  </Card>
+  </AnimatedCard>
 )
 
 StatsCard.propTypes = {
@@ -89,6 +110,8 @@ StatsCard.propTypes = {
   label: PropTypes.string.isRequired,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   isLoading: PropTypes.bool.isRequired,
+  variant: PropTypes.string,
+  delay: PropTypes.number,
 }
 
 // ─── Employee row ─────────────────────────────────────────────────────────────
@@ -102,7 +125,10 @@ const EmployeeRow = ({ employee, onDelete, onSendInvite }) => {
     .slice(0, 2)
 
   return (
-    <div className="flex items-center gap-4 px-4 py-3 border-b last:border-0 hover:bg-muted/30 transition-colors">
+    <motion.div
+      className="flex items-center gap-4 px-4 py-3 border-b last:border-0 hover:bg-muted/30 transition-colors"
+      whileHover={{ backgroundColor: "rgba(0,0,0,0.02)" }}
+    >
       <Avatar className="h-9 w-9">
         <AvatarFallback className="text-sm font-semibold bg-primary/10 text-primary">
           {initials}
@@ -117,17 +143,19 @@ const EmployeeRow = ({ employee, onDelete, onSendInvite }) => {
       </div>
 
       <div className="hidden sm:block text-xs text-muted-foreground w-28 truncate">
-        {employee.department ?? "—"}
+        {employee.department ?? "\u2014"}
       </div>
 
       <StatusBadge status={employee.status} />
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
-            <MoreHorizontal className="h-4 w-4" />
-            <span className="sr-only">Actions</span>
-          </Button>
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+              <MoreHorizontal className="h-4 w-4" />
+              <span className="sr-only">Actions</span>
+            </Button>
+          </motion.div>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem asChild>
@@ -152,7 +180,7 @@ const EmployeeRow = ({ employee, onDelete, onSendInvite }) => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    </div>
+    </motion.div>
   )
 }
 
@@ -202,9 +230,15 @@ const EmployeeListContent = ({ isLoading, isError, employees, onDelete, onSendIn
     )
   }
 
-  return employees?.map((emp) => (
-    <EmployeeRow key={emp.id} employee={emp} onDelete={onDelete} onSendInvite={onSendInvite} />
-  ))
+  return (
+    <StaggerContainer>
+      {employees?.map((emp) => (
+        <StaggerItem key={emp.id}>
+          <EmployeeRow employee={emp} onDelete={onDelete} onSendInvite={onSendInvite} />
+        </StaggerItem>
+      ))}
+    </StaggerContainer>
+  )
 }
 
 EmployeeListContent.propTypes = {
@@ -230,30 +264,40 @@ const EmployeeListUI = ({
   return (
     <div className="space-y-6 p-6">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            Employee Management
-          </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Manage your organisation&apos;s employees
-          </p>
+      <FadeIn delay={0} direction="up">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 p-2.5 text-white shadow-lg shadow-indigo-500/25">
+              <Users className="h-6 w-6" />
+            </div>
+            <div>
+              <BlurText
+                text="Employee Management"
+                className="text-2xl font-bold tracking-tight"
+              />
+              <p className="text-sm text-muted-foreground mt-0.5">
+                Manage your organisation&apos;s employees
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+              <Button asChild variant="outline" size="sm" className="rounded-xl">
+                <Link to={ct.route.employeeManagement.INVITE}>
+                  <MailPlus className="mr-1.5 h-4 w-4" />
+                  Invite User
+                </Link>
+              </Button>
+            </motion.div>
+            <ShimmerButton className="h-8 px-3 py-0 text-sm" asChild>
+              <Link to={ct.route.employeeManagement.CREATE}>
+                <Plus className="mr-1.5 h-4 w-4" />
+                New Employee
+              </Link>
+            </ShimmerButton>
+          </div>
         </div>
-        <div className="flex gap-2 flex-wrap">
-          <Button asChild variant="outline" size="sm">
-            <Link to={ct.route.employeeManagement.INVITE}>
-              <MailPlus className="mr-1.5 h-4 w-4" />
-              Invite User
-            </Link>
-          </Button>
-          <Button asChild size="sm">
-            <Link to={ct.route.employeeManagement.CREATE}>
-              <Plus className="mr-1.5 h-4 w-4" />
-              New Employee
-            </Link>
-          </Button>
-        </div>
-      </div>
+      </FadeIn>
 
       {/* Stats */}
       <div className="grid gap-4 grid-cols-2 sm:grid-cols-3">
@@ -262,53 +306,61 @@ const EmployeeListUI = ({
           label="Total Employees"
           value={stats?.total}
           isLoading={isLoading}
+          variant="total"
+          delay={0.1}
         />
         <StatsCard
           icon={UserCheck}
           label="Active"
           value={stats?.active}
           isLoading={isLoading}
+          variant="active"
+          delay={0.2}
         />
         <StatsCard
           icon={UserRound}
           label="Pending Invite"
           value={stats?.invited}
           isLoading={isLoading}
+          variant="invited"
+          delay={0.3}
         />
       </div>
 
       {/* List card */}
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <CardTitle className="text-base">All Employees</CardTitle>
-              <CardDescription className="text-xs mt-0.5">
-                {isLoading ? "Loading…" : `${employees?.length ?? 0} records`}
-              </CardDescription>
+      <FadeIn delay={0.35} direction="up">
+        <Card className="rounded-xl border-0 shadow-sm overflow-hidden">
+          <CardHeader className="pb-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <CardTitle className="text-base">All Employees</CardTitle>
+                <CardDescription className="text-xs mt-0.5">
+                  {isLoading ? "Loading\u2026" : `${employees?.length ?? 0} records`}
+                </CardDescription>
+              </div>
+              <div className="relative w-full sm:w-64">
+                <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
+                <Input
+                  placeholder="Search by name or email\u2026"
+                  value={search}
+                  onChange={(event) => onSearchChange(event.target.value)}
+                  className="pl-8 h-8 text-sm rounded-xl"
+                />
+              </div>
             </div>
-            <div className="relative w-full sm:w-64">
-              <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
-              <Input
-                placeholder="Search by name or email…"
-                value={search}
-                onChange={(event) => onSearchChange(event.target.value)}
-                className="pl-8 h-8 text-sm"
-              />
-            </div>
-          </div>
-        </CardHeader>
+          </CardHeader>
 
-        <CardContent className="p-0">
-          <EmployeeListContent
-            isLoading={isLoading}
-            isError={isError}
-            employees={employees}
-            onDelete={onDelete}
-            onSendInvite={onSendInvite}
-          />
-        </CardContent>
-      </Card>
+          <CardContent className="p-0">
+            <EmployeeListContent
+              isLoading={isLoading}
+              isError={isError}
+              employees={employees}
+              onDelete={onDelete}
+              onSendInvite={onSendInvite}
+            />
+          </CardContent>
+        </Card>
+      </FadeIn>
     </div>
   )
 }

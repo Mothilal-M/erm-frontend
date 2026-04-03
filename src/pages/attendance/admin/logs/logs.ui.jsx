@@ -1,6 +1,7 @@
 import PropTypes from "prop-types"
+import { motion } from "framer-motion"
+import { ClipboardList } from "lucide-react"
 
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -9,8 +10,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Separator } from "@/components/ui/separator"
 import { exportLogsToCSV, exportLogsToJSON } from "@lib/utils/attendance-export"
+
+import AnimatedCard from "@/components/magicui/animated-card"
+import BlurText from "@/components/magicui/blur-text"
+import FadeIn from "@/components/magicui/fade-in"
+import PulseBadge from "@/components/magicui/pulse-badge"
 
 import EditEntryModal from "./components/edit-entry-modal"
 import FlagEntryModal from "./components/flag-entry-modal"
@@ -74,45 +79,47 @@ const EntryDetailPanel = ({ entry, onClose }) => {
   if (!entry) return null
 
   return (
-    <Card className="border-primary/30 bg-primary/5">
-      <CardHeader className="flex flex-row items-center justify-between py-3">
-        <CardTitle className="text-base">Entry Detail</CardTitle>
-        <Button size="sm" variant="ghost" onClick={onClose}>
-          Close
-        </Button>
-      </CardHeader>
-      <CardContent className="grid grid-cols-2 gap-2 text-sm md:grid-cols-4">
-        <div>
-          <p className="text-xs text-muted-foreground">Employee</p>
-          <p className="font-medium">{entry.employeeName ?? "—"}</p>
-        </div>
-        <div>
-          <p className="text-xs text-muted-foreground">Department</p>
-          <p className="font-medium">{entry.department ?? "—"}</p>
-        </div>
-        <div>
-          <p className="text-xs text-muted-foreground">Clock In</p>
-          <p className="font-medium">
-            {entry.clockIn ? new Date(entry.clockIn).toLocaleString() : "—"}
-          </p>
-        </div>
-        <div>
-          <p className="text-xs text-muted-foreground">Clock Out</p>
-          <p className="font-medium">
-            {entry.clockOut ? new Date(entry.clockOut).toLocaleString() : "—"}
-          </p>
-        </div>
-        <div>
-          <p className="text-xs text-muted-foreground">Duration</p>
-          <p className="font-medium">{entry.durationDisplay ?? "—"}</p>
-        </div>
-        <div>
-          <p className="text-xs text-muted-foreground">Status</p>
-          <p className="font-medium">{entry.status ?? "—"}</p>
-        </div>
-        <EntryDetailOptionalFields entry={entry} />
-      </CardContent>
-    </Card>
+    <AnimatedCard delay={0.1} className="border-0 shadow-sm">
+      <Card className="border-primary/30 bg-primary/5">
+        <CardHeader className="flex flex-row items-center justify-between py-3">
+          <CardTitle className="text-base">Entry Detail</CardTitle>
+          <Button size="sm" variant="ghost" onClick={onClose}>
+            Close
+          </Button>
+        </CardHeader>
+        <CardContent className="grid grid-cols-2 gap-2 text-sm md:grid-cols-4">
+          <div>
+            <p className="text-xs text-muted-foreground">Employee</p>
+            <p className="font-medium">{entry.employeeName ?? "—"}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Department</p>
+            <p className="font-medium">{entry.department ?? "—"}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Clock In</p>
+            <p className="font-medium">
+              {entry.clockIn ? new Date(entry.clockIn).toLocaleString() : "—"}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Clock Out</p>
+            <p className="font-medium">
+              {entry.clockOut ? new Date(entry.clockOut).toLocaleString() : "—"}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Duration</p>
+            <p className="font-medium">{entry.durationDisplay ?? "—"}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Status</p>
+            <p className="font-medium">{entry.status ?? "—"}</p>
+          </div>
+          <EntryDetailOptionalFields entry={entry} />
+        </CardContent>
+      </Card>
+    </AnimatedCard>
   )
 }
 
@@ -196,71 +203,103 @@ const AdminLogsUI = ({
   return (
     <div className="flex flex-col gap-6 p-4 md:p-6">
       {/* Page header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold">Attendance Logs</h1>
-          <p className="text-sm text-muted-foreground">
-            Review, edit, and manage employee attendance records.
-          </p>
+      <FadeIn direction="down" delay={0} duration={0.5}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-cyan-600 shadow-md">
+              <ClipboardList className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <BlurText
+                text="Attendance Logs"
+                className="text-xl font-semibold"
+                delay={0.05}
+              />
+              <p className="text-sm text-muted-foreground">
+                Review, edit, and manage employee attendance records.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <PulseBadge color="blue">
+              {totalCount ?? 0} record{totalCount !== 1 ? "s" : ""}
+            </PulseBadge>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="rounded-xl">
+                  Export
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <motion.div
+                  whileHover={{ x: 4 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                >
+                  <DropdownMenuItem
+                    onClick={() =>
+                      exportLogsToCSV(
+                        logs,
+                        `attendance-logs-${new Date().toISOString().split("T")[0]}.csv`
+                      )
+                    }
+                  >
+                    Export as CSV
+                  </DropdownMenuItem>
+                </motion.div>
+                <motion.div
+                  whileHover={{ x: 4 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                >
+                  <DropdownMenuItem
+                    onClick={() =>
+                      exportLogsToJSON(
+                        logs,
+                        `attendance-logs-${new Date().toISOString().split("T")[0]}.json`
+                      )
+                    }
+                  >
+                    Export as JSON
+                  </DropdownMenuItem>
+                </motion.div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <Badge variant="secondary">
-            {totalCount ?? 0} record{totalCount !== 1 ? "s" : ""}
-          </Badge>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                Export
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={() =>
-                  exportLogsToCSV(
-                    logs,
-                    `attendance-logs-${new Date().toISOString().split("T")[0]}.csv`
-                  )
-                }
-              >
-                Export as CSV
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() =>
-                  exportLogsToJSON(
-                    logs,
-                    `attendance-logs-${new Date().toISOString().split("T")[0]}.json`
-                  )
-                }
-              >
-                Export as JSON
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
+      </FadeIn>
 
-      <Separator />
+      <motion.div
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: 1 }}
+        transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+        style={{ originX: 0 }}
+      >
+        <div className="h-px w-full bg-border" />
+      </motion.div>
 
       {/* Filters row */}
-      <LogsFilters
-        filters={filters}
-        onChange={onFilterChange}
-        onReset={onFilterReset}
-        onAddManualEntry={onManualOpen}
-      />
+      <FadeIn direction="up" delay={0.15} duration={0.4}>
+        <LogsFilters
+          filters={filters}
+          onChange={onFilterChange}
+          onReset={onFilterReset}
+          onAddManualEntry={onManualOpen}
+        />
+      </FadeIn>
 
       {/* Logs table */}
-      <LogsTable
-        logs={logs}
-        isLoading={isLoading}
-        page={page}
-        totalCount={totalCount}
-        pageSize={pageSize}
-        onPageChange={onPageChange}
-        onEdit={onEditOpen}
-        onFlag={onFlagOpen}
-        onView={onViewOpen}
-      />
+      <FadeIn direction="up" delay={0.25} duration={0.4}>
+        <LogsTable
+          logs={logs}
+          isLoading={isLoading}
+          page={page}
+          totalCount={totalCount}
+          pageSize={pageSize}
+          onPageChange={onPageChange}
+          onEdit={onEditOpen}
+          onFlag={onFlagOpen}
+          onView={onViewOpen}
+        />
+      </FadeIn>
 
       {/* View detail panel (inline card) */}
       <EntryDetailPanel entry={viewEntry} onClose={onViewClose} />
