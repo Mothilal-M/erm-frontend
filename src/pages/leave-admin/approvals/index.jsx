@@ -45,7 +45,7 @@ const ApprovalsPage = () => {
             variant: "destructive",
           })
         },
-      }
+      },
     )
   }
 

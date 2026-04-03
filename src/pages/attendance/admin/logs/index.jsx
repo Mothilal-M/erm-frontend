@@ -67,7 +67,7 @@ const AdminLogs = () => {
         onError: () => {
           toast({ title: "Failed to update entry.", variant: "destructive" })
         },
-      }
+      },
     )
   }
 
@@ -88,7 +88,7 @@ const AdminLogs = () => {
         onError: () => {
           toast({ title: "Failed to update flag.", variant: "destructive" })
         },
-      }
+      },
     )
   }
 

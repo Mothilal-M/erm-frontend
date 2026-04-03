@@ -88,7 +88,7 @@ export function renderWithProviders(
     route = "/",
     theme = "light",
     ...renderOptions
-  } = {}
+  } = {},
 ) {
   // Use route if provided, otherwise use initialEntries
   const entries = route !== "/" ? [route] : initialEntries
@@ -126,7 +126,7 @@ export function renderWithRedux(
     preloadedState = {},
     store = createTestStore(preloadedState),
     ...renderOptions
-  } = {}
+  } = {},
 ) {
   function Wrapper({ children }) {
     return <Provider store={store}>{children}</Provider>
@@ -146,7 +146,7 @@ export function renderWithRedux(
  */
 export function renderWithQuery(
   ui,
-  { queryClient = createTestQueryClient(), ...renderOptions } = {}
+  { queryClient = createTestQueryClient(), ...renderOptions } = {},
 ) {
   function Wrapper({ children }) {
     return (
@@ -173,7 +173,7 @@ export function renderWithRouter(
     initialIndex = 0,
     route = "/",
     ...renderOptions
-  } = {}
+  } = {},
 ) {
   const entries = route !== "/" ? [route] : initialEntries
 
@@ -261,7 +261,7 @@ export async function userType(element, value, delay = 50) {
 export function createMockFile(
   name = "test.txt",
   size = 1024,
-  type = "text/plain"
+  type = "text/plain",
 ) {
   const blob = new Blob(["a".repeat(size)], { type })
   return new File([blob], name, { type })

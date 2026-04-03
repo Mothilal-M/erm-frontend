@@ -397,7 +397,7 @@ export const projectHandlers = [
         return new HttpResponse(null, { status: 404 })
       }
       return HttpResponse.json(task)
-    }
+    },
   ),
 
   http.patch(
@@ -414,7 +414,7 @@ export const projectHandlers = [
       tasks[taskIndex] = updatedTask
 
       return HttpResponse.json(updatedTask)
-    }
+    },
   ),
 
   http.post(
@@ -437,7 +437,7 @@ export const projectHandlers = [
       task.comments.push(newComment)
 
       return HttpResponse.json(newComment, { status: 201 })
-    }
+    },
   ),
 
   // AI Insights endpoints
@@ -449,7 +449,7 @@ export const projectHandlers = [
         return new HttpResponse(null, { status: 404 })
       }
       return HttpResponse.json(insights)
-    }
+    },
   ),
 
   // Workflow endpoints
@@ -477,7 +477,7 @@ export const projectHandlers = [
       const updated = { ...workflow, ...body }
       mockWorkflows[params.projectId] = updated
       return HttpResponse.json(updated)
-    }
+    },
   ),
 
   // Analytics endpoints
@@ -489,6 +489,6 @@ export const projectHandlers = [
         return new HttpResponse(null, { status: 404 })
       }
       return HttpResponse.json(analytics)
-    }
+    },
   ),
 ]

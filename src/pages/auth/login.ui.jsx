@@ -77,7 +77,8 @@ const LoginUI = ({ form, onSubmit, onGoogleLogin, loading }) => {
               Management
             </h2>
             <p className="text-slate-400 text-lg max-w-md leading-relaxed">
-              Streamline your workforce management with powerful tools for attendance, leaves, and team collaboration.
+              Streamline your workforce management with powerful tools for
+              attendance, leaves, and team collaboration.
             </p>
             <div className="flex gap-8 pt-4">
               <div>
@@ -109,7 +110,9 @@ const LoginUI = ({ form, onSubmit, onGoogleLogin, loading }) => {
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-3 mb-4">
             <div className="h-9 w-9 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground text-base font-bold">E</span>
+              <span className="text-primary-foreground text-base font-bold">
+                E
+              </span>
             </div>
             <span className="text-lg font-semibold">ERM</span>
           </div>
@@ -180,7 +183,9 @@ const LoginUI = ({ form, onSubmit, onGoogleLogin, loading }) => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium">Password</FormLabel>
+                    <FormLabel className="text-sm font-medium">
+                      Password
+                    </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

@@ -83,7 +83,7 @@ const EditEmployee = () => {
             variant: "destructive",
           })
         },
-      }
+      },
     )
   }
 

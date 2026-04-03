@@ -93,7 +93,7 @@ const createEmployee = http.post(
     }
     employees = [...employees, newEmployee]
     return HttpResponse.json(newEmployee, { status: 201 })
-  }
+  },
 )
 
 // ─── PATCH /employee-management/:id/ ─────────────────────────────────────────
@@ -108,7 +108,7 @@ const updateEmployee = http.patch(
     }
     employees[idx] = { ...employees[idx], ...body }
     return HttpResponse.json(employees[idx])
-  }
+  },
 )
 
 // ─── DELETE /employee-management/:id/ ────────────────────────────────────────
@@ -122,7 +122,7 @@ const removeEmployee = http.delete(
     }
     employees = employees.filter((e) => e.id !== Number(params.id))
     return HttpResponse.json({ detail: "Deleted." })
-  }
+  },
 )
 
 // ─── POST /employee-management/invite/ ───────────────────────────────────────
@@ -144,9 +144,9 @@ const inviteUser = http.post(
     employees = [...employees, invited]
     return HttpResponse.json(
       { detail: `Invitation sent to ${body.email}.`, employee: invited },
-      { status: 201 }
+      { status: 201 },
     )
-  }
+  },
 )
 
 const mockEmployeePerformance = {
@@ -222,7 +222,7 @@ const mockEmployeePerformance = {
 }
 
 const getEmployeePerformance = http.get("*/employee/performance/", () =>
-  HttpResponse.json(mockEmployeePerformance)
+  HttpResponse.json(mockEmployeePerformance),
 )
 
 // ─── GET /employee-management/profile/:id ─────────────────────────────────────
@@ -405,7 +405,7 @@ const getEmployee360Profile = http.get(
     }
 
     return HttpResponse.json(profile360)
-  }
+  },
 )
 
 const handlers = [

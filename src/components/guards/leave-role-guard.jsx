@@ -52,13 +52,13 @@ const ROLE_LABELS = {
 const LeaveRoleGuard = ({ children, allowedRoles }) => {
   const navigate = useNavigate()
   const leaveRole = useSelector(
-    (s) => s[ct.store.USER_STORE].leave_management_role
+    (s) => s[ct.store.USER_STORE].leave_management_role,
   )
   const hasAccess = allowedRoles.includes(leaveRole)
 
   const [countdown, setCountdown] = useState(3)
   const [message] = useState(
-    () => FUNNY_MESSAGES[Math.floor(Math.random() * FUNNY_MESSAGES.length)]
+    () => FUNNY_MESSAGES[Math.floor(Math.random() * FUNNY_MESSAGES.length)],
   )
 
   useEffect(() => {

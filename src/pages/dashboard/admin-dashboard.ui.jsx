@@ -43,7 +43,10 @@ import {
   AnimatedProgress,
   PulseBadge,
 } from "@/components/magicui"
-import { StaggerContainer, StaggerItem } from "@/components/magicui/stagger-container"
+import {
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/magicui/stagger-container"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -64,14 +67,54 @@ const STAT_KEYS = ["s1", "s2", "s3", "s4", "s5", "s6"]
 const CHART_KEYS = ["c1", "c2", "c3"]
 
 const QUICK_LINKS = [
-  { label: "Employees", icon: Users, to: "/employee-management", gradient: "from-indigo-500 to-blue-600" },
-  { label: "Departments", icon: Building2, to: "/employee-management/departments", gradient: "from-purple-500 to-violet-600" },
-  { label: "Live Attendance", icon: Activity, to: "/attendance/admin/live", gradient: "from-emerald-500 to-green-600" },
-  { label: "Attendance Logs", icon: Clock, to: "/attendance/admin/logs", gradient: "from-blue-500 to-cyan-500" },
-  { label: "Attendance Summary", icon: BarChart2, to: "/attendance/admin/summary", gradient: "from-cyan-500 to-teal-500" },
-  { label: "Leave Dashboard", icon: Calendar, to: "/leave/admin", gradient: "from-orange-500 to-amber-500" },
-  { label: "Leave Approvals", icon: CheckCircle2, to: "/leave/admin/approvals", gradient: "from-emerald-500 to-green-500" },
-  { label: "Projects", icon: FolderOpen, to: "/projects", gradient: "from-rose-500 to-pink-500" },
+  {
+    label: "Employees",
+    icon: Users,
+    to: "/employee-management",
+    gradient: "from-indigo-500 to-blue-600",
+  },
+  {
+    label: "Departments",
+    icon: Building2,
+    to: "/employee-management/departments",
+    gradient: "from-purple-500 to-violet-600",
+  },
+  {
+    label: "Live Attendance",
+    icon: Activity,
+    to: "/attendance/admin/live",
+    gradient: "from-emerald-500 to-green-600",
+  },
+  {
+    label: "Attendance Logs",
+    icon: Clock,
+    to: "/attendance/admin/logs",
+    gradient: "from-blue-500 to-cyan-500",
+  },
+  {
+    label: "Attendance Summary",
+    icon: BarChart2,
+    to: "/attendance/admin/summary",
+    gradient: "from-cyan-500 to-teal-500",
+  },
+  {
+    label: "Leave Dashboard",
+    icon: Calendar,
+    to: "/leave/admin",
+    gradient: "from-orange-500 to-amber-500",
+  },
+  {
+    label: "Leave Approvals",
+    icon: CheckCircle2,
+    to: "/leave/admin/approvals",
+    gradient: "from-emerald-500 to-green-500",
+  },
+  {
+    label: "Projects",
+    icon: FolderOpen,
+    to: "/projects",
+    gradient: "from-rose-500 to-pink-500",
+  },
 ]
 
 /* ---- Stat Card ---- */
@@ -80,17 +123,28 @@ const StatCard = ({ label, value, icon: Icon, gradient, to, delay = 0 }) => (
     <CardContent className="pt-5 pb-4">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            {label}
+          </p>
           <p className="text-3xl font-bold mt-1.5 tracking-tight tabular-nums">
-            {typeof value === "number" ? <NumberTicker value={value} delay={delay + 0.2} /> : value}
+            {typeof value === "number" ? (
+              <NumberTicker value={value} delay={delay + 0.2} />
+            ) : (
+              value
+            )}
           </p>
         </div>
-        <div className={`rounded-xl p-3 bg-gradient-to-br ${gradient} text-white shadow-lg`}>
+        <div
+          className={`rounded-xl p-3 bg-gradient-to-br ${gradient} text-white shadow-lg`}
+        >
           <Icon className="h-5 w-5" />
         </div>
       </div>
       {to && (
-        <Link to={to} className="mt-3 flex items-center gap-1 text-xs text-primary font-medium hover:gap-2 transition-all">
+        <Link
+          to={to}
+          className="mt-3 flex items-center gap-1 text-xs text-primary font-medium hover:gap-2 transition-all"
+        >
           View details <ArrowRight className="h-3 w-3" />
         </Link>
       )}
@@ -108,7 +162,8 @@ StatCard.propTypes = {
 StatCard.defaultProps = { to: null, delay: 0 }
 
 /* ---- Admin Stats Grid ---- */
-const countActive = (list) => Array.isArray(list) ? list.filter((p) => p.status === "Active").length : 0
+const countActive = (list) =>
+  Array.isArray(list) ? list.filter((p) => p.status === "Active").length : 0
 
 const getAdminStats = (employees, projects, leaveSummary) => ({
   totalEmp: employees?.length ?? 0,
@@ -120,20 +175,70 @@ const getAdminStats = (employees, projects, leaveSummary) => ({
 })
 
 const AdminStatsGrid = ({ employees, projects, leaveSummary }) => {
-  const { totalEmp, activeProjects, pending, avgPresent, wfh, onLeave } = getAdminStats(employees, projects, leaveSummary)
+  const { totalEmp, activeProjects, pending, avgPresent, wfh, onLeave } =
+    getAdminStats(employees, projects, leaveSummary)
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
-      <StatCard label="Total Employees" value={totalEmp} icon={Users} gradient="from-indigo-500 to-blue-600" to="/employee-management" delay={0} />
-      <StatCard label="Active Projects" value={activeProjects} icon={FolderOpen} gradient="from-purple-500 to-violet-600" to="/projects" delay={0.06} />
-      <StatCard label="Pending Leaves" value={pending} icon={AlertCircle} gradient="from-orange-500 to-amber-500" to="/leave/admin/approvals" delay={0.12} />
-      <StatCard label="Avg Daily Present" value={avgPresent} icon={UserCheck} gradient="from-emerald-500 to-green-600" to="/attendance/admin/summary" delay={0.18} />
-      <StatCard label="WFH This Month" value={wfh} icon={Home} gradient="from-cyan-500 to-teal-500" delay={0.24} />
-      <StatCard label="Avg On Leave" value={onLeave} icon={Calendar} gradient="from-rose-500 to-pink-600" to="/leave/admin" delay={0.3} />
+      <StatCard
+        label="Total Employees"
+        value={totalEmp}
+        icon={Users}
+        gradient="from-indigo-500 to-blue-600"
+        to="/employee-management"
+        delay={0}
+      />
+      <StatCard
+        label="Active Projects"
+        value={activeProjects}
+        icon={FolderOpen}
+        gradient="from-purple-500 to-violet-600"
+        to="/projects"
+        delay={0.06}
+      />
+      <StatCard
+        label="Pending Leaves"
+        value={pending}
+        icon={AlertCircle}
+        gradient="from-orange-500 to-amber-500"
+        to="/leave/admin/approvals"
+        delay={0.12}
+      />
+      <StatCard
+        label="Avg Daily Present"
+        value={avgPresent}
+        icon={UserCheck}
+        gradient="from-emerald-500 to-green-600"
+        to="/attendance/admin/summary"
+        delay={0.18}
+      />
+      <StatCard
+        label="WFH This Month"
+        value={wfh}
+        icon={Home}
+        gradient="from-cyan-500 to-teal-500"
+        delay={0.24}
+      />
+      <StatCard
+        label="Avg On Leave"
+        value={onLeave}
+        icon={Calendar}
+        gradient="from-rose-500 to-pink-600"
+        to="/leave/admin"
+        delay={0.3}
+      />
     </div>
   )
 }
-AdminStatsGrid.propTypes = { employees: PropTypes.array, projects: PropTypes.array, leaveSummary: PropTypes.object }
-AdminStatsGrid.defaultProps = { employees: [], projects: [], leaveSummary: null }
+AdminStatsGrid.propTypes = {
+  employees: PropTypes.array,
+  projects: PropTypes.array,
+  leaveSummary: PropTypes.object,
+}
+AdminStatsGrid.defaultProps = {
+  employees: [],
+  projects: [],
+  leaveSummary: null,
+}
 
 /* ---- Attendance Trend Chart ---- */
 const WEEK_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"]
@@ -169,10 +274,17 @@ const AttendanceTrendChart = ({ leaveSummary }) => {
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-base font-semibold">Weekly Attendance Trend</CardTitle>
-            <CardDescription>Present / WFH / On Leave this week</CardDescription>
+            <CardTitle className="text-base font-semibold">
+              Weekly Attendance Trend
+            </CardTitle>
+            <CardDescription>
+              Present / WFH / On Leave this week
+            </CardDescription>
           </div>
-          <Link to="/attendance/admin/summary" className="text-xs text-primary font-medium flex items-center gap-1 hover:gap-2 transition-all">
+          <Link
+            to="/attendance/admin/summary"
+            className="text-xs text-primary font-medium flex items-center gap-1 hover:gap-2 transition-all"
+          >
             Full report <ArrowUpRight className="h-3 w-3" />
           </Link>
         </div>
@@ -190,14 +302,37 @@ const AttendanceTrendChart = ({ leaveSummary }) => {
                 <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="hsl(var(--border))"
+              opacity={0.5}
+            />
             <XAxis dataKey="day" tick={{ fontSize: 12 }} />
             <YAxis tick={{ fontSize: 12 }} />
             <Tooltip contentStyle={tooltipStyle} />
             <Legend />
-            <Area type="monotone" dataKey="present" stroke="#6366f1" fill="url(#gradPresent)" strokeWidth={2} />
-            <Area type="monotone" dataKey="wfh" stroke="#22c55e" fill="url(#gradWfh)" strokeWidth={2} />
-            <Area type="monotone" dataKey="onLeave" stroke="#f59e0b" fill="none" strokeWidth={2} strokeDasharray="4 2" />
+            <Area
+              type="monotone"
+              dataKey="present"
+              stroke="#6366f1"
+              fill="url(#gradPresent)"
+              strokeWidth={2}
+            />
+            <Area
+              type="monotone"
+              dataKey="wfh"
+              stroke="#22c55e"
+              fill="url(#gradWfh)"
+              strokeWidth={2}
+            />
+            <Area
+              type="monotone"
+              dataKey="onLeave"
+              stroke="#f59e0b"
+              fill="none"
+              strokeWidth={2}
+              strokeDasharray="4 2"
+            />
           </AreaChart>
         </ResponsiveContainer>
       </CardContent>
@@ -213,14 +348,26 @@ const LeaveBreakdownChart = ({ leaveSummary }) => {
   return (
     <AnimatedCard delay={0.25} className="border-0 shadow-sm">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold">Leave Breakdown</CardTitle>
+        <CardTitle className="text-base font-semibold">
+          Leave Breakdown
+        </CardTitle>
         <CardDescription>By leave type this month</CardDescription>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={220}>
           <PieChart>
-            <Pie data={data} dataKey="count" nameKey="type" cx="50%" cy="50%" outerRadius={80}
-              label={({ type, percent }) => `${type} ${(percent * 100).toFixed(0)}%`} labelLine={false}>
+            <Pie
+              data={data}
+              dataKey="count"
+              nameKey="type"
+              cx="50%"
+              cy="50%"
+              outerRadius={80}
+              label={({ type, percent }) =>
+                `${type} ${(percent * 100).toFixed(0)}%`
+              }
+              labelLine={false}
+            >
               {data.map((entry) => (
                 <Cell key={entry.type} fill={entry.color ?? CHART_COLORS[0]} />
               ))}
@@ -241,13 +388,21 @@ const DepartmentStatsChart = ({ leaveSummary }) => {
   return (
     <AnimatedCard delay={0.3} className="border-0 shadow-sm">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold">Department Overview</CardTitle>
-        <CardDescription>Present / On Leave / WFH per department</CardDescription>
+        <CardTitle className="text-base font-semibold">
+          Department Overview
+        </CardTitle>
+        <CardDescription>
+          Present / On Leave / WFH per department
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={data} barGap={4}>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="hsl(var(--border))"
+              opacity={0.5}
+            />
             <XAxis dataKey="department" tick={{ fontSize: 11 }} />
             <YAxis tick={{ fontSize: 11 }} />
             <Tooltip contentStyle={tooltipStyle} />
@@ -275,10 +430,15 @@ const ProjectProgressChart = ({ projects }) => {
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-base font-semibold">Project Progress</CardTitle>
+            <CardTitle className="text-base font-semibold">
+              Project Progress
+            </CardTitle>
             <CardDescription>Completion % for active projects</CardDescription>
           </div>
-          <Link to="/projects" className="text-xs text-primary font-medium flex items-center gap-1 hover:gap-2 transition-all">
+          <Link
+            to="/projects"
+            className="text-xs text-primary font-medium flex items-center gap-1 hover:gap-2 transition-all"
+          >
             All projects <ArrowUpRight className="h-3 w-3" />
           </Link>
         </div>
@@ -286,11 +446,28 @@ const ProjectProgressChart = ({ projects }) => {
       <CardContent>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart layout="vertical" data={data}>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="hsl(var(--border))"
+              opacity={0.5}
+            />
             <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 11 }} />
-            <YAxis dataKey="name" type="category" width={110} tick={{ fontSize: 11 }} />
-            <Tooltip contentStyle={tooltipStyle} formatter={(v) => [`${v}%`, "Progress"]} />
-            <Bar dataKey="progress" fill="#6366f1" radius={[0, 6, 6, 0]} background={{ fill: "hsl(var(--muted))", radius: [0, 6, 6, 0] }} />
+            <YAxis
+              dataKey="name"
+              type="category"
+              width={110}
+              tick={{ fontSize: 11 }}
+            />
+            <Tooltip
+              contentStyle={tooltipStyle}
+              formatter={(v) => [`${v}%`, "Progress"]}
+            />
+            <Bar
+              dataKey="progress"
+              fill="#6366f1"
+              radius={[0, 6, 6, 0]}
+              background={{ fill: "hsl(var(--muted))", radius: [0, 6, 6, 0] }}
+            />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>
@@ -308,17 +485,26 @@ const PendingApprovals = ({ leaveSummary }) => {
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-base font-semibold">Pending Leave Approvals</CardTitle>
-            <CardDescription>{approvals.length} requests awaiting review</CardDescription>
+            <CardTitle className="text-base font-semibold">
+              Pending Leave Approvals
+            </CardTitle>
+            <CardDescription>
+              {approvals.length} requests awaiting review
+            </CardDescription>
           </div>
-          <Link to="/leave/admin/approvals" className="text-xs text-primary font-medium flex items-center gap-1 hover:gap-2 transition-all">
+          <Link
+            to="/leave/admin/approvals"
+            className="text-xs text-primary font-medium flex items-center gap-1 hover:gap-2 transition-all"
+          >
             Review all <ArrowUpRight className="h-3 w-3" />
           </Link>
         </div>
       </CardHeader>
       <CardContent className="space-y-2 max-h-72 overflow-y-auto">
         {approvals.length === 0 && (
-          <p className="text-sm text-muted-foreground text-center py-6">No pending approvals</p>
+          <p className="text-sm text-muted-foreground text-center py-6">
+            No pending approvals
+          </p>
         )}
         {approvals.map((approval, idx) => (
           <motion.div
@@ -337,7 +523,8 @@ const PendingApprovals = ({ leaveSummary }) => {
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium truncate">{approval.name}</p>
               <p className="text-xs text-muted-foreground">
-                {approval.type} · {approval.days} day{approval.days !== 1 ? "s" : ""}
+                {approval.type} · {approval.days} day
+                {approval.days !== 1 ? "s" : ""}
               </p>
             </div>
             <PulseBadge color="amber">{approval.from}</PulseBadge>
@@ -356,12 +543,16 @@ const RecentActivity = ({ leaveSummary }) => {
   return (
     <AnimatedCard delay={0.35} className="border-0 shadow-sm">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold">Recent Activity</CardTitle>
+        <CardTitle className="text-base font-semibold">
+          Recent Activity
+        </CardTitle>
         <CardDescription>Latest leave & attendance events</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3 max-h-72 overflow-y-auto">
         {activity.length === 0 && (
-          <p className="text-sm text-muted-foreground text-center py-6">No recent activity</p>
+          <p className="text-sm text-muted-foreground text-center py-6">
+            No recent activity
+          </p>
         )}
         {activity.map((item, idx) => (
           <motion.div
@@ -377,7 +568,9 @@ const RecentActivity = ({ leaveSummary }) => {
                 <span className="font-medium">{item.name}</span>{" "}
                 <span className="text-muted-foreground">{item.action}</span>
               </p>
-              <p className="text-xs text-muted-foreground">{item.date} · {item.type}</p>
+              <p className="text-xs text-muted-foreground">
+                {item.date} · {item.type}
+              </p>
             </div>
           </motion.div>
         ))}
@@ -394,7 +587,9 @@ const TopLeaveTakers = ({ leaveSummary }) => {
   return (
     <AnimatedCard delay={0.35} className="border-0 shadow-sm">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold">Top Leave Takers</CardTitle>
+        <CardTitle className="text-base font-semibold">
+          Top Leave Takers
+        </CardTitle>
         <CardDescription>Employees with most leave this month</CardDescription>
       </CardHeader>
       <CardContent className="space-y-2.5">
@@ -406,15 +601,25 @@ const TopLeaveTakers = ({ leaveSummary }) => {
             transition={{ delay: 0.4 + idx * 0.06 }}
             className="flex items-center gap-3"
           >
-            <span className="text-sm font-bold text-muted-foreground w-4 tabular-nums">{idx + 1}</span>
+            <span className="text-sm font-bold text-muted-foreground w-4 tabular-nums">
+              {idx + 1}
+            </span>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium truncate">{person.name}</p>
-              <p className="text-xs text-muted-foreground">{person.department}</p>
+              <p className="text-xs text-muted-foreground">
+                {person.department}
+              </p>
             </div>
             <div className="w-24">
-              <AnimatedProgress value={Math.min((person.totalDays / 5) * 100, 100)} height="h-1.5" delay={0.5 + idx * 0.06} />
+              <AnimatedProgress
+                value={Math.min((person.totalDays / 5) * 100, 100)}
+                height="h-1.5"
+                delay={0.5 + idx * 0.06}
+              />
             </div>
-            <span className="text-sm font-semibold w-10 text-right tabular-nums">{person.totalDays}d</span>
+            <span className="text-sm font-semibold w-10 text-right tabular-nums">
+              {person.totalDays}d
+            </span>
           </motion.div>
         ))}
       </CardContent>
@@ -434,7 +639,10 @@ const ProjectsList = ({ projects }) => {
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <FolderOpen className="h-4 w-4 text-rose-500" /> Active Projects
           </CardTitle>
-          <Link to="/projects" className="text-xs text-primary font-medium flex items-center gap-1 hover:gap-2 transition-all">
+          <Link
+            to="/projects"
+            className="text-xs text-primary font-medium flex items-center gap-1 hover:gap-2 transition-all"
+          >
             View all <ArrowUpRight className="h-3 w-3" />
           </Link>
         </div>
@@ -449,15 +657,28 @@ const ProjectsList = ({ projects }) => {
             className="space-y-1.5"
           >
             <div className="flex items-center justify-between">
-              <Link to={`/projects/${project.id}`} className="text-sm font-medium hover:text-primary transition-colors truncate max-w-[60%]">
+              <Link
+                to={`/projects/${project.id}`}
+                className="text-sm font-medium hover:text-primary transition-colors truncate max-w-[60%]"
+              >
                 {project.name}
               </Link>
-              <Badge variant={project.status === "Active" ? "default" : "secondary"} className="text-xs shrink-0 rounded-lg">
+              <Badge
+                variant={project.status === "Active" ? "default" : "secondary"}
+                className="text-xs shrink-0 rounded-lg"
+              >
                 {project.status}
               </Badge>
             </div>
-            <AnimatedProgress value={project.progress ?? 0} height="h-1.5" barClassName="bg-gradient-to-r from-indigo-500 to-purple-500" delay={0.5 + idx * 0.06} />
-            <p className="text-xs text-muted-foreground text-right tabular-nums">{project.progress ?? 0}% complete</p>
+            <AnimatedProgress
+              value={project.progress ?? 0}
+              height="h-1.5"
+              barClassName="bg-gradient-to-r from-indigo-500 to-purple-500"
+              delay={0.5 + idx * 0.06}
+            />
+            <p className="text-xs text-muted-foreground text-right tabular-nums">
+              {project.progress ?? 0}% complete
+            </p>
           </motion.div>
         ))}
       </CardContent>
@@ -472,7 +693,9 @@ const QuickLinks = () => (
   <FadeIn delay={0.4}>
     <Card className="border-0 shadow-sm">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold">Quick Navigation</CardTitle>
+        <CardTitle className="text-base font-semibold">
+          Quick Navigation
+        </CardTitle>
         <CardDescription>Jump to any module</CardDescription>
       </CardHeader>
       <CardContent>
@@ -490,7 +713,9 @@ const QuickLinks = () => (
                 >
                   <link.icon className="h-4 w-4" />
                 </motion.div>
-                <span className="text-xs font-medium text-center">{link.label}</span>
+                <span className="text-xs font-medium text-center">
+                  {link.label}
+                </span>
               </Link>
             </StaggerItem>
           ))}
@@ -504,8 +729,14 @@ const QuickLinks = () => (
 const AdminHeader = ({ userName }) => {
   const now = new Date()
   const hour = now.getHours()
-  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening"
-  const dateString = now.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })
+  const greeting =
+    hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening"
+  const dateString = now.toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  })
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -529,7 +760,10 @@ const AdminHeader = ({ userName }) => {
               </Link>
             </Button>
           </motion.div>
-          <ShimmerButton className="h-9 px-4 text-xs rounded-xl" to="/leave/admin/approvals">
+          <ShimmerButton
+            className="h-9 px-4 text-xs rounded-xl"
+            to="/leave/admin/approvals"
+          >
             <CheckCircle2 className="h-4 w-4" /> Approvals
           </ShimmerButton>
         </div>
@@ -544,10 +778,30 @@ AdminHeader.defaultProps = { userName: null }
 const AttendanceSummaryCards = ({ leaveSummary }) => {
   const stats = leaveSummary?.thisMonth
   const items = [
-    { label: "Total Leaves", value: stats?.totalLeaves ?? 0, gradient: "from-orange-500 to-amber-500", icon: Calendar },
-    { label: "Total Absent", value: stats?.totalAbsent ?? 0, gradient: "from-red-500 to-rose-600", icon: AlertCircle },
-    { label: "Total Present", value: stats?.totalPresent ?? 0, gradient: "from-emerald-500 to-green-600", icon: CheckCircle2 },
-    { label: "Half Days", value: stats?.totalHalfDay ?? 0, gradient: "from-yellow-500 to-amber-500", icon: Clock },
+    {
+      label: "Total Leaves",
+      value: stats?.totalLeaves ?? 0,
+      gradient: "from-orange-500 to-amber-500",
+      icon: Calendar,
+    },
+    {
+      label: "Total Absent",
+      value: stats?.totalAbsent ?? 0,
+      gradient: "from-red-500 to-rose-600",
+      icon: AlertCircle,
+    },
+    {
+      label: "Total Present",
+      value: stats?.totalPresent ?? 0,
+      gradient: "from-emerald-500 to-green-600",
+      icon: CheckCircle2,
+    },
+    {
+      label: "Half Days",
+      value: stats?.totalHalfDay ?? 0,
+      gradient: "from-yellow-500 to-amber-500",
+      icon: Clock,
+    },
   ]
   return (
     <StaggerContainer className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -555,7 +809,9 @@ const AttendanceSummaryCards = ({ leaveSummary }) => {
         <StaggerItem key={label}>
           <AnimatedCard className="border-0 shadow-sm text-center">
             <CardContent className="pt-4 pb-3">
-              <div className={`inline-flex rounded-xl p-2 bg-gradient-to-br ${gradient} text-white shadow-md mb-2`}>
+              <div
+                className={`inline-flex rounded-xl p-2 bg-gradient-to-br ${gradient} text-white shadow-md mb-2`}
+              >
                 <Icon className="h-4 w-4" />
               </div>
               <p className="text-2xl font-bold tabular-nums">
@@ -581,17 +837,28 @@ const getClockProperties = (status) => ({
   todayTotalMinutes: status?.todayTotalMinutes ?? 0,
 })
 
-const AdminDashboardUI = ({ userName, employees, projects, leaveSummary, attendanceStatus, isLoading }) => {
+const AdminDashboardUI = ({
+  userName,
+  employees,
+  projects,
+  leaveSummary,
+  attendanceStatus,
+  isLoading,
+}) => {
   const clockProperties = getClockProperties(attendanceStatus)
   if (isLoading) {
     return (
       <div className="p-6 space-y-6">
         <div className="h-12 bg-muted rounded-xl animate-pulse" />
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
-          {STAT_KEYS.map((k) => <div key={k} className="h-28 bg-muted rounded-2xl animate-pulse" />)}
+          {STAT_KEYS.map((k) => (
+            <div key={k} className="h-28 bg-muted rounded-2xl animate-pulse" />
+          ))}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {CHART_KEYS.map((k) => <div key={k} className="h-64 bg-muted rounded-2xl animate-pulse" />)}
+          {CHART_KEYS.map((k) => (
+            <div key={k} className="h-64 bg-muted rounded-2xl animate-pulse" />
+          ))}
         </div>
       </div>
     )
@@ -600,11 +867,20 @@ const AdminDashboardUI = ({ userName, employees, projects, leaveSummary, attenda
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-[1400px] mx-auto">
       <AdminHeader userName={userName} />
-      <motion.div initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.6, ease: "easeOut" }} style={{ transformOrigin: "left" }}>
+      <motion.div
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: 1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        style={{ transformOrigin: "left" }}
+      >
         <Separator />
       </motion.div>
 
-      <AdminStatsGrid employees={employees} projects={projects} leaveSummary={leaveSummary} />
+      <AdminStatsGrid
+        employees={employees}
+        projects={projects}
+        leaveSummary={leaveSummary}
+      />
       <AttendanceSummaryCards leaveSummary={leaveSummary} />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

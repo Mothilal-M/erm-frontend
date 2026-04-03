@@ -14,10 +14,10 @@ import UserNav from "./user-nav"
 const Navbar = () => {
   const appState = useSelector((state) => state[ct.store.APP_STORE])
   const empRole = useSelector(
-    (state) => state[ct.store.USER_STORE].employee_management_role
+    (state) => state[ct.store.USER_STORE].employee_management_role,
   )
   const attendanceRole = useSelector(
-    (state) => state[ct.store.USER_STORE].attendance_management_role
+    (state) => state[ct.store.USER_STORE].attendance_management_role,
   )
 
   const { currentModule, standupStatus } = appState || {

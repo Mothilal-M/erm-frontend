@@ -78,7 +78,8 @@ const SignupUI = ({ form, onSubmit, onGoogleSignup, loading }) => {
               Management
             </h2>
             <p className="text-slate-400 text-lg max-w-md leading-relaxed">
-              Streamline your workforce management with powerful tools for attendance, leaves, and team collaboration.
+              Streamline your workforce management with powerful tools for
+              attendance, leaves, and team collaboration.
             </p>
             <div className="flex gap-8 pt-4">
               <div>
@@ -110,7 +111,9 @@ const SignupUI = ({ form, onSubmit, onGoogleSignup, loading }) => {
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-3 mb-4">
             <div className="h-9 w-9 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground text-base font-bold">E</span>
+              <span className="text-primary-foreground text-base font-bold">
+                E
+              </span>
             </div>
             <span className="text-lg font-semibold">ERM</span>
           </div>
@@ -158,7 +161,9 @@ const SignupUI = ({ form, onSubmit, onGoogleSignup, loading }) => {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium">Full Name</FormLabel>
+                    <FormLabel className="text-sm font-medium">
+                      Full Name
+                    </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -204,7 +209,9 @@ const SignupUI = ({ form, onSubmit, onGoogleSignup, loading }) => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium">Password</FormLabel>
+                    <FormLabel className="text-sm font-medium">
+                      Password
+                    </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -239,7 +246,9 @@ const SignupUI = ({ form, onSubmit, onGoogleSignup, loading }) => {
                 name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium">Confirm Password</FormLabel>
+                    <FormLabel className="text-sm font-medium">
+                      Confirm Password
+                    </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -253,7 +262,9 @@ const SignupUI = ({ form, onSubmit, onGoogleSignup, loading }) => {
                         />
                         <button
                           type="button"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                           tabIndex={-1}
                         >

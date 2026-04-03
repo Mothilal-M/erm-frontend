@@ -61,7 +61,7 @@ const statusBadge = (status) => {
 const LiveRow = ({ entry, index = 0 }) => {
   const clockedInAt = useMemo(
     () => new Date(entry.clockedInAt),
-    [entry.clockedInAt]
+    [entry.clockedInAt],
   )
 
   // Calculate elapsed time on each render - this is intentional as we want
@@ -69,7 +69,7 @@ const LiveRow = ({ entry, index = 0 }) => {
 
   const elapsedMinutes = Math.floor(
     // eslint-disable-next-line react-hooks/purity
-    (Date.now() - clockedInAt.getTime()) / 60000
+    (Date.now() - clockedInAt.getTime()) / 60000,
   )
 
   const rowClassName = entry.willAutoExpire
@@ -176,10 +176,7 @@ const AdminLiveUI = ({ liveData, isLoading }) => {
       <Separator />
 
       {/* Clocked-in table */}
-      <AnimatedCard
-        delay={0.15}
-        className="rounded-xl border-0 shadow-sm"
-      >
+      <AnimatedCard delay={0.15} className="rounded-xl border-0 shadow-sm">
         <CardHeader className="pb-2">
           <CardTitle className="text-base">Currently Clocked In</CardTitle>
         </CardHeader>
@@ -241,10 +238,7 @@ const AdminLiveUI = ({ liveData, isLoading }) => {
 
       {/* Not clocked in */}
       {!isLoading && notClocked.length > 0 && (
-        <AnimatedCard
-          delay={0.3}
-          className="rounded-xl border-0 shadow-sm"
-        >
+        <AnimatedCard delay={0.3} className="rounded-xl border-0 shadow-sm">
           <CardHeader className="pb-2">
             <CardTitle className="text-base text-muted-foreground">
               Not Clocked In Today

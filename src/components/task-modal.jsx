@@ -77,7 +77,7 @@ const TaskModal = ({
         onSuccess: () => {
           setNewComment("")
         },
-      }
+      },
     )
   }
 
@@ -182,7 +182,7 @@ const TaskModal = ({
                 onValueChange={(value) =>
                   handleInputChange(
                     "assignee",
-                    value === "none" ? null : Number(value)
+                    value === "none" ? null : Number(value),
                   )
                 }
               >

@@ -37,7 +37,9 @@ const ClockUI = ({
             <h1 className="text-2xl font-bold tracking-tight">
               <BlurText text="Attendance" />
             </h1>
-            <p className="text-sm text-muted-foreground">Track your work sessions</p>
+            <p className="text-sm text-muted-foreground">
+              Track your work sessions
+            </p>
           </div>
         </div>
       </FadeIn>

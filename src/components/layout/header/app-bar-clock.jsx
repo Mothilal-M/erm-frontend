@@ -45,7 +45,7 @@ const AppBarClock = () => {
 
     const update = () => {
       const diff = Math.floor(
-        (Date.now() - new Date(clockedInAt).getTime()) / 1000
+        (Date.now() - new Date(clockedInAt).getTime()) / 1000,
       )
       setLiveElapsed(diff)
     }
@@ -73,7 +73,7 @@ const AppBarClock = () => {
             variant: "destructive",
           })
         },
-      }
+      },
     )
   }
 
@@ -95,7 +95,7 @@ const AppBarClock = () => {
             variant: "destructive",
           })
         },
-      }
+      },
     )
   }
 

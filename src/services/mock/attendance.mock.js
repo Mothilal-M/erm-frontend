@@ -95,7 +95,7 @@ let mockLogs = generateLogs(20)
 const getStatusMock = http.get("*/attendance/status/", () => {
   if (session.isClocked) {
     const elapsed = Math.floor(
-      (Date.now() - new Date(session.clockedInAt).getTime()) / 1000
+      (Date.now() - new Date(session.clockedInAt).getTime()) / 1000,
     )
     const maxSeconds = 4 * 60 * 60 // 4 hours
     const expiresInSeconds = Math.max(0, maxSeconds - elapsed)
@@ -138,7 +138,7 @@ const clockOutMock = http.post(
     }
     const clockOut = new Date().toISOString()
     const elapsed = Math.floor(
-      (Date.now() - new Date(session.clockedInAt).getTime()) / 60000
+      (Date.now() - new Date(session.clockedInAt).getTime()) / 60000,
     )
     session.todayTotalMinutes += elapsed
     session.isClocked = false
@@ -149,7 +149,7 @@ const clockOutMock = http.post(
       durationMinutes: elapsed,
       workSummary: body.workSummary,
     })
-  }
+  },
 )
 
 const getTodayMock = http.get("*/attendance/today/", () => {
@@ -259,10 +259,10 @@ const adminEditMock = http.patch(
             editedAt: new Date().toISOString(),
             editReason: body.editReason,
           }
-        : l
+        : l,
     )
     return HttpResponse.json({ success: true })
-  }
+  },
 )
 
 const adminFlagMock = http.patch(
@@ -279,10 +279,10 @@ const adminFlagMock = http.patch(
             flaggedBy: body.isFlagged ? "Admin User" : null,
             flaggedAt: body.isFlagged ? new Date().toISOString() : null,
           }
-        : l
+        : l,
     )
     return HttpResponse.json({ success: true })
-  }
+  },
 )
 
 const adminManualEntryMock = http.post(
@@ -301,7 +301,7 @@ const adminManualEntryMock = http.post(
       durationMinutes:
         body.clockIn && body.clockOut
           ? Math.floor(
-              (new Date(body.clockOut) - new Date(body.clockIn)) / 60000
+              (new Date(body.clockOut) - new Date(body.clockIn)) / 60000,
             )
           : null,
       workSummary: body.workSummary,
@@ -318,7 +318,7 @@ const adminManualEntryMock = http.post(
     }
     mockLogs = [newEntry, ...mockLogs]
     return HttpResponse.json(newEntry, { status: 201 })
-  }
+  },
 )
 
 const adminLiveMock = http.get("*/attendance/admin/live/", () => {

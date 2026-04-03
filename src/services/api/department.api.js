@@ -33,7 +33,7 @@ export const postDepartment = async (payload) => {
 export const patchDepartment = async (id, payload) => {
   return api.patch(
     `${ct.api.employeeManagement.departmentDetail}/${id}`,
-    payload
+    payload,
   )
 }
 

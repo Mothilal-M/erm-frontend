@@ -87,7 +87,7 @@ const patchLeaveSettingsMock = http.patch(
     const body = await request.json()
     leaveSettings = { ...leaveSettings, ...body }
     return HttpResponse.json(leaveSettings)
-  }
+  },
 )
 
 // ─── Day detail mock ──────────────────────────────────────────────────────────
@@ -162,7 +162,7 @@ const generateDayDetail = (date) => {
       name: `${pick(FIRST_NAMES, i)} ${pick(FIRST_NAMES, i + 1)}`,
       department: pick(DEPARTMENTS, i),
       checkIn: `0${8 + (rand(i) % 2)}:${String(rand(i + 10) % 60).padStart(2, "0")}`,
-    })
+    }),
   )
 
   const onLeave = Array.from({ length: onLeaveCount }, (_, i) => ({
@@ -199,7 +199,7 @@ const attendanceDayDetailMock = http.get(
     const date =
       url.searchParams.get("date") || new Date().toISOString().split("T")[0]
     return HttpResponse.json(generateDayDetail(date))
-  }
+  },
 )
 
 const handlers = [

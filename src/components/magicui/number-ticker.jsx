@@ -1,4 +1,10 @@
-import { animate, motion, useInView, useMotionValue, useTransform } from "framer-motion"
+import {
+  animate,
+  motion,
+  useInView,
+  useMotionValue,
+  useTransform,
+} from "framer-motion"
 import PropTypes from "prop-types"
 import { useEffect, useRef } from "react"
 
@@ -7,7 +13,13 @@ import { cn } from "@/lib/utils"
 /**
  * NumberTicker — animates a number counting up from 0.
  */
-const NumberTicker = ({ value, className = "", duration = 1.2, delay = 0, suffix = "" }) => {
+const NumberTicker = ({
+  value,
+  className = "",
+  duration = 1.2,
+  delay = 0,
+  suffix = "",
+}) => {
   const ref = useRef(null)
   const motionValue = useMotionValue(0)
   const rounded = useTransform(motionValue, (v) => Math.round(v))

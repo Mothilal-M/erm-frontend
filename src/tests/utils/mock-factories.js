@@ -178,7 +178,7 @@ export function createMockApiResponse(data, options = {}) {
 export function createMockApiError(
   message = "Error",
   status = 500,
-  options = {}
+  options = {},
 ) {
   const error = new Error(message)
   error.response = {

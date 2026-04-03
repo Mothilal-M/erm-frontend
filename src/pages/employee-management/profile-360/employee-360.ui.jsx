@@ -116,18 +116,17 @@ InfoRow.defaultProps = { value: null }
 // ─── Stat Card Component ──────────────────────────────────────────────────────
 
 const StatCard = ({ icon: Icon, label, value, subtext, accent }) => (
-  <AnimatedCard delay={0.1} className={`border-0 shadow-sm rounded-xl ${accent}`}>
+  <AnimatedCard
+    delay={0.1}
+    className={`border-0 shadow-sm rounded-xl ${accent}`}
+  >
     <CardContent className="flex items-center gap-3 p-4">
       <div className="w-10 h-10 rounded-xl bg-white/50 dark:bg-white/10 flex items-center justify-center">
         <Icon className="h-5 w-5" />
       </div>
       <div>
         <p className="text-2xl font-bold leading-none">
-          {typeof value === "number" ? (
-            <NumberTicker value={value} />
-          ) : (
-            value
-          )}
+          {typeof value === "number" ? <NumberTicker value={value} /> : value}
         </p>
         <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
         {subtext && (
@@ -305,7 +304,7 @@ AttendanceSection.propTypes = {
         clockIn: PropTypes.string,
         clockOut: PropTypes.string,
         duration: PropTypes.string,
-      })
+      }),
     ),
   }),
 }
@@ -330,7 +329,7 @@ const LeaveSection = ({ leave }) => {
         <div className="space-y-3">
           {balances.map((bal, index) => {
             const remainingPct = Math.round(
-              (bal.remaining / bal.allocated) * 100
+              (bal.remaining / bal.allocated) * 100,
             )
             return (
               <div key={bal.type} className="space-y-1">
@@ -403,7 +402,7 @@ LeaveSection.propTypes = {
         allocated: PropTypes.number,
         used: PropTypes.number,
         remaining: PropTypes.number,
-      })
+      }),
     ),
     history: PropTypes.arrayOf(
       PropTypes.shape({
@@ -412,7 +411,7 @@ LeaveSection.propTypes = {
         from: PropTypes.string,
         to: PropTypes.string,
         status: PropTypes.string,
-      })
+      }),
     ),
   }),
 }
@@ -510,7 +509,7 @@ PerformanceSection.propTypes = {
         id: PropTypes.number,
         title: PropTypes.string,
         status: PropTypes.string,
-      })
+      }),
     ),
     awards: PropTypes.arrayOf(PropTypes.string),
   }),
@@ -567,7 +566,7 @@ AssetsSection.propTypes = {
       type: PropTypes.string,
       serialNumber: PropTypes.string,
       condition: PropTypes.string,
-    })
+    }),
   ),
 }
 
@@ -630,7 +629,7 @@ DocumentsSection.propTypes = {
       name: PropTypes.string,
       category: PropTypes.string,
       uploadedAt: PropTypes.string,
-    })
+    }),
   ),
 }
 
@@ -701,7 +700,7 @@ TimelineSection.propTypes = {
       title: PropTypes.string,
       date: PropTypes.string,
       description: PropTypes.string,
-    })
+    }),
   ),
 }
 
@@ -771,13 +770,21 @@ const Employee360UI = ({ data, isLoading, isError }) => {
 
       {/* Hero Card */}
       <FadeIn delay={0.15}>
-        <AnimatedCard delay={0.2} className="border-0 shadow-sm rounded-xl bg-linear-to-r from-blue-600/10 via-indigo-500/10 to-purple-600/10">
+        <AnimatedCard
+          delay={0.2}
+          className="border-0 shadow-sm rounded-xl bg-linear-to-r from-blue-600/10 via-indigo-500/10 to-purple-600/10"
+        >
           <CardContent className="p-6">
             <div className="flex flex-wrap items-center gap-6">
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.3 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 200,
+                  damping: 15,
+                  delay: 0.3,
+                }}
               >
                 <Avatar className="w-20 h-20 border-2 border-white/30 shadow-lg">
                   <AvatarImage src={employee?.avatar} alt={employee?.name} />
@@ -790,9 +797,7 @@ const Employee360UI = ({ data, isLoading, isError }) => {
                 <div className="flex items-center gap-2 flex-wrap">
                   <h2 className="text-xl font-bold">{employee?.name}</h2>
                   <PulseBadge
-                    color={
-                      STATUS_COLOR_MAP[employee?.status] ?? "emerald"
-                    }
+                    color={STATUS_COLOR_MAP[employee?.status] ?? "emerald"}
                   >
                     {employee?.status ?? "Active"}
                   </PulseBadge>
@@ -806,11 +811,16 @@ const Employee360UI = ({ data, isLoading, isError }) => {
                 </p>
               </div>
               <div className="shrink-0 flex gap-2">
-                <Button variant="outline" size="sm" asChild className="rounded-xl">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  asChild
+                  className="rounded-xl"
+                >
                   <Link
                     to={ct.route.employeeManagement.EDIT.replace(
                       ":id",
-                      employee?.id
+                      employee?.id,
                     )}
                   >
                     Edit Profile

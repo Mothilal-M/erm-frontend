@@ -17,8 +17,9 @@ const EmployeeDashboard = lazy(() => import("@pages/leave-employee"))
 const RequestLeavePage = lazy(() => import("@pages/leave-employee/request"))
 
 // Attendance pages
+const AttendanceClock = lazy(() => import("@pages/attendance/employee"))
 const AttendanceHistory = lazy(
-  () => import("@pages/attendance/employee/history")
+  () => import("@pages/attendance/employee/history"),
 )
 const AdminAttendanceLogs = lazy(() => import("@pages/attendance/admin/logs"))
 const AdminLiveStatus = lazy(() => import("@pages/attendance/admin/live"))
@@ -30,7 +31,7 @@ const CreateEmployee = lazy(() => import("@pages/employee-management/create"))
 const EditEmployee = lazy(() => import("@pages/employee-management/edit"))
 const InviteUsers = lazy(() => import("@pages/employee-management/invite"))
 const DepartmentList = lazy(
-  () => import("@pages/employee-management/departments")
+  () => import("@pages/employee-management/departments"),
 )
 const Employee360 = lazy(() => import("@pages/employee-management/profile-360"))
 
@@ -40,12 +41,12 @@ const ProjectDetails = lazy(() => import("@pages/projects/project-details"))
 const SprintBoard = lazy(() => import("@pages/sprint-board"))
 const ProjectSettings = lazy(() => import("@pages/projects/project-settings"))
 const CreateNotePage = lazy(
-  () => import("@pages/projects/notes/create-note.page")
+  () => import("@pages/projects/notes/create-note.page"),
 )
 
 // Daily Update pages
 const CreateStandupPage = lazy(
-  () => import("@pages/daily-update/create-standup")
+  () => import("@pages/daily-update/create-standup"),
 )
 const TeamUpdatesPage = lazy(() => import("@pages/daily-update/team"))
 const ProgressLogPage = lazy(() => import("@pages/daily-update/progress"))
@@ -110,10 +111,15 @@ const mainRoutes = [
     element: leaveGuard(<RequestLeavePage />, ["employee"]),
   },
 
-  // Attendance — employee routes (accessible to authenticated users)
+  // Attendance — employee clock-in page
+  {
+    path: ct.route.attendance.EMPLOYEE_CLOCK,
+    element: attendanceGuard(<AttendanceClock />, ["employee"]),
+  },
+  // Attendance — employee history (accessible to employees)
   {
     path: ct.route.attendance.EMPLOYEE_HISTORY,
-    element: attendanceGuard(<AttendanceHistory />, ["admin", "employee"]),
+    element: attendanceGuard(<AttendanceHistory />, ["employee"]),
   },
 
   // Attendance — admin-only routes

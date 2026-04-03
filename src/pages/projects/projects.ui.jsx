@@ -203,7 +203,7 @@ const ProjectsUI = ({ data, isLoading, error }) => {
                               month: "short",
                               day: "numeric",
                               year: "numeric",
-                            }
+                            },
                           )}
                         </p>
                       </div>
@@ -280,9 +280,9 @@ ProjectsUI.propTypes = {
           id: PropTypes.number.isRequired,
           name: PropTypes.string.isRequired,
           avatar: PropTypes.string.isRequired,
-        })
+        }),
       ),
-    })
+    }),
   ).isRequired,
   isLoading: PropTypes.bool.isRequired,
   error: PropTypes.oneOf([PropTypes.bool, PropTypes.object]),

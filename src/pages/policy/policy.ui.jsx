@@ -418,7 +418,8 @@ const PolicyUI = ({
               />
             </div>
             <p className="text-sm text-muted-foreground mt-0.5 ml-13">
-              <NumberTicker value={totalCount} /> {totalCount === 1 ? "policy" : "policies"} total
+              <NumberTicker value={totalCount} />{" "}
+              {totalCount === 1 ? "policy" : "policies"} total
             </p>
           </div>
           <ShimmerButton className="shrink-0" onClick={onOpenCreate}>

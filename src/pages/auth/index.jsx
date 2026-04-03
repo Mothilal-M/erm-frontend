@@ -16,7 +16,9 @@ import LoginUI from "./login.ui"
 
 const FormSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
+  password: z
+    .string()
+    .min(6, { message: "Password must be at least 6 characters." }),
 })
 
 const Login = () => {
@@ -41,11 +43,14 @@ const Login = () => {
       const { data } = await api.get(ct.api.auth.me)
       dispatch(
         login({
-          userName: data.name || firebaseUser.displayName || firebaseUser.email.split("@")[0],
+          userName:
+            data.name ||
+            firebaseUser.displayName ||
+            firebaseUser.email.split("@")[0],
           userEmail: data.email || firebaseUser.email,
           userRole: data.role || "employee",
           uid: data.uid || firebaseUser.uid,
-        })
+        }),
       )
       toast({
         title: "Welcome back!",
@@ -57,11 +62,15 @@ const Login = () => {
       if (error.response?.status === 404) {
         toast({
           title: "Account not found",
-          description: "No account found with this email. Redirecting to sign up...",
+          description:
+            "No account found with this email. Redirecting to sign up...",
         })
         navigate("/signup")
       } else {
-        const message = getErrorMessage(error, "Unable to sign in. Please try again.")
+        const message = getErrorMessage(
+          error,
+          "Unable to sign in. Please try again.",
+        )
         toast({
           title: "Sign in failed",
           description: message,
@@ -81,9 +90,16 @@ const Login = () => {
       const result = await loginWithEmail(data.email, data.password)
       await handlePostLogin(result.user)
     } catch (error) {
-      const message = getErrorMessage(error, "Unable to sign in. Please check your credentials and try again.")
+      const message = getErrorMessage(
+        error,
+        "Unable to sign in. Please check your credentials and try again.",
+      )
       if (message) {
-        toast({ title: "Sign in failed", description: message, variant: "destructive" })
+        toast({
+          title: "Sign in failed",
+          description: message,
+          variant: "destructive",
+        })
       }
     } finally {
       setLoading(false)
@@ -99,7 +115,10 @@ const Login = () => {
       const result = await loginWithGoogle()
       await handlePostLogin(result.user)
     } catch (error) {
-      const message = getErrorMessage(error, "Google sign-in failed. Please try again.")
+      const message = getErrorMessage(
+        error,
+        "Google sign-in failed. Please try again.",
+      )
       if (message) {
         toast({
           title: "Google sign-in failed",

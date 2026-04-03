@@ -19,7 +19,10 @@ import {
   AnimatedProgress,
   PulseBadge,
 } from "@/components/magicui"
-import { StaggerContainer, StaggerItem } from "@/components/magicui/stagger-container"
+import {
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/magicui/stagger-container"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -43,9 +46,22 @@ const AttendanceRing = ({ pct }) => {
   return (
     <div className="relative flex items-center justify-center w-24 h-24">
       <svg className="-rotate-90" width="96" height="96">
-        <circle cx="48" cy="48" r={r} stroke="currentColor" strokeWidth="7" fill="none" className="text-muted/20" />
+        <circle
+          cx="48"
+          cy="48"
+          r={r}
+          stroke="currentColor"
+          strokeWidth="7"
+          fill="none"
+          className="text-muted/20"
+        />
         <motion.circle
-          cx="48" cy="48" r={r} stroke="currentColor" strokeWidth="7" fill="none"
+          cx="48"
+          cy="48"
+          r={r}
+          stroke="currentColor"
+          strokeWidth="7"
+          fill="none"
           strokeDasharray={circumference}
           strokeLinecap="round"
           className="text-emerald-500"
@@ -65,7 +81,14 @@ AttendanceRing.propTypes = { pct: PropTypes.number }
 AttendanceRing.defaultProps = { pct: 0 }
 
 /* ---- Leave Balance Row ---- */
-const LeaveBalanceRow = ({ type, allocated, used, pending, remaining, delay = 0 }) => {
+const LeaveBalanceRow = ({
+  type,
+  allocated,
+  used,
+  pending,
+  remaining,
+  delay = 0,
+}) => {
   const usedPct = allocated > 0 ? Math.round((used / allocated) * 100) : 0
   const pendingPct = allocated > 0 ? Math.round((pending / allocated) * 100) : 0
 
@@ -79,7 +102,10 @@ const LeaveBalanceRow = ({ type, allocated, used, pending, remaining, delay = 0 
       <div className="flex items-center justify-between text-sm">
         <span className="font-medium">{type}</span>
         <span className="text-muted-foreground text-xs">
-          <span className="text-foreground font-semibold tabular-nums">{remaining}</span> / {allocated} days left
+          <span className="text-foreground font-semibold tabular-nums">
+            {remaining}
+          </span>{" "}
+          / {allocated} days left
         </span>
       </div>
       <div className="w-full h-2.5 bg-muted/40 rounded-full overflow-hidden flex gap-px">
@@ -87,35 +113,50 @@ const LeaveBalanceRow = ({ type, allocated, used, pending, remaining, delay = 0 
           className="bg-red-400 rounded-l-full"
           initial={{ width: 0 }}
           animate={{ width: `${usedPct}%` }}
-          transition={{ duration: 0.8, delay: delay + 0.1, ease: [0.25, 0.4, 0.25, 1] }}
+          transition={{
+            duration: 0.8,
+            delay: delay + 0.1,
+            ease: [0.25, 0.4, 0.25, 1],
+          }}
           title={`Used: ${used}`}
         />
         <motion.div
           className="bg-amber-400"
           initial={{ width: 0 }}
           animate={{ width: `${pendingPct}%` }}
-          transition={{ duration: 0.8, delay: delay + 0.2, ease: [0.25, 0.4, 0.25, 1] }}
+          transition={{
+            duration: 0.8,
+            delay: delay + 0.2,
+            ease: [0.25, 0.4, 0.25, 1],
+          }}
           title={`Pending: ${pending}`}
         />
         <motion.div
           className="bg-emerald-500 rounded-r-full"
           initial={{ width: 0 }}
           animate={{ width: `${100 - usedPct - pendingPct}%` }}
-          transition={{ duration: 0.8, delay: delay + 0.3, ease: [0.25, 0.4, 0.25, 1] }}
+          transition={{
+            duration: 0.8,
+            delay: delay + 0.3,
+            ease: [0.25, 0.4, 0.25, 1],
+          }}
           title={`Remaining: ${remaining}`}
         />
       </div>
       <div className="flex gap-3 text-[11px] text-muted-foreground">
         <span className="flex items-center gap-1">
-          <span className="inline-block w-2 h-2 rounded-full bg-red-400" /> Used: {used}
+          <span className="inline-block w-2 h-2 rounded-full bg-red-400" />{" "}
+          Used: {used}
         </span>
         {pending > 0 && (
           <span className="flex items-center gap-1">
-            <span className="inline-block w-2 h-2 rounded-full bg-amber-400" /> Pending: {pending}
+            <span className="inline-block w-2 h-2 rounded-full bg-amber-400" />{" "}
+            Pending: {pending}
           </span>
         )}
         <span className="flex items-center gap-1">
-          <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" /> Available: {remaining}
+          <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" />{" "}
+          Available: {remaining}
         </span>
       </div>
     </motion.div>
@@ -178,7 +219,10 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
                 <Avatar className="w-16 h-16 ring-2 ring-primary/20 ring-offset-2 ring-offset-background shadow-lg">
                   <AvatarImage src={emp?.avatar} alt={emp?.name} />
                   <AvatarFallback className="text-lg font-bold bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
-                    {emp?.name?.split(" ").map((n) => n[0]).join("")}
+                    {emp?.name
+                      ?.split(" ")
+                      .map((n) => n[0])
+                      .join("")}
                   </AvatarFallback>
                 </Avatar>
               </motion.div>
@@ -187,17 +231,22 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
                   <BlurText text={emp?.name ?? ""} />
                 </h1>
                 <FadeIn delay={0.2}>
-                  <p className="text-sm text-muted-foreground">{emp?.role} · {emp?.department}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {emp?.role} · {emp?.department}
+                  </p>
                 </FadeIn>
                 <FadeIn delay={0.25}>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    ID: {emp?.id} · Manager: {emp?.manager} · Joined {emp?.joinDate}
+                    ID: {emp?.id} · Manager: {emp?.manager} · Joined{" "}
+                    {emp?.joinDate}
                   </p>
                 </FadeIn>
               </div>
               <div className="shrink-0 flex flex-col items-center gap-2">
                 <AttendanceRing pct={thisMonth?.attendancePct} />
-                <p className="text-xs text-center text-muted-foreground">This month</p>
+                <p className="text-xs text-center text-muted-foreground">
+                  This month
+                </p>
                 <ShimmerButton
                   className="h-9 px-4 text-xs rounded-xl"
                   onClick={onRequestLeave}
@@ -213,24 +262,50 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
       {/* Quick Stats */}
       {isLoading ? (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-20 rounded-2xl" />)}
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-20 rounded-2xl" />
+          ))}
         </div>
       ) : (
         <StaggerContainer className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
-            { icon: CalendarDays, label: "Total Allocated", value: totalAllocated, gradient: "from-blue-500 to-indigo-600" },
-            { icon: CalendarX, label: "Days Used", value: totalUsed, gradient: "from-red-500 to-rose-600" },
-            { icon: Clock, label: "Pending Approval", value: totalPending, gradient: "from-amber-500 to-orange-500" },
-            { icon: Target, label: "Days Remaining", value: totalRemaining, gradient: "from-emerald-500 to-green-600" },
+            {
+              icon: CalendarDays,
+              label: "Total Allocated",
+              value: totalAllocated,
+              gradient: "from-blue-500 to-indigo-600",
+            },
+            {
+              icon: CalendarX,
+              label: "Days Used",
+              value: totalUsed,
+              gradient: "from-red-500 to-rose-600",
+            },
+            {
+              icon: Clock,
+              label: "Pending Approval",
+              value: totalPending,
+              gradient: "from-amber-500 to-orange-500",
+            },
+            {
+              icon: Target,
+              label: "Days Remaining",
+              value: totalRemaining,
+              gradient: "from-emerald-500 to-green-600",
+            },
           ].map(({ icon: Icon, label, value, gradient }) => (
             <StaggerItem key={label}>
               <AnimatedCard className="border-0 shadow-sm">
                 <CardContent className="flex items-center gap-3 p-4">
-                  <div className={`rounded-xl p-2.5 bg-gradient-to-br ${gradient} text-white shadow-md`}>
+                  <div
+                    className={`rounded-xl p-2.5 bg-gradient-to-br ${gradient} text-white shadow-md`}
+                  >
                     <Icon className="h-4 w-4" />
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">{label}</p>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">
+                      {label}
+                    </p>
                     <p className="text-2xl font-bold leading-none mt-0.5 tabular-nums">
                       <NumberTicker value={value} />
                     </p>
@@ -246,11 +321,15 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
         {/* Leave Balance */}
         <AnimatedCard delay={0.15} className="border-0 shadow-sm">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base font-semibold">Leave Balance</CardTitle>
+            <CardTitle className="text-base font-semibold">
+              Leave Balance
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
             {isLoading
-              ? [1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-14 rounded-lg" />)
+              ? [1, 2, 3, 4].map((i) => (
+                  <Skeleton key={i} className="h-14 rounded-lg" />
+                ))
               : balance.map((b, idx) => (
                   <LeaveBalanceRow
                     key={b.type}
@@ -277,21 +356,42 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
             <CardContent>
               {isLoading ? (
                 <div className="space-y-2">
-                  {[1, 2, 3].map((i) => <Skeleton key={i} className="h-10 rounded-lg" />)}
+                  {[1, 2, 3].map((i) => (
+                    <Skeleton key={i} className="h-10 rounded-lg" />
+                  ))}
                 </div>
               ) : (
                 <StaggerContainer className="grid grid-cols-3 gap-3 text-center">
                   {[
-                    { label: "Present", value: thisMonth?.presentDays, color: "text-emerald-600", bg: "bg-emerald-500/10" },
-                    { label: "On Leave", value: thisMonth?.leaveDays, color: "text-amber-600", bg: "bg-amber-500/10" },
-                    { label: "Absent", value: thisMonth?.absentDays, color: "text-red-500", bg: "bg-red-500/10" },
+                    {
+                      label: "Present",
+                      value: thisMonth?.presentDays,
+                      color: "text-emerald-600",
+                      bg: "bg-emerald-500/10",
+                    },
+                    {
+                      label: "On Leave",
+                      value: thisMonth?.leaveDays,
+                      color: "text-amber-600",
+                      bg: "bg-amber-500/10",
+                    },
+                    {
+                      label: "Absent",
+                      value: thisMonth?.absentDays,
+                      color: "text-red-500",
+                      bg: "bg-red-500/10",
+                    },
                   ].map(({ label, value, color, bg }) => (
                     <StaggerItem key={label}>
                       <div className={`p-3 rounded-xl ${bg}`}>
-                        <p className={`text-2xl font-bold ${color} tabular-nums`}>
+                        <p
+                          className={`text-2xl font-bold ${color} tabular-nums`}
+                        >
                           <NumberTicker value={value ?? 0} />
                         </p>
-                        <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {label}
+                        </p>
                       </div>
                     </StaggerItem>
                   ))}
@@ -302,11 +402,15 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
 
           <AnimatedCard delay={0.25} className="border-0 shadow-sm">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base font-semibold">Upcoming</CardTitle>
+              <CardTitle className="text-base font-semibold">
+                Upcoming
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {isLoading ? (
-                [1, 2].map((i) => <Skeleton key={i} className="h-14 rounded-lg" />)
+                [1, 2].map((i) => (
+                  <Skeleton key={i} className="h-14 rounded-lg" />
+                ))
               ) : upcoming.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-4">
                   No upcoming leaves or holidays.
@@ -336,17 +440,22 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
       {/* Leave History */}
       <AnimatedCard delay={0.3} className="border-0 shadow-sm">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base font-semibold">Leave History</CardTitle>
+          <CardTitle className="text-base font-semibold">
+            Leave History
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="space-y-2">
-              {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-14 rounded-lg" />)}
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} className="h-14 rounded-lg" />
+              ))}
             </div>
           ) : (
             <div className="space-y-1">
               {history.map((item, idx) => {
-                const style = STATUS_STYLES[item.status] ?? STATUS_STYLES.pending
+                const style =
+                  STATUS_STYLES[item.status] ?? STATUS_STYLES.pending
                 return (
                   <motion.div
                     key={item.id}
@@ -358,12 +467,15 @@ const EmployeeDashboardUI = ({ data, isLoading, isError, onRequestLeave }) => {
                       <div className="min-w-0">
                         <p className="font-medium">{item.type}</p>
                         <p className="text-xs text-muted-foreground">
-                          {item.from} <ArrowRight className="inline h-3 w-3" /> {item.to} · {item.days} day{item.days > 1 ? "s" : ""}
+                          {item.from} <ArrowRight className="inline h-3 w-3" />{" "}
+                          {item.to} · {item.days} day{item.days > 1 ? "s" : ""}
                         </p>
                       </div>
                       <PulseBadge color={style.color}>{style.label}</PulseBadge>
                     </div>
-                    {idx < history.length - 1 && <Separator className="opacity-50" />}
+                    {idx < history.length - 1 && (
+                      <Separator className="opacity-50" />
+                    )}
                   </motion.div>
                 )
               })}
@@ -393,7 +505,7 @@ EmployeeDashboardUI.propTypes = {
         used: PropTypes.number,
         pending: PropTypes.number,
         remaining: PropTypes.number,
-      })
+      }),
     ),
     thisMonth: PropTypes.shape({
       presentDays: PropTypes.number,
@@ -410,14 +522,14 @@ EmployeeDashboardUI.propTypes = {
         to: PropTypes.string,
         days: PropTypes.number,
         status: PropTypes.string,
-      })
+      }),
     ),
     upcoming: PropTypes.arrayOf(
       PropTypes.shape({
         label: PropTypes.string,
         date: PropTypes.string,
         daysUntil: PropTypes.number,
-      })
+      }),
     ),
   }),
   isLoading: PropTypes.bool.isRequired,

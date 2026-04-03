@@ -75,7 +75,7 @@ const ErrorFallback = ({ error, resetErrorBoundary }) => {
       stack: error?.stack,
       name: error?.name,
     }),
-    [error]
+    [error],
   )
 
   return (

@@ -1,5 +1,11 @@
 import { motion, AnimatePresence } from "framer-motion"
-import { FileText, CalendarDays, AlertTriangle, Send, BarChart3 } from "lucide-react"
+import {
+  FileText,
+  CalendarDays,
+  AlertTriangle,
+  Send,
+  BarChart3,
+} from "lucide-react"
 import PropTypes from "prop-types"
 
 import {
@@ -39,7 +45,11 @@ import { Textarea } from "@/components/ui/textarea"
 /* eslint-disable max-lines-per-function */
 
 const LEAVE_TYPES = [
-  { value: "Annual Leave", icon: "🏖️", desc: "Planned vacation / personal time" },
+  {
+    value: "Annual Leave",
+    icon: "🏖️",
+    desc: "Planned vacation / personal time",
+  },
   { value: "Sick Leave", icon: "🤒", desc: "Illness or medical needs" },
   { value: "Casual Leave", icon: "🎲", desc: "Short unplanned leave" },
   { value: "Compensatory", icon: "⚖️", desc: "In lieu of overtime worked" },
@@ -48,9 +58,24 @@ const LEAVE_TYPES = [
 ]
 
 const SUB_TYPES = [
-  { value: "full", icon: "📅", label: "Full Day(s)", desc: "One or more full working days" },
-  { value: "halfday", icon: "🌗", label: "Half Day", desc: "Morning or afternoon only" },
-  { value: "wfh", icon: "🏠", label: "Work From Home", desc: "Working remotely (requires approval)" },
+  {
+    value: "full",
+    icon: "📅",
+    label: "Full Day(s)",
+    desc: "One or more full working days",
+  },
+  {
+    value: "halfday",
+    icon: "🌗",
+    label: "Half Day",
+    desc: "Morning or afternoon only",
+  },
+  {
+    value: "wfh",
+    icon: "🏠",
+    label: "Work From Home",
+    desc: "Working remotely (requires approval)",
+  },
 ]
 
 const HALF_DAY_SLOTS = [
@@ -60,7 +85,13 @@ const HALF_DAY_SLOTS = [
 
 const [TODAY] = new Date().toISOString().split("T")
 
-const RequestLeaveUI = ({ form, subType, estimatedDays, isSubmitting, onSubmit }) => {
+const RequestLeaveUI = ({
+  form,
+  subType,
+  estimatedDays,
+  isSubmitting,
+  onSubmit,
+}) => {
   return (
     <div className="p-4 md:p-6 max-w-2xl mx-auto space-y-5">
       {/* Header */}
@@ -87,9 +118,12 @@ const RequestLeaveUI = ({ form, subType, estimatedDays, isSubmitting, onSubmit }
 
       <AnimatedCard delay={0.1} className="border-0 shadow-sm">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base font-semibold">Leave Request Form</CardTitle>
+          <CardTitle className="text-base font-semibold">
+            Leave Request Form
+          </CardTitle>
           <CardDescription className="text-xs">
-            Fields marked with * are required. Requests are usually reviewed within 1-2 business days.
+            Fields marked with * are required. Requests are usually reviewed
+            within 1-2 business days.
           </CardDescription>
         </CardHeader>
 
@@ -121,8 +155,12 @@ const RequestLeaveUI = ({ form, subType, estimatedDays, isSubmitting, onSubmit }
                           }`}
                         >
                           <div className="text-xl">{st.icon}</div>
-                          <p className="text-sm font-semibold mt-1">{st.label}</p>
-                          <p className="text-[11px] text-muted-foreground mt-0.5">{st.desc}</p>
+                          <p className="text-sm font-semibold mt-1">
+                            {st.label}
+                          </p>
+                          <p className="text-[11px] text-muted-foreground mt-0.5">
+                            {st.desc}
+                          </p>
                         </motion.button>
                       ))}
                     </div>
@@ -139,7 +177,10 @@ const RequestLeaveUI = ({ form, subType, estimatedDays, isSubmitting, onSubmit }
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Leave Category *</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger className="rounded-xl">
                             <SelectValue placeholder="Select leave category..." />
@@ -148,7 +189,10 @@ const RequestLeaveUI = ({ form, subType, estimatedDays, isSubmitting, onSubmit }
                         <SelectContent>
                           {LEAVE_TYPES.map((lt) => (
                             <SelectItem key={lt.value} value={lt.value}>
-                              {lt.icon} {lt.value} — <span className="text-muted-foreground">{lt.desc}</span>
+                              {lt.icon} {lt.value} —{" "}
+                              <span className="text-muted-foreground">
+                                {lt.desc}
+                              </span>
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -169,7 +213,12 @@ const RequestLeaveUI = ({ form, subType, estimatedDays, isSubmitting, onSubmit }
                       <FormItem>
                         <FormLabel>From Date *</FormLabel>
                         <FormControl>
-                          <Input type="date" min={TODAY} className="rounded-xl" {...field} />
+                          <Input
+                            type="date"
+                            min={TODAY}
+                            className="rounded-xl"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -185,13 +234,17 @@ const RequestLeaveUI = ({ form, subType, estimatedDays, isSubmitting, onSubmit }
                           <Input
                             type="date"
                             min={form.watch("fromDate") || TODAY}
-                            disabled={subType === "wfh" || subType === "halfday"}
+                            disabled={
+                              subType === "wfh" || subType === "halfday"
+                            }
                             className="rounded-xl"
                             {...field}
                           />
                         </FormControl>
                         {(subType === "wfh" || subType === "halfday") && (
-                          <FormDescription className="text-xs">Auto-set to same day</FormDescription>
+                          <FormDescription className="text-xs">
+                            Auto-set to same day
+                          </FormDescription>
                         )}
                         <FormMessage />
                       </FormItem>
@@ -230,8 +283,12 @@ const RequestLeaveUI = ({ form, subType, estimatedDays, isSubmitting, onSubmit }
                                 }`}
                               >
                                 <span className="text-xl">{slot.icon}</span>
-                                <p className="text-sm font-medium mt-1">{slot.label}</p>
-                                <p className="text-[11px] text-muted-foreground">{slot.desc}</p>
+                                <p className="text-sm font-medium mt-1">
+                                  {slot.label}
+                                </p>
+                                <p className="text-[11px] text-muted-foreground">
+                                  {slot.desc}
+                                </p>
                               </motion.button>
                             ))}
                           </div>
@@ -253,11 +310,16 @@ const RequestLeaveUI = ({ form, subType, estimatedDays, isSubmitting, onSubmit }
                     className="flex items-center gap-2 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20"
                   >
                     <BarChart3 className="h-4 w-4 text-emerald-600 shrink-0" />
-                    <span className="text-emerald-700 dark:text-emerald-400 font-medium text-sm">Estimated:</span>
+                    <span className="text-emerald-700 dark:text-emerald-400 font-medium text-sm">
+                      Estimated:
+                    </span>
                     <PulseBadge color="emerald">
-                      {estimatedDays} working {estimatedDays === 1 ? "day" : "days"}
+                      {estimatedDays} working{" "}
+                      {estimatedDays === 1 ? "day" : "days"}
                     </PulseBadge>
-                    <span className="text-xs text-muted-foreground ml-auto">(weekends excluded)</span>
+                    <span className="text-xs text-muted-foreground ml-auto">
+                      (weekends excluded)
+                    </span>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -306,9 +368,15 @@ const RequestLeaveUI = ({ form, subType, estimatedDays, isSubmitting, onSubmit }
                       <FormItem>
                         <FormLabel>Handover To</FormLabel>
                         <FormControl>
-                          <Input placeholder="Colleague's name..." className="rounded-xl" {...field} />
+                          <Input
+                            placeholder="Colleague's name..."
+                            className="rounded-xl"
+                            {...field}
+                          />
                         </FormControl>
-                        <FormDescription className="text-xs">Who covers your work?</FormDescription>
+                        <FormDescription className="text-xs">
+                          Who covers your work?
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -320,9 +388,15 @@ const RequestLeaveUI = ({ form, subType, estimatedDays, isSubmitting, onSubmit }
                       <FormItem>
                         <FormLabel>Emergency Contact</FormLabel>
                         <FormControl>
-                          <Input placeholder="Phone or email..." className="rounded-xl" {...field} />
+                          <Input
+                            placeholder="Phone or email..."
+                            className="rounded-xl"
+                            {...field}
+                          />
                         </FormControl>
-                        <FormDescription className="text-xs">If urgent contact needed</FormDescription>
+                        <FormDescription className="text-xs">
+                          If urgent contact needed
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -338,8 +412,9 @@ const RequestLeaveUI = ({ form, subType, estimatedDays, isSubmitting, onSubmit }
                 >
                   <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
                   <p>
-                    Requests must be submitted at least <strong>2 working days</strong> in advance
-                    (except sick leave). WFH requests require manager approval.
+                    Requests must be submitted at least{" "}
+                    <strong>2 working days</strong> in advance (except sick
+                    leave). WFH requests require manager approval.
                   </p>
                 </motion.div>
               </FadeIn>

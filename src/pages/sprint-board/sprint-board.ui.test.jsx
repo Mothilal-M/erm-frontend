@@ -12,7 +12,7 @@ describe("BoardFilters component", () => {
         filters={defaultFilters}
         onChange={vi.fn()}
         // tasks omitted intentionally
-      />
+      />,
     )
     expect(screen.getByText(/Filters:/i)).toBeInTheDocument()
     expect(screen.getByText(/All Types/i)).toBeInTheDocument()
@@ -25,7 +25,11 @@ describe("BoardFilters component", () => {
       { id: "3", assignee: { id: 10, name: "Alice" } },
     ]
     render(
-      <BoardFilters filters={defaultFilters} onChange={vi.fn()} tasks={tasks} />
+      <BoardFilters
+        filters={defaultFilters}
+        onChange={vi.fn()}
+        tasks={tasks}
+      />,
     )
 
     // open assignee select menu
@@ -41,7 +45,7 @@ describe("BoardFilters component", () => {
         filters={defaultFilters}
         onChange={handleChange}
         tasks={[]}
-      />
+      />,
     )
 
     // select priority filter

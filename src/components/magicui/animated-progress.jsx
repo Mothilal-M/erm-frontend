@@ -22,7 +22,11 @@ const AnimatedProgress = ({
   return (
     <div
       ref={ref}
-      className={cn("w-full rounded-full bg-muted/60 overflow-hidden", height, className)}
+      className={cn(
+        "w-full rounded-full bg-muted/60 overflow-hidden",
+        height,
+        className,
+      )}
     >
       <motion.div
         className={cn("h-full rounded-full bg-primary", barClassName)}

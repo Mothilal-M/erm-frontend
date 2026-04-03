@@ -439,11 +439,9 @@ const RewardsUI = ({
         </FadeIn>
       ) : isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {["rsk-1", "rsk-2", "rsk-3", "rsk-4", "rsk-5", "rsk-6"].map(
-            (key) => (
-              <RewardCardSkeleton key={key} />
-            )
-          )}
+          {["rsk-1", "rsk-2", "rsk-3", "rsk-4", "rsk-5", "rsk-6"].map((key) => (
+            <RewardCardSkeleton key={key} />
+          ))}
         </div>
       ) : rewards.length === 0 ? (
         <FadeIn>

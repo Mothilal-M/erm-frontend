@@ -9,7 +9,10 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 const fmtTime = (iso) =>
   iso
-    ? new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    ? new Date(iso).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
     : "\u2014"
 
 const fmtDuration = (mins) => {
@@ -48,22 +51,33 @@ const SessionRow = ({ entry, index }) => {
       </td>
       <td className="px-4 py-3.5 tabular-nums">
         <div className="flex items-center gap-2">
-          <div className={`h-1.5 w-1.5 rounded-full ${isAutoExpired ? "bg-amber-500" : "bg-red-400"}`} />
+          <div
+            className={`h-1.5 w-1.5 rounded-full ${isAutoExpired ? "bg-amber-500" : "bg-red-400"}`}
+          />
           {isAutoExpired ? (
-            <span className="text-amber-600 dark:text-amber-400">{fmtTime(entry.clockOut)}</span>
+            <span className="text-amber-600 dark:text-amber-400">
+              {fmtTime(entry.clockOut)}
+            </span>
           ) : (
             fmtTime(entry.clockOut)
           )}
         </div>
       </td>
-      <td className="px-4 py-3.5 tabular-nums font-medium">{fmtDuration(entry.durationMinutes)}</td>
+      <td className="px-4 py-3.5 tabular-nums font-medium">
+        {fmtDuration(entry.durationMinutes)}
+      </td>
       <td className="px-4 py-3.5 max-w-xs">
         {entry.workSummary ? (
-          <span className="text-muted-foreground truncate block max-w-50" title={entry.workSummary}>
+          <span
+            className="text-muted-foreground truncate block max-w-50"
+            title={entry.workSummary}
+          >
             {entry.workSummary}
           </span>
         ) : (
-          <span className="text-muted-foreground/40 italic text-xs">\u2014</span>
+          <span className="text-muted-foreground/40 italic text-xs">
+            \u2014
+          </span>
         )}
       </td>
       <td className="px-4 py-3.5">
@@ -134,7 +148,13 @@ const SessionTable = ({ todayData, isLoading }) => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/30">
-                  {["Clock In", "Clock Out", "Duration", "Work Summary", "Status"].map((h) => (
+                  {[
+                    "Clock In",
+                    "Clock Out",
+                    "Duration",
+                    "Work Summary",
+                    "Status",
+                  ].map((h) => (
                     <th
                       key={h}
                       className="px-4 py-2.5 text-left font-medium text-xs uppercase tracking-wider text-muted-foreground"
@@ -158,7 +178,10 @@ const SessionTable = ({ todayData, isLoading }) => {
 }
 
 SessionTable.propTypes = {
-  todayData: PropTypes.shape({ entries: PropTypes.array, hasAutoExpiredEntry: PropTypes.bool }),
+  todayData: PropTypes.shape({
+    entries: PropTypes.array,
+    hasAutoExpiredEntry: PropTypes.bool,
+  }),
   isLoading: PropTypes.bool,
 }
 SessionTable.defaultProps = { todayData: null, isLoading: false }

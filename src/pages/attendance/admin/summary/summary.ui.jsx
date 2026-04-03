@@ -124,10 +124,7 @@ const DailyBarChart = ({ days }) => {
   return (
     <div className="flex items-end gap-2 h-32">
       {days.map((day, index) => (
-        <div
-          key={day.date}
-          className="flex flex-col items-center gap-1 flex-1"
-        >
+        <div key={day.date} className="flex flex-col items-center gap-1 flex-1">
           <motion.span
             className="text-xs font-medium text-muted-foreground"
             initial={{ opacity: 0, y: -8 }}
@@ -167,7 +164,7 @@ DailyBarChart.propTypes = {
     PropTypes.shape({
       date: PropTypes.string.isRequired,
       count: PropTypes.number.isRequired,
-    })
+    }),
   ),
 }
 
@@ -356,7 +353,7 @@ EmployeeMetricsTable.propTypes = {
     PropTypes.shape({
       employeeId: PropTypes.number,
       employeeName: PropTypes.string.isRequired,
-    })
+    }),
   ).isRequired,
 }
 
@@ -368,7 +365,7 @@ const summaryShape = PropTypes.shape({
     flaggedEntries: PropTypes.number,
   }),
   dailyAttendance: PropTypes.arrayOf(
-    PropTypes.shape({ date: PropTypes.string, count: PropTypes.number })
+    PropTypes.shape({ date: PropTypes.string, count: PropTypes.number }),
   ),
   employeeMetrics: PropTypes.arrayOf(
     PropTypes.shape({
@@ -378,7 +375,7 @@ const summaryShape = PropTypes.shape({
       avgMinutesPerDay: PropTypes.number,
       lateArrivals: PropTypes.number,
       earlyDepartures: PropTypes.number,
-    })
+    }),
   ),
 })
 

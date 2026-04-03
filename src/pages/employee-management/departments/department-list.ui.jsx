@@ -441,11 +441,7 @@ const DeptGridSection = ({
     <StaggerContainer className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {departments?.map((dept) => (
         <StaggerItem key={dept.id}>
-          <DeptCard
-            dept={dept}
-            onEdit={onEdit}
-            onDelete={onDelete}
-          />
+          <DeptCard dept={dept} onEdit={onEdit} onDelete={onDelete} />
         </StaggerItem>
       ))}
       {!departments?.length && (
@@ -490,7 +486,12 @@ const DepartmentListUI = ({
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+            transition={{
+              type: "spring",
+              stiffness: 200,
+              damping: 15,
+              delay: 0.1,
+            }}
             className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/25"
           >
             <Building2 className="h-5 w-5" />

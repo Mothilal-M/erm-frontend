@@ -125,7 +125,7 @@ export function OptimizedImage({
           onError={handleError}
           className={cn(
             "w-full h-full transition-opacity duration-300",
-            isLoading ? "opacity-0" : "opacity-100"
+            isLoading ? "opacity-0" : "opacity-100",
           )}
           style={{ objectFit }}
           {...props}
@@ -223,7 +223,7 @@ export function PictureOptimized({
             }}
             className={cn(
               "w-full h-full transition-opacity duration-300",
-              isLoading ? "opacity-0" : "opacity-100"
+              isLoading ? "opacity-0" : "opacity-100",
             )}
             {...props}
           />

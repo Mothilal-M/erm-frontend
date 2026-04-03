@@ -36,13 +36,21 @@ const ClockRing = ({ progress, isActive }) => {
     <div className="relative flex items-center justify-center w-44 h-44">
       <svg className="-rotate-90" width="176" height="176">
         <circle
-          cx="88" cy="88" r={r}
-          stroke="currentColor" strokeWidth="6" fill="none"
+          cx="88"
+          cy="88"
+          r={r}
+          stroke="currentColor"
+          strokeWidth="6"
+          fill="none"
           className="text-muted/20"
         />
         <motion.circle
-          cx="88" cy="88" r={r}
-          stroke="currentColor" strokeWidth="6" fill="none"
+          cx="88"
+          cy="88"
+          r={r}
+          stroke="currentColor"
+          strokeWidth="6"
+          fill="none"
           strokeDasharray={circumference}
           strokeLinecap="round"
           className={isActive ? "text-emerald-500" : "text-muted-foreground/30"}
@@ -60,7 +68,9 @@ const ClockRing = ({ progress, isActive }) => {
         />
       )}
       <div className="absolute flex flex-col items-center">
-        <Timer className={`h-5 w-5 mb-1 ${isActive ? "text-emerald-500" : "text-muted-foreground"}`} />
+        <Timer
+          className={`h-5 w-5 mb-1 ${isActive ? "text-emerald-500" : "text-muted-foreground"}`}
+        />
         <span className="text-3xl font-bold tabular-nums tracking-tight">
           {isActive ? formatElapsed(progress * 8 * 3600) : "—"}
         </span>
@@ -75,7 +85,13 @@ ClockRing.propTypes = {
 }
 
 /* ---- Clocked In Body ---- */
-const ClockedInBody = ({ elapsed, clockedInAt, willAutoExpire, isMutating, onClockOut }) => {
+const ClockedInBody = ({
+  elapsed,
+  clockedInAt,
+  willAutoExpire,
+  isMutating,
+  onClockOut,
+}) => {
   const progress = Math.min(elapsed / (8 * 3600), 1) // 8h workday
   const r = 70
   const circumference = 2 * Math.PI * r
@@ -91,13 +107,21 @@ const ClockedInBody = ({ elapsed, clockedInAt, willAutoExpire, isMutating, onClo
       <div className="relative flex items-center justify-center w-44 h-44">
         <svg className="-rotate-90" width="176" height="176">
           <circle
-            cx="88" cy="88" r={r}
-            stroke="currentColor" strokeWidth="6" fill="none"
+            cx="88"
+            cy="88"
+            r={r}
+            stroke="currentColor"
+            strokeWidth="6"
+            fill="none"
             className="text-muted/20"
           />
           <motion.circle
-            cx="88" cy="88" r={r}
-            stroke="currentColor" strokeWidth="6" fill="none"
+            cx="88"
+            cy="88"
+            r={r}
+            stroke="currentColor"
+            strokeWidth="6"
+            fill="none"
             strokeDasharray={circumference}
             strokeLinecap="round"
             className="text-emerald-500"
@@ -130,7 +154,11 @@ const ClockedInBody = ({ elapsed, clockedInAt, willAutoExpire, isMutating, onClo
         )}
       </div>
 
-      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} className="w-full">
+      <motion.div
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.97 }}
+        className="w-full"
+      >
         <Button
           variant="destructive"
           size="lg"
@@ -166,8 +194,12 @@ const ClockedOutBody = ({ todayMinutes, isMutating, onClockIn }) => (
     <div className="relative flex items-center justify-center w-44 h-44">
       <svg className="-rotate-90" width="176" height="176">
         <circle
-          cx="88" cy="88" r="70"
-          stroke="currentColor" strokeWidth="6" fill="none"
+          cx="88"
+          cy="88"
+          r="70"
+          stroke="currentColor"
+          strokeWidth="6"
+          fill="none"
           className="text-muted/20"
         />
       </svg>
@@ -203,10 +235,19 @@ ClockedOutBody.propTypes = {
 
 const deriveState = (status) => {
   if (!status) {
-    return { isClocked: false, elapsed: 0, todayMinutes: 0, clockedInAt: null, willAutoExpire: false }
+    return {
+      isClocked: false,
+      elapsed: 0,
+      todayMinutes: 0,
+      clockedInAt: null,
+      willAutoExpire: false,
+    }
   }
   const clockedInAt = status.clockedInAt
-    ? new Date(status.clockedInAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    ? new Date(status.clockedInAt).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
     : null
   return {
     isClocked: status.isClocked ?? false,
@@ -217,7 +258,13 @@ const deriveState = (status) => {
   }
 }
 
-const ClockCard = ({ status, isLoading, onClockIn, onClockOut, isMutating }) => {
+const ClockCard = ({
+  status,
+  isLoading,
+  onClockIn,
+  onClockOut,
+  isMutating,
+}) => {
   if (isLoading) {
     return (
       <Card className="border-0 shadow-sm">
@@ -230,7 +277,8 @@ const ClockCard = ({ status, isLoading, onClockIn, onClockOut, isMutating }) => 
     )
   }
 
-  const { isClocked, elapsed, todayMinutes, clockedInAt, willAutoExpire } = deriveState(status)
+  const { isClocked, elapsed, todayMinutes, clockedInAt, willAutoExpire } =
+    deriveState(status)
 
   return (
     <motion.div
@@ -238,11 +286,11 @@ const ClockCard = ({ status, isLoading, onClockIn, onClockOut, isMutating }) => 
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.5, ease: [0.25, 0.4, 0.25, 1] }}
     >
-      <Card className={`border-0 shadow-sm overflow-hidden ${
-        isClocked
-          ? "bg-gradient-to-b from-emerald-500/5 to-transparent"
-          : ""
-      }`}>
+      <Card
+        className={`border-0 shadow-sm overflow-hidden ${
+          isClocked ? "bg-gradient-to-b from-emerald-500/5 to-transparent" : ""
+        }`}
+      >
         <CardContent className="p-8">
           <AnimatePresence mode="wait">
             {isClocked ? (

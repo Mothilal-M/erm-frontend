@@ -9,7 +9,10 @@ import {
   NumberTicker,
   PulseBadge,
 } from "@/components/magicui"
-import { StaggerContainer, StaggerItem } from "@/components/magicui/stagger-container"
+import {
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/magicui/stagger-container"
 import { Badge } from "@/components/ui/badge"
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -17,12 +20,27 @@ import { Skeleton } from "@/components/ui/skeleton"
 /* eslint-disable react/no-array-index-key */
 
 const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ]
 
 const fmtTime = (iso) =>
-  iso ? new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "\u2014"
+  iso
+    ? new Date(iso).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "\u2014"
 
 const fmtMins = (mins) => {
   if (!mins) return "0m"
@@ -50,7 +68,9 @@ const SummaryCard = ({ label, value, icon: Icon, gradient, delay }) => (
           </p>
           <p className="text-2xl font-bold mt-1 tracking-tight">{value}</p>
         </div>
-        <div className={`rounded-xl p-2.5 bg-gradient-to-br ${gradient} text-white shadow-md`}>
+        <div
+          className={`rounded-xl p-2.5 bg-gradient-to-br ${gradient} text-white shadow-md`}
+        >
           <Icon className="h-4 w-4" />
         </div>
       </div>
@@ -91,13 +111,20 @@ const HistoryRow = ({ entry, date, idx }) => {
       </td>
       <td className="px-4 py-3.5 tabular-nums">
         <div className="flex items-center gap-1.5">
-          <div className={`h-1.5 w-1.5 rounded-full ${isAutoExpired ? "bg-amber-500" : "bg-red-400"}`} />
+          <div
+            className={`h-1.5 w-1.5 rounded-full ${isAutoExpired ? "bg-amber-500" : "bg-red-400"}`}
+          />
           {fmtTime(entry.clockOut)}
         </div>
       </td>
-      <td className="px-4 py-3.5 tabular-nums font-medium">{fmtMins(entry.durationMinutes)}</td>
+      <td className="px-4 py-3.5 tabular-nums font-medium">
+        {fmtMins(entry.durationMinutes)}
+      </td>
       <td className="px-4 py-3.5 max-w-48">
-        <span className="text-muted-foreground truncate block" title={entry.workSummary ?? "\u2014"}>
+        <span
+          className="text-muted-foreground truncate block"
+          title={entry.workSummary ?? "\u2014"}
+        >
           {entry.workSummary ?? "\u2014"}
         </span>
       </td>
@@ -122,7 +149,14 @@ const HistoryTableBody = ({ entries }) => {
         if (!day.entries?.length) return null
         return day.entries.map((entry) => {
           const idx = rowIdx++
-          return <HistoryRow key={entry.id} entry={entry} date={day.date} idx={idx} />
+          return (
+            <HistoryRow
+              key={entry.id}
+              entry={entry}
+              date={day.date}
+              idx={idx}
+            />
+          )
         })
       })}
     </tbody>
@@ -138,13 +172,22 @@ const deriveHistory = (data) => ({
   avgMins: data?.avgMinutesPerDay ?? 0,
 })
 
-const HistoryUI = ({ data, isLoading, year, month, onYearChange, onMonthChange }) => {
+const HistoryUI = ({
+  data,
+  isLoading,
+  year,
+  month,
+  onYearChange,
+  onMonthChange,
+}) => {
   if (isLoading) {
     return (
       <div className="max-w-4xl mx-auto p-4 md:p-6 flex flex-col gap-4">
         <Skeleton className="h-10 w-48 rounded-xl" />
         <div className="grid grid-cols-3 gap-3">
-          {[1, 2, 3].map((i) => <Skeleton key={i} className="h-24 w-full rounded-2xl" />)}
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-24 w-full rounded-2xl" />
+          ))}
         </div>
         <Skeleton className="h-64 w-full rounded-2xl" />
       </div>
@@ -171,7 +214,9 @@ const HistoryUI = ({ data, isLoading, year, month, onYearChange, onMonthChange }
               <h1 className="text-2xl font-bold tracking-tight">
                 <BlurText text="My History" />
               </h1>
-              <p className="text-sm text-muted-foreground">View your attendance records</p>
+              <p className="text-sm text-muted-foreground">
+                View your attendance records
+              </p>
             </div>
           </div>
 
@@ -183,7 +228,9 @@ const HistoryUI = ({ data, isLoading, year, month, onYearChange, onMonthChange }
                 onChange={(e) => onMonthChange(Number(e.target.value))}
               >
                 {MONTHS.map((m, i) => (
-                  <option key={m} value={i + 1}>{m}</option>
+                  <option key={m} value={i + 1}>
+                    {m}
+                  </option>
                 ))}
               </select>
               <select
@@ -192,7 +239,9 @@ const HistoryUI = ({ data, isLoading, year, month, onYearChange, onMonthChange }
                 onChange={(e) => onYearChange(Number(e.target.value))}
               >
                 {[2024, 2025, 2026].map((y) => (
-                  <option key={y} value={y}>{y}</option>
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
                 ))}
               </select>
             </div>
@@ -244,7 +293,14 @@ const HistoryUI = ({ data, isLoading, year, month, onYearChange, onMonthChange }
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b bg-muted/30">
-                    {["Date", "Clock In", "Clock Out", "Duration", "Summary", "Status"].map((h) => (
+                    {[
+                      "Date",
+                      "Clock In",
+                      "Clock Out",
+                      "Duration",
+                      "Summary",
+                      "Status",
+                    ].map((h) => (
                       <th
                         key={h}
                         className="px-4 py-2.5 text-left font-medium text-xs uppercase tracking-wider text-muted-foreground"

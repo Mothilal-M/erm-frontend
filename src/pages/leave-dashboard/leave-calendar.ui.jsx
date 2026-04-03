@@ -1,5 +1,12 @@
 import { motion, AnimatePresence } from "framer-motion"
-import { Clock, Loader2, UserX, ChevronLeft, ChevronRight, Users } from "lucide-react"
+import {
+  Clock,
+  Loader2,
+  UserX,
+  ChevronLeft,
+  ChevronRight,
+  Users,
+} from "lucide-react"
 import PropTypes from "prop-types"
 
 import {
@@ -9,7 +16,10 @@ import {
   NumberTicker,
   PulseBadge,
 } from "@/components/magicui"
-import { StaggerContainer, StaggerItem } from "@/components/magicui/stagger-container"
+import {
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/magicui/stagger-container"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -26,8 +36,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 /* eslint-disable complexity, react/no-array-index-key, max-lines-per-function */
 
 const MONTH_NAMES = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ]
 
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
@@ -35,8 +55,10 @@ const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 const getDayColorClass = (record) => {
   if (record.isWeekend) return "bg-muted/30 border-muted"
   const presentPct = record.present / record.total
-  if (presentPct >= 0.85) return "bg-emerald-500/10 border-emerald-500/25 hover:bg-emerald-500/20"
-  if (presentPct >= 0.7) return "bg-yellow-500/10 border-yellow-500/25 hover:bg-yellow-500/20"
+  if (presentPct >= 0.85)
+    return "bg-emerald-500/10 border-emerald-500/25 hover:bg-emerald-500/20"
+  if (presentPct >= 0.7)
+    return "bg-yellow-500/10 border-yellow-500/25 hover:bg-yellow-500/20"
   return "bg-red-500/10 border-red-500/25 hover:bg-red-500/20"
 }
 
@@ -47,23 +69,40 @@ const AttendanceBar = ({ present, leaveCount, total }) => {
   const absentW = 100 - presentW - leaveW
   return (
     <div className="flex w-full h-1.5 rounded-full overflow-hidden mt-1.5 gap-px">
-      <div className="bg-emerald-500 rounded-l-full transition-all" style={{ width: `${presentW}%` }} />
-      <div className="bg-amber-400 transition-all" style={{ width: `${leaveW}%` }} />
-      <div className="bg-red-500 rounded-r-full transition-all" style={{ width: `${absentW}%` }} />
+      <div
+        className="bg-emerald-500 rounded-l-full transition-all"
+        style={{ width: `${presentW}%` }}
+      />
+      <div
+        className="bg-amber-400 transition-all"
+        style={{ width: `${leaveW}%` }}
+      />
+      <div
+        className="bg-red-500 rounded-r-full transition-all"
+        style={{ width: `${absentW}%` }}
+      />
     </div>
   )
 }
-AttendanceBar.propTypes = { present: PropTypes.number.isRequired, leaveCount: PropTypes.number.isRequired, total: PropTypes.number.isRequired }
+AttendanceBar.propTypes = {
+  present: PropTypes.number.isRequired,
+  leaveCount: PropTypes.number.isRequired,
+  total: PropTypes.number.isRequired,
+}
 
 /* ---- Stat Card ---- */
 const StatCard = ({ label, value, gradient, icon: Icon }) => (
   <AnimatedCard className="border-0 shadow-sm">
     <CardContent className="flex items-center gap-3 p-4">
-      <div className={`rounded-xl p-2.5 bg-gradient-to-br ${gradient} text-white shadow-md`}>
+      <div
+        className={`rounded-xl p-2.5 bg-gradient-to-br ${gradient} text-white shadow-md`}
+      >
         <Icon className="h-4 w-4" />
       </div>
       <div>
-        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{label}</p>
+        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+          {label}
+        </p>
         <p className="text-2xl font-bold leading-none mt-0.5 tabular-nums">
           <NumberTicker value={value} />
         </p>
@@ -79,18 +118,25 @@ StatCard.propTypes = {
 }
 
 const initials = (name) =>
-  name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
+  name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2)
 
 /* ---- Day Detail Sheet ---- */
 const EmployeeRow = ({ emp, colorScheme }) => {
   const colorMap = {
     emerald: {
       bg: "bg-emerald-500/5 border-emerald-500/15 hover:bg-emerald-500/10",
-      avatar: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300",
+      avatar:
+        "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300",
     },
     amber: {
       bg: "bg-amber-500/5 border-amber-500/15 hover:bg-amber-500/10",
-      avatar: "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300",
+      avatar:
+        "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300",
     },
     red: {
       bg: "bg-red-500/5 border-red-500/15 hover:bg-red-500/10",
@@ -112,7 +158,9 @@ const EmployeeRow = ({ emp, colorScheme }) => {
       </Avatar>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium truncate">{emp.name}</p>
-        <p className="text-xs text-muted-foreground truncate">{emp.department}</p>
+        <p className="text-xs text-muted-foreground truncate">
+          {emp.department}
+        </p>
       </div>
       {emp.checkIn && (
         <div className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-medium shrink-0">
@@ -121,7 +169,10 @@ const EmployeeRow = ({ emp, colorScheme }) => {
         </div>
       )}
       {emp.leaveType && (
-        <Badge variant="outline" className="text-[10px] shrink-0 border-amber-400/40 text-amber-600 dark:text-amber-400">
+        <Badge
+          variant="outline"
+          className="text-[10px] shrink-0 border-amber-400/40 text-amber-600 dark:text-amber-400"
+        >
           {emp.leaveType}
         </Badge>
       )}
@@ -131,29 +182,46 @@ const EmployeeRow = ({ emp, colorScheme }) => {
     </motion.div>
   )
 }
-EmployeeRow.propTypes = { emp: PropTypes.object.isRequired, colorScheme: PropTypes.string.isRequired }
+EmployeeRow.propTypes = {
+  emp: PropTypes.object.isRequired,
+  colorScheme: PropTypes.string.isRequired,
+}
 
 const DayDetailSheet = ({ open, onClose, date, dayDetail, isLoading }) => {
   const formatted = date
     ? new Date(`${date}T00:00:00`).toLocaleDateString("en-US", {
-        weekday: "long", month: "long", day: "numeric", year: "numeric",
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        year: "numeric",
       })
     : ""
 
   return (
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
-      <SheetContent side="right" className="w-full sm:max-w-md flex flex-col p-0">
+      <SheetContent
+        side="right"
+        className="w-full sm:max-w-md flex flex-col p-0"
+      >
         <SheetHeader className="px-5 pt-5 pb-4 border-b shrink-0">
           <SheetTitle className="text-base font-bold">{formatted}</SheetTitle>
           {isLoading ? (
             <div className="flex gap-2 mt-2">
-              {[1, 2, 3].map((i) => <Skeleton key={i} className="h-6 w-20 rounded-full" />)}
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-6 w-20 rounded-full" />
+              ))}
             </div>
           ) : dayDetail ? (
             <div className="flex gap-2 flex-wrap mt-1">
-              <PulseBadge color="emerald">{dayDetail.summary.present} Present</PulseBadge>
-              <PulseBadge color="amber">{dayDetail.summary.onLeave} On Leave</PulseBadge>
-              <PulseBadge color="red">{dayDetail.summary.absent} Absent</PulseBadge>
+              <PulseBadge color="emerald">
+                {dayDetail.summary.present} Present
+              </PulseBadge>
+              <PulseBadge color="amber">
+                {dayDetail.summary.onLeave} On Leave
+              </PulseBadge>
+              <PulseBadge color="red">
+                {dayDetail.summary.absent} Absent
+              </PulseBadge>
             </div>
           ) : null}
         </SheetHeader>
@@ -165,7 +233,10 @@ const DayDetailSheet = ({ open, onClose, date, dayDetail, isLoading }) => {
         ) : (
           <Tabs defaultValue="present" className="flex-1 flex flex-col min-h-0">
             <TabsList className="mx-5 mt-4 grid grid-cols-3 shrink-0 rounded-xl">
-              <TabsTrigger value="present" className="gap-1.5 text-xs rounded-lg">
+              <TabsTrigger
+                value="present"
+                className="gap-1.5 text-xs rounded-lg"
+              >
                 <span className="h-2 w-2 rounded-full bg-emerald-500" />
                 Present ({dayDetail?.present?.length ?? 0})
               </TabsTrigger>
@@ -173,18 +244,40 @@ const DayDetailSheet = ({ open, onClose, date, dayDetail, isLoading }) => {
                 <span className="h-2 w-2 rounded-full bg-amber-400" />
                 Leave ({dayDetail?.onLeave?.length ?? 0})
               </TabsTrigger>
-              <TabsTrigger value="absent" className="gap-1.5 text-xs rounded-lg">
+              <TabsTrigger
+                value="absent"
+                className="gap-1.5 text-xs rounded-lg"
+              >
                 <span className="h-2 w-2 rounded-full bg-red-500" />
                 Absent ({dayDetail?.absent?.length ?? 0})
               </TabsTrigger>
             </TabsList>
 
             {[
-              { key: "present", data: dayDetail?.present, color: "emerald", emptyLabel: "No employees present" },
-              { key: "leave", data: dayDetail?.onLeave, color: "amber", emptyLabel: "Nobody on leave" },
-              { key: "absent", data: dayDetail?.absent, color: "red", emptyLabel: "No absences recorded" },
+              {
+                key: "present",
+                data: dayDetail?.present,
+                color: "emerald",
+                emptyLabel: "No employees present",
+              },
+              {
+                key: "leave",
+                data: dayDetail?.onLeave,
+                color: "amber",
+                emptyLabel: "Nobody on leave",
+              },
+              {
+                key: "absent",
+                data: dayDetail?.absent,
+                color: "red",
+                emptyLabel: "No absences recorded",
+              },
             ].map(({ key, data, color, emptyLabel }) => (
-              <TabsContent key={key} value={key} className="flex-1 min-h-0 mt-0 data-[state=inactive]:hidden">
+              <TabsContent
+                key={key}
+                value={key}
+                className="flex-1 min-h-0 mt-0 data-[state=inactive]:hidden"
+              >
                 <ScrollArea className="h-full px-5 py-4">
                   <div className="space-y-2">
                     {data?.map((emp) => (
@@ -217,10 +310,19 @@ DayDetailSheet.propTypes = {
 
 /* ---- Main Calendar UI ---- */
 const LeaveCalendarUI = ({
-  year, month, data, isLoading, isError,
-  onPrevMonth, onNextMonth, canGoNext,
-  selectedDate, dayDetail, isDayLoading,
-  onDayClick, onSheetClose,
+  year,
+  month,
+  data,
+  isLoading,
+  isError,
+  onPrevMonth,
+  onNextMonth,
+  canGoNext,
+  selectedDate,
+  dayDetail,
+  isDayLoading,
+  onDayClick,
+  onSheetClose,
 }) => {
   const today = new Date()
   const [todayString] = today.toISOString().split("T")
@@ -236,20 +338,31 @@ const LeaveCalendarUI = ({
         }
         return acc
       },
-      { present: 0, absent: 0, onLeave: 0, workdays: 0 }
+      { present: 0, absent: 0, onLeave: 0, workdays: 0 },
     )
 
   const monthTotals = computeMonthTotals(data?.records)
 
   const firstDayOfWeek = new Date(year, month, 1).getDay()
-  const recordMap = Object.fromEntries((data?.records ?? []).map((r) => [r.date, r]))
+  const recordMap = Object.fromEntries(
+    (data?.records ?? []).map((r) => [r.date, r]),
+  )
   const daysInMonth = new Date(year, month + 1, 0).getDate()
 
   const gridCells = []
   for (let i = 0; i < firstDayOfWeek; i++) gridCells.push(null)
   for (let d = 1; d <= daysInMonth; d++) {
     const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`
-    gridCells.push(recordMap[dateStr] ?? { date: dateStr, isWeekend: false, present: 0, absent: 0, onLeave: 0, total: 0 })
+    gridCells.push(
+      recordMap[dateStr] ?? {
+        date: dateStr,
+        isWeekend: false,
+        present: 0,
+        absent: 0,
+        onLeave: 0,
+        total: 0,
+      },
+    )
   }
 
   if (isError) {
@@ -276,15 +389,43 @@ const LeaveCalendarUI = ({
       {/* Stats */}
       {isLoading ? (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-20 rounded-2xl" />)}
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-20 rounded-2xl" />
+          ))}
         </div>
       ) : (
         <StaggerContainer className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
-            { label: "Total Employees", value: data?.totalEmployees ?? 0, gradient: "from-blue-500 to-indigo-600", icon: Users },
-            { label: "Avg. Present / Day", value: monthTotals.workdays ? Math.round(monthTotals.present / monthTotals.workdays) : 0, gradient: "from-emerald-500 to-green-600", icon: Users },
-            { label: "Avg. On Leave / Day", value: monthTotals.workdays ? Math.round(monthTotals.onLeave / monthTotals.workdays) : 0, gradient: "from-amber-500 to-orange-500", icon: Users },
-            { label: "Avg. Absent / Day", value: monthTotals.workdays ? Math.round(monthTotals.absent / monthTotals.workdays) : 0, gradient: "from-red-500 to-rose-600", icon: Users },
+            {
+              label: "Total Employees",
+              value: data?.totalEmployees ?? 0,
+              gradient: "from-blue-500 to-indigo-600",
+              icon: Users,
+            },
+            {
+              label: "Avg. Present / Day",
+              value: monthTotals.workdays
+                ? Math.round(monthTotals.present / monthTotals.workdays)
+                : 0,
+              gradient: "from-emerald-500 to-green-600",
+              icon: Users,
+            },
+            {
+              label: "Avg. On Leave / Day",
+              value: monthTotals.workdays
+                ? Math.round(monthTotals.onLeave / monthTotals.workdays)
+                : 0,
+              gradient: "from-amber-500 to-orange-500",
+              icon: Users,
+            },
+            {
+              label: "Avg. Absent / Day",
+              value: monthTotals.workdays
+                ? Math.round(monthTotals.absent / monthTotals.workdays)
+                : 0,
+              gradient: "from-red-500 to-rose-600",
+              icon: Users,
+            },
           ].map((stat) => (
             <StaggerItem key={stat.label}>
               <StatCard {...stat} />
@@ -325,7 +466,10 @@ const LeaveCalendarUI = ({
         <CardContent>
           <div className="grid grid-cols-7 mb-2">
             {DAY_LABELS.map((label) => (
-              <div key={label} className="text-center text-xs font-semibold text-muted-foreground py-1">
+              <div
+                key={label}
+                className="text-center text-xs font-semibold text-muted-foreground py-1"
+              >
                 {label}
               </div>
             ))}
@@ -340,7 +484,8 @@ const LeaveCalendarUI = ({
           ) : (
             <div className="grid grid-cols-7 gap-1">
               {gridCells.map((record, index) => {
-                if (!record) return <div key={`empty-${index}`} className="h-16 md:h-20" />
+                if (!record)
+                  return <div key={`empty-${index}`} className="h-16 md:h-20" />
 
                 const dayNumber = parseInt(record.date.split("-")[2])
                 const isToday = record.date === todayString
@@ -364,26 +509,44 @@ const LeaveCalendarUI = ({
                       ${isClickable ? "cursor-pointer" : "cursor-default"}
                     `}
                   >
-                    <span className={`text-xs font-semibold leading-none ${
-                      isToday ? "text-primary" : record.isWeekend ? "text-muted-foreground/50" : "text-foreground"
-                    }`}>
+                    <span
+                      className={`text-xs font-semibold leading-none ${
+                        isToday
+                          ? "text-primary"
+                          : record.isWeekend
+                            ? "text-muted-foreground/50"
+                            : "text-foreground"
+                      }`}
+                    >
                       {dayNumber}
                     </span>
 
                     {!record.isWeekend && record.total > 0 && (
                       <div className="mt-1 space-y-0.5 hidden md:block">
-                        <p className="text-[10px] text-emerald-600 font-medium leading-none">✓ {record.present}</p>
-                        <p className="text-[10px] text-amber-600 font-medium leading-none">⏳ {record.onLeave}</p>
-                        <p className="text-[10px] text-red-500 font-medium leading-none">✗ {record.absent}</p>
+                        <p className="text-[10px] text-emerald-600 font-medium leading-none">
+                          ✓ {record.present}
+                        </p>
+                        <p className="text-[10px] text-amber-600 font-medium leading-none">
+                          ⏳ {record.onLeave}
+                        </p>
+                        <p className="text-[10px] text-red-500 font-medium leading-none">
+                          ✗ {record.absent}
+                        </p>
                       </div>
                     )}
 
                     {!record.isWeekend && record.total > 0 && (
-                      <AttendanceBar present={record.present} leaveCount={record.onLeave} total={record.total} />
+                      <AttendanceBar
+                        present={record.present}
+                        leaveCount={record.onLeave}
+                        total={record.total}
+                      />
                     )}
 
                     {record.isWeekend && (
-                      <p className="text-[9px] text-muted-foreground/40 mt-0.5 hidden md:block">Weekend</p>
+                      <p className="text-[9px] text-muted-foreground/40 mt-0.5 hidden md:block">
+                        Weekend
+                      </p>
                     )}
                   </motion.div>
                 )
@@ -393,7 +556,9 @@ const LeaveCalendarUI = ({
 
           {/* Legend */}
           <div className="flex flex-wrap items-center gap-4 mt-4 pt-4 border-t">
-            <span className="text-xs font-medium text-muted-foreground">Legend:</span>
+            <span className="text-xs font-medium text-muted-foreground">
+              Legend:
+            </span>
             {[
               { color: "bg-emerald-500", label: "Present" },
               { color: "bg-amber-400", label: "On Leave" },
@@ -416,9 +581,30 @@ const LeaveCalendarUI = ({
       {/* Attendance Guide */}
       <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
         {[
-          { emoji: "🟢", title: "High Attendance", desc: "85%+ of employees present", gradient: "from-emerald-500/10 to-emerald-500/5", border: "border-emerald-500/20", textColor: "text-emerald-700 dark:text-emerald-400" },
-          { emoji: "🟡", title: "Moderate Attendance", desc: "70-84% of employees present", gradient: "from-yellow-500/10 to-yellow-500/5", border: "border-yellow-500/20", textColor: "text-yellow-700 dark:text-yellow-400" },
-          { emoji: "🔴", title: "Low Attendance", desc: "Below 70% of employees present", gradient: "from-red-500/10 to-red-500/5", border: "border-red-500/20", textColor: "text-red-700 dark:text-red-400" },
+          {
+            emoji: "🟢",
+            title: "High Attendance",
+            desc: "85%+ of employees present",
+            gradient: "from-emerald-500/10 to-emerald-500/5",
+            border: "border-emerald-500/20",
+            textColor: "text-emerald-700 dark:text-emerald-400",
+          },
+          {
+            emoji: "🟡",
+            title: "Moderate Attendance",
+            desc: "70-84% of employees present",
+            gradient: "from-yellow-500/10 to-yellow-500/5",
+            border: "border-yellow-500/20",
+            textColor: "text-yellow-700 dark:text-yellow-400",
+          },
+          {
+            emoji: "🔴",
+            title: "Low Attendance",
+            desc: "Below 70% of employees present",
+            gradient: "from-red-500/10 to-red-500/5",
+            border: "border-red-500/20",
+            textColor: "text-red-700 dark:text-red-400",
+          },
         ].map(({ emoji, title, desc, gradient, border, textColor }) => (
           <StaggerItem key={title}>
             <motion.div
@@ -452,13 +638,15 @@ LeaveCalendarUI.propTypes = {
   month: PropTypes.number.isRequired,
   data: PropTypes.shape({
     totalEmployees: PropTypes.number,
-    records: PropTypes.arrayOf(PropTypes.shape({
-      date: PropTypes.string,
-      isWeekend: PropTypes.bool,
-      present: PropTypes.number,
-      onLeave: PropTypes.number,
-      total: PropTypes.number,
-    })),
+    records: PropTypes.arrayOf(
+      PropTypes.shape({
+        date: PropTypes.string,
+        isWeekend: PropTypes.bool,
+        present: PropTypes.number,
+        onLeave: PropTypes.number,
+        total: PropTypes.number,
+      }),
+    ),
   }).isRequired,
   isLoading: PropTypes.bool.isRequired,
   isError: PropTypes.bool.isRequired,

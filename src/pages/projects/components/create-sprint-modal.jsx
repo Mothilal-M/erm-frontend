@@ -76,7 +76,7 @@ export const CreateSprintModal = ({ projectId = null }) => {
     setSelectedEpics((previous) =>
       previous.includes(epicId)
         ? previous.filter((id) => id !== epicId)
-        : [...previous, epicId]
+        : [...previous, epicId],
     )
   }
 
@@ -84,7 +84,7 @@ export const CreateSprintModal = ({ projectId = null }) => {
     setSelectedTasks((previous) =>
       previous.includes(taskId)
         ? previous.filter((id) => id !== taskId)
-        : [...previous, taskId]
+        : [...previous, taskId],
     )
   }
 

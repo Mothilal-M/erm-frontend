@@ -130,7 +130,7 @@ const profileHandlers = [
     if (!currentPassword || !newPassword) {
       return HttpResponse.json(
         { error: "Both fields are required." },
-        { status: 400 }
+        { status: 400 },
       )
     }
     return HttpResponse.json({ message: "Password changed successfully." })

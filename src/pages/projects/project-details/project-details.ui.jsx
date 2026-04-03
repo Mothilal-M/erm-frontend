@@ -286,7 +286,10 @@ const OverviewTab = ({ project, activeSprint }) => (
     <div className="lg:col-span-2 space-y-5">
       {activeSprint ? (
         <FadeIn direction="up" delay={0.1}>
-          <AnimatedCard delay={0.1} className="border-0 shadow-sm rounded-xl border-l-4 border-l-primary overflow-hidden">
+          <AnimatedCard
+            delay={0.1}
+            className="border-0 shadow-sm rounded-xl border-l-4 border-l-primary overflow-hidden"
+          >
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <CardTitle className="text-lg flex items-center gap-2">
@@ -322,7 +325,11 @@ const OverviewTab = ({ project, activeSprint }) => (
               <div className="grid grid-cols-3 gap-3">
                 <div className="bg-muted/40 rounded-xl p-3 text-center border">
                   <div className="text-3xl font-extrabold text-primary">
-                    <NumberTicker value={activeSprint.progress} suffix="%" delay={0.2} />
+                    <NumberTicker
+                      value={activeSprint.progress}
+                      suffix="%"
+                      delay={0.2}
+                    />
                   </div>
                   <div className="text-[11px] text-muted-foreground mt-1 font-medium uppercase tracking-wide">
                     Completion
@@ -388,7 +395,10 @@ const OverviewTab = ({ project, activeSprint }) => (
 
       {/* AI Insights */}
       <FadeIn direction="up" delay={0.2}>
-        <AnimatedCard delay={0.2} className="border-0 shadow-sm rounded-xl border-amber-200/80 dark:border-amber-800/40 overflow-hidden">
+        <AnimatedCard
+          delay={0.2}
+          className="border-0 shadow-sm rounded-xl border-amber-200/80 dark:border-amber-800/40 overflow-hidden"
+        >
           <div className="h-1 bg-linear-to-r from-amber-400 to-orange-400" />
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2 text-amber-700 dark:text-amber-400">
@@ -451,7 +461,8 @@ const OverviewTab = ({ project, activeSprint }) => (
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              {project.description || "No description provided for this project."}
+              {project.description ||
+                "No description provided for this project."}
             </p>
           </CardContent>
         </AnimatedCard>
@@ -473,7 +484,11 @@ const OverviewTab = ({ project, activeSprint }) => (
                   Completion
                 </span>
                 <span className="text-3xl font-extrabold text-primary leading-none">
-                  <NumberTicker value={project.progress} suffix="%" delay={0.3} />
+                  <NumberTicker
+                    value={project.progress}
+                    suffix="%"
+                    delay={0.3}
+                  />
                 </span>
               </div>
               <AnimatedProgress
@@ -557,7 +572,10 @@ const OverviewTab = ({ project, activeSprint }) => (
                 No team members assigned.
               </p>
             )}
-            <Button variant="outline" className="w-full mt-4 h-8 text-xs rounded-xl">
+            <Button
+              variant="outline"
+              className="w-full mt-4 h-8 text-xs rounded-xl"
+            >
               Manage Team
             </Button>
           </CardContent>
@@ -570,7 +588,9 @@ const OverviewTab = ({ project, activeSprint }) => (
       <FadeIn direction="up" delay={0.3}>
         <div className="flex items-center gap-2 pt-2">
           <TrendingUp className="h-5 w-5 text-primary" />
-          <h3 className="text-lg font-bold text-foreground">Project Analytics</h3>
+          <h3 className="text-lg font-bold text-foreground">
+            Project Analytics
+          </h3>
         </div>
       </FadeIn>
       <StaggerContainer className="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -601,7 +621,11 @@ const OverviewTab = ({ project, activeSprint }) => (
                       y2="1"
                     >
                       <stop offset="0%" stopColor="#6366f1" stopOpacity={1} />
-                      <stop offset="100%" stopColor="#818cf8" stopOpacity={0.7} />
+                      <stop
+                        offset="100%"
+                        stopColor="#818cf8"
+                        stopOpacity={0.7}
+                      />
                     </linearGradient>
                   </defs>
                   <CartesianGrid
@@ -746,7 +770,10 @@ const OverviewTab = ({ project, activeSprint }) => (
 
         {/* Issue Breakdown */}
         <StaggerItem>
-          <AnimatedCard delay={0.45} className="border-0 shadow-sm rounded-xl lg:col-span-2">
+          <AnimatedCard
+            delay={0.45}
+            className="border-0 shadow-sm rounded-xl lg:col-span-2"
+          >
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Target className="h-4 w-4 text-primary" />
@@ -917,10 +944,13 @@ const SprintsTab = ({ project, sprints }) => (
                       </div>
                       <div className="flex items-center text-xs text-muted-foreground gap-1.5 mt-0.5">
                         <Calendar className="h-3 w-3" />
-                        {new Date(sprint.startDate).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                        })}
+                        {new Date(sprint.startDate).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "numeric",
+                          },
+                        )}
                         {" – "}
                         {new Date(sprint.endDate).toLocaleDateString("en-US", {
                           month: "short",
@@ -1344,7 +1374,9 @@ const EpicsTab = () => {
                     <div className="w-36 hidden sm:block">
                       <div className="flex justify-between text-[11px] mb-1 font-medium">
                         <span className={config.color}>{epic.status}</span>
-                        <span className="text-foreground">{epic.progress}%</span>
+                        <span className="text-foreground">
+                          {epic.progress}%
+                        </span>
                       </div>
                       <AnimatedProgress
                         value={epic.progress}
@@ -1621,12 +1653,17 @@ const ProjectDetailsUI = ({ project, sprints, isLoading, error }) => {
       <StaggerContainer className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <StaggerItem>
           <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
-            <AnimatedCard delay={0.1} className="border-0 shadow-sm rounded-xl flex items-center gap-2.5 px-4 py-3">
+            <AnimatedCard
+              delay={0.1}
+              className="border-0 shadow-sm rounded-xl flex items-center gap-2.5 px-4 py-3"
+            >
               <div className="h-8 w-8 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
                 <Zap className="h-4 w-4 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground font-medium">Sprints</p>
+                <p className="text-xs text-muted-foreground font-medium">
+                  Sprints
+                </p>
                 <p className="text-sm font-bold text-foreground">
                   <NumberTicker value={totalSprints} delay={0.15} />
                 </p>
@@ -1636,14 +1673,23 @@ const ProjectDetailsUI = ({ project, sprints, isLoading, error }) => {
         </StaggerItem>
         <StaggerItem>
           <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
-            <AnimatedCard delay={0.15} className="border-0 shadow-sm rounded-xl flex items-center gap-2.5 px-4 py-3">
+            <AnimatedCard
+              delay={0.15}
+              className="border-0 shadow-sm rounded-xl flex items-center gap-2.5 px-4 py-3"
+            >
               <div className="h-8 w-8 rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center shrink-0">
                 <Users className="h-4 w-4 text-violet-600 dark:text-violet-400" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground font-medium">Team</p>
+                <p className="text-xs text-muted-foreground font-medium">
+                  Team
+                </p>
                 <p className="text-sm font-bold text-foreground">
-                  <NumberTicker value={teamSize} delay={0.2} suffix=" members" />
+                  <NumberTicker
+                    value={teamSize}
+                    delay={0.2}
+                    suffix=" members"
+                  />
                 </p>
               </div>
             </AnimatedCard>
@@ -1651,7 +1697,10 @@ const ProjectDetailsUI = ({ project, sprints, isLoading, error }) => {
         </StaggerItem>
         <StaggerItem>
           <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
-            <AnimatedCard delay={0.2} className="border-0 shadow-sm rounded-xl flex items-center gap-2.5 px-4 py-3">
+            <AnimatedCard
+              delay={0.2}
+              className="border-0 shadow-sm rounded-xl flex items-center gap-2.5 px-4 py-3"
+            >
               <div className="h-8 w-8 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
               </div>
@@ -1668,7 +1717,10 @@ const ProjectDetailsUI = ({ project, sprints, isLoading, error }) => {
         </StaggerItem>
         <StaggerItem>
           <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
-            <AnimatedCard delay={0.25} className="border-0 shadow-sm rounded-xl flex items-center gap-2.5 px-4 py-3">
+            <AnimatedCard
+              delay={0.25}
+              className="border-0 shadow-sm rounded-xl flex items-center gap-2.5 px-4 py-3"
+            >
               <div className="h-8 w-8 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shrink-0">
                 <Timer className="h-4 w-4 text-amber-600 dark:text-amber-400" />
               </div>
@@ -1744,7 +1796,7 @@ ProjectDetailsUI.propTypes = {
         id: PropTypes.number.isRequired,
         name: PropTypes.string.isRequired,
         avatar: PropTypes.string.isRequired,
-      })
+      }),
     ),
   }),
   sprints: PropTypes.arrayOf(
@@ -1755,7 +1807,7 @@ ProjectDetailsUI.propTypes = {
       progress: PropTypes.number.isRequired,
       startDate: PropTypes.string.isRequired,
       endDate: PropTypes.string.isRequired,
-    })
+    }),
   ).isRequired,
   isLoading: PropTypes.bool.isRequired,
   error: PropTypes.oneOf([PropTypes.bool, PropTypes.object]),

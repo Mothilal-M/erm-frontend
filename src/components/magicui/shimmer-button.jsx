@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
 const baseClasses = cn(
   "relative overflow-hidden rounded-xl px-6 py-3 font-semibold text-sm",
   "bg-primary text-primary-foreground shadow-lg shadow-primary/20",
-  "transition-shadow hover:shadow-xl hover:shadow-primary/30"
+  "transition-shadow hover:shadow-xl hover:shadow-primary/30",
 )
 
 const ShimmerOverlay = ({ shimmerColor }) => (
@@ -34,11 +34,22 @@ ShimmerOverlay.propTypes = { shimmerColor: PropTypes.string.isRequired }
  * Pass `to="/path"` to render as a React Router Link instead of a button.
  */
 const ShimmerButton = forwardRef(
-  ({ children, className, shimmerColor = "rgba(255,255,255,0.2)", to, ...props }, ref) => {
+  (
+    {
+      children,
+      className,
+      shimmerColor = "rgba(255,255,255,0.2)",
+      to,
+      ...props
+    },
+    ref,
+  ) => {
     const content = (
       <>
         <ShimmerOverlay shimmerColor={shimmerColor} />
-        <span className="relative z-10 flex items-center justify-center gap-2">{children}</span>
+        <span className="relative z-10 flex items-center justify-center gap-2">
+          {children}
+        </span>
       </>
     )
 
@@ -52,7 +63,11 @@ const ShimmerButton = forwardRef(
           <Link
             ref={ref}
             to={to}
-            className={cn(baseClasses, "inline-flex items-center justify-center no-underline", className)}
+            className={cn(
+              baseClasses,
+              "inline-flex items-center justify-center no-underline",
+              className,
+            )}
             {...props}
           >
             {content}
@@ -72,7 +87,7 @@ const ShimmerButton = forwardRef(
         {content}
       </motion.button>
     )
-  }
+  },
 )
 
 ShimmerButton.displayName = "ShimmerButton"

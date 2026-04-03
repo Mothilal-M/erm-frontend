@@ -38,8 +38,8 @@ export const IssueDetailsSidebar = ({
   const toggleSubtaskComplete = (subtaskId) => {
     setSubtasks(
       subtasks.map((st) =>
-        st.id === subtaskId ? { ...st, completed: !st.completed } : st
-      )
+        st.id === subtaskId ? { ...st, completed: !st.completed } : st,
+      ),
     )
   }
 
@@ -328,7 +328,7 @@ IssueDetailsSidebar.propTypes = {
         id: PropTypes.string,
         title: PropTypes.string,
         completed: PropTypes.bool,
-      })
+      }),
     ),
   }),
   open: PropTypes.bool,

@@ -87,12 +87,6 @@ const projectManagementItems = [
   { title: "Project", url: "/projects", icon: FolderOpen },
 ]
 
-const listOfProjects = [
-  { title: "Admin Dashboard", url: "/leave/admin", icon: LayoutDashboard },
-  { title: "Approvals", url: "/leave/admin/approvals", icon: ClipboardList },
-  { title: "Settings", url: "/leave/admin/settings", icon: Settings },
-]
-
 // ─── Animated menu item ─────────────────────────────────────────────────────
 
 const AnimatedMenuItem = ({ item, isActive }) => (
@@ -101,9 +95,10 @@ const AnimatedMenuItem = ({ item, isActive }) => (
       asChild
       className={`
         group relative rounded-xl transition-all duration-200
-        ${isActive
-          ? "bg-primary/10 text-primary font-medium shadow-sm"
-          : "hover:bg-muted/60"
+        ${
+          isActive
+            ? "bg-primary/10 text-primary font-medium shadow-sm"
+            : "hover:bg-muted/60"
         }
       `}
     >
@@ -113,7 +108,9 @@ const AnimatedMenuItem = ({ item, isActive }) => (
           whileTap={{ scale: 0.95 }}
           transition={{ type: "spring", stiffness: 400, damping: 17 }}
         >
-          <item.icon className={`h-4 w-4 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
+          <item.icon
+            className={`h-4 w-4 ${isActive ? "text-primary" : "text-muted-foreground"}`}
+          />
         </motion.div>
         <span>{item.title}</span>
         {isActive && (
@@ -168,7 +165,7 @@ NavGroup.propTypes = {
       title: PropTypes.string.isRequired,
       url: PropTypes.string.isRequired,
       icon: PropTypes.elementType.isRequired,
-    })
+    }),
   ).isRequired,
 }
 
@@ -180,14 +177,17 @@ const AnimatedSubItem = ({ item, isActive }) => (
       asChild
       className={`
         rounded-lg transition-all duration-200
-        ${isActive
-          ? "bg-primary/10 text-primary font-medium"
-          : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"
+        ${
+          isActive
+            ? "bg-primary/10 text-primary font-medium"
+            : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"
         }
       `}
     >
       <Link to={item.url} className="flex items-center gap-2">
-        <item.icon className={`h-3.5 w-3.5 ${isActive ? "text-primary" : ""}`} />
+        <item.icon
+          className={`h-3.5 w-3.5 ${isActive ? "text-primary" : ""}`}
+        />
         <span>{item.title}</span>
       </Link>
     </SidebarMenuSubButton>
@@ -211,7 +211,11 @@ const CollapsibleNavGroup = ({ title, icon: Icon, items, gradient }) => {
 
   return (
     <SidebarMenu>
-      <Collapsible asChild defaultOpen={isAnyActive} className="group/collapsible">
+      <Collapsible
+        asChild
+        defaultOpen={isAnyActive}
+        className="group/collapsible"
+      >
         <SidebarMenuItem>
           <CollapsibleTrigger asChild>
             <SidebarMenuButton
@@ -225,7 +229,9 @@ const CollapsibleNavGroup = ({ title, icon: Icon, items, gradient }) => {
                 whileHover={{ scale: 1.1 }}
                 className={`rounded-lg p-1 ${gradient ? `bg-gradient-to-br ${gradient} text-white` : ""}`}
               >
-                <Icon className={`h-3.5 w-3.5 ${gradient ? "" : "text-muted-foreground"}`} />
+                <Icon
+                  className={`h-3.5 w-3.5 ${gradient ? "" : "text-muted-foreground"}`}
+                />
               </motion.div>
               <span>{title}</span>
               {isAnyActive && (
@@ -260,97 +266,13 @@ CollapsibleNavGroup.propTypes = {
       title: PropTypes.string.isRequired,
       url: PropTypes.string.isRequired,
       icon: PropTypes.elementType.isRequired,
-    })
+    }),
   ).isRequired,
   gradient: PropTypes.string,
 }
 
 CollapsibleNavGroup.defaultProps = {
   gradient: null,
-}
-
-const ProjectCollapsibleNavGroup = ({
-  title,
-  icon: Icon,
-  items,
-  projectLabel,
-  projectItems,
-}) => {
-  const location = useLocation()
-  const isSubActive = items.some((item) => location.pathname === item.url)
-
-  return (
-    <SidebarMenu>
-      <SidebarGroupLabel className="text-[10px] uppercase tracking-widest text-muted-foreground/70 font-semibold px-3">
-        {projectLabel}
-      </SidebarGroupLabel>
-      <SidebarGroupContent>
-        <SidebarMenu>
-          {projectItems.map((item) => (
-            <AnimatedMenuItem
-              key={item.title}
-              item={item}
-              isActive={location.pathname === item.url}
-            />
-          ))}
-        </SidebarMenu>
-      </SidebarGroupContent>
-      <Collapsible asChild defaultOpen={isSubActive} className="group/collapsible">
-        <SidebarMenuItem>
-          <CollapsibleTrigger asChild>
-            <SidebarMenuButton
-              tooltip={title}
-              className={`
-                rounded-xl transition-all duration-200
-                ${isSubActive ? "bg-muted/80 font-medium" : "hover:bg-muted/50"}
-              `}
-            >
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                className="rounded-lg p-1 bg-gradient-to-br from-rose-500 to-pink-600 text-white"
-              >
-                <Icon className="h-3.5 w-3.5" />
-              </motion.div>
-              <span>{title}</span>
-              <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground/50 transition-transform duration-300 group-data-[state=open]/collapsible:rotate-90" />
-            </SidebarMenuButton>
-          </CollapsibleTrigger>
-
-          <CollapsibleContent>
-            <SidebarMenuSub className="ml-3 border-l border-border/40 pl-2">
-              {items.map((item) => (
-                <AnimatedSubItem
-                  key={item.title}
-                  item={item}
-                  isActive={location.pathname === item.url}
-                />
-              ))}
-            </SidebarMenuSub>
-          </CollapsibleContent>
-        </SidebarMenuItem>
-      </Collapsible>
-    </SidebarMenu>
-  )
-}
-
-ProjectCollapsibleNavGroup.propTypes = {
-  title: PropTypes.string.isRequired,
-  icon: PropTypes.elementType.isRequired,
-  items: PropTypes.arrayOf(
-    PropTypes.shape({
-      title: PropTypes.string.isRequired,
-      url: PropTypes.string.isRequired,
-      icon: PropTypes.elementType.isRequired,
-    })
-  ).isRequired,
-  projectLabel: PropTypes.string.isRequired,
-  projectItems: PropTypes.arrayOf(
-    PropTypes.shape({
-      title: PropTypes.string.isRequired,
-      url: PropTypes.string.isRequired,
-      icon: PropTypes.elementType.isRequired,
-    })
-  ).isRequired,
 }
 
 // ─── Modules section ──────────────────────────────────────────────────────────
@@ -425,14 +347,15 @@ ModulesNavGroup.propTypes = {
 // ─── AppSidebar ───────────────────────────────────────────────────────────
 
 const AppSidebar = () => {
+  const location = useLocation()
   const leaveRole = useSelector(
-    (s) => s[ct.store.USER_STORE].leave_management_role
+    (s) => s[ct.store.USER_STORE].leave_management_role,
   )
   const empMgmtRole = useSelector(
-    (s) => s[ct.store.USER_STORE].employee_management_role
+    (s) => s[ct.store.USER_STORE].employee_management_role,
   )
   const attendanceRole = useSelector(
-    (s) => s[ct.store.USER_STORE].attendance_management_role
+    (s) => s[ct.store.USER_STORE].attendance_management_role,
   )
 
   return (
@@ -450,7 +373,9 @@ const AppSidebar = () => {
             </motion.div>
             <div className="group-data-[collapsible=icon]:hidden">
               <p className="text-sm font-bold tracking-tight">ERM Platform</p>
-              <p className="text-[10px] text-muted-foreground">Management Suite</p>
+              <p className="text-[10px] text-muted-foreground">
+                Management Suite
+              </p>
             </div>
           </div>
         </div>
@@ -463,13 +388,22 @@ const AppSidebar = () => {
           isAttendanceAdmin={attendanceRole === "admin"}
           isAttendanceEmployee={attendanceRole === "employee"}
         />
-        <ProjectCollapsibleNavGroup
-          title="Project Management"
-          icon={FolderOpen}
-          items={listOfProjects}
-          projectLabel="Projects"
-          projectItems={projectManagementItems}
-        />
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-[10px] uppercase tracking-widest text-muted-foreground/70 font-semibold px-3">
+            Projects
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {projectManagementItems.map((item) => (
+                <AnimatedMenuItem
+                  key={item.title}
+                  item={item}
+                  isActive={location.pathname === item.url}
+                />
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
     </Sidebar>
   )

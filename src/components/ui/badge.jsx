@@ -23,7 +23,7 @@ const badgeVariants = cva(
     defaultVariants: {
       variant: "default",
     },
-  }
+  },
 )
 
 function Badge({ className, variant = "default", asChild = false, ...props }) {

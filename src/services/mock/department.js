@@ -88,22 +88,22 @@ const handleCreateDepartment = async ({ request }) => {
 // ─── GET /employee-management/departments/ ────────────────────────────────────
 
 const listDepartments = http.get("*/employee-management/departments/", () =>
-  respondWithDepartmentList()
+  respondWithDepartmentList(),
 )
 const listDepartmentsNoSlash = http.get(
   "*/employee-management/departments",
-  () => respondWithDepartmentList()
+  () => respondWithDepartmentList(),
 )
 
 // ─── POST /employee-management/departments/ ───────────────────────────────────
 
 const createDepartment = http.post(
   "*/employee-management/departments/",
-  handleCreateDepartment
+  handleCreateDepartment,
 )
 const createDepartmentNoSlash = http.post(
   "*/employee-management/departments",
-  handleCreateDepartment
+  handleCreateDepartment,
 )
 
 // ─── PATCH /employee-management/departments/:id/ ──────────────────────────────
@@ -117,7 +117,7 @@ const updateDepartment = http.patch(
       return HttpResponse.json({ detail: "Not found." }, { status: 404 })
     departments[idx] = { ...departments[idx], ...body }
     return HttpResponse.json(departments[idx])
-  }
+  },
 )
 
 // ─── DELETE /employee-management/departments/:id/ ─────────────────────────────
@@ -130,7 +130,7 @@ const removeDepartment = http.delete(
       return HttpResponse.json({ detail: "Not found." }, { status: 404 })
     departments = departments.filter((d) => d.id !== Number(params.id))
     return HttpResponse.json({ detail: "Deleted." })
-  }
+  },
 )
 
 const handlers = [

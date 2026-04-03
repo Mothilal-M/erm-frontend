@@ -25,7 +25,7 @@ const EmployeeList = () => {
     return list.filter(
       (employee) =>
         employee.name.toLowerCase().includes(lower) ||
-        employee.email.toLowerCase().includes(lower)
+        employee.email.toLowerCase().includes(lower),
     )
   }, [data, search])
 

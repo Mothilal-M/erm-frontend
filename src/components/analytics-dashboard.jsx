@@ -206,7 +206,7 @@ const AnalyticsDashboard = ({ analytics, isLoading, error }) => {
                         {count}
                       </div>
                     )
-                  }
+                  },
                 )}
               </div>
             </div>
@@ -232,7 +232,7 @@ const AnalyticsDashboard = ({ analytics, isLoading, error }) => {
                         {count}
                       </div>
                     )
-                  }
+                  },
                 )}
               </div>
             </div>

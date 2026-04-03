@@ -33,9 +33,7 @@ const NotificationsUI = ({
                 delay={0.2}
               />
               {unreadCount > 0 && (
-                <PulseBadge color="blue">
-                  {unreadCount} new
-                </PulseBadge>
+                <PulseBadge color="blue">{unreadCount} new</PulseBadge>
               )}
             </div>
             {unreadCount > 0 && (
@@ -147,7 +145,7 @@ NotificationsUI.propTypes = {
       time: PropTypes.string.isRequired,
       read: PropTypes.bool.isRequired,
       type: PropTypes.string.isRequired,
-    })
+    }),
   ).isRequired,
   onMarkAsRead: PropTypes.func.isRequired,
   onMarkAllAsRead: PropTypes.func.isRequired,

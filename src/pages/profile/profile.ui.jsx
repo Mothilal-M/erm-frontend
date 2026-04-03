@@ -326,7 +326,12 @@ const ProfileHeaderCard = ({
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.1 }}
+          transition={{
+            type: "spring",
+            stiffness: 260,
+            damping: 20,
+            delay: 0.1,
+          }}
         >
           <Avatar className="h-24 w-24 text-2xl">
             <AvatarFallback className="bg-primary/10 text-primary">
@@ -591,9 +596,7 @@ const AssetsSection = ({ assets }) => {
                     </p>
                   </div>
                 </div>
-                <PulseBadge color="blue">
-                  {asset.condition}
-                </PulseBadge>
+                <PulseBadge color="blue">{asset.condition}</PulseBadge>
               </motion.div>
             ))}
           </div>
@@ -611,7 +614,7 @@ AssetsSection.propTypes = {
       type: PropTypes.string,
       serialNumber: PropTypes.string,
       condition: PropTypes.string,
-    })
+    }),
   ),
 }
 
@@ -656,7 +659,10 @@ const DocumentsSection = ({ documents }) => {
                     </p>
                   </div>
                 </div>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
                   <Button variant="ghost" size="sm" className="text-xs">
                     View
                   </Button>
@@ -677,7 +683,7 @@ DocumentsSection.propTypes = {
       name: PropTypes.string,
       category: PropTypes.string,
       uploadedAt: PropTypes.string,
-    })
+    }),
   ),
 }
 
@@ -769,7 +775,7 @@ TimelineContent.propTypes = {
       title: PropTypes.string,
       date: PropTypes.string,
       description: PropTypes.string,
-    })
+    }),
   ),
 }
 
@@ -902,9 +908,7 @@ const renderTeamSetup = ({
                 >
                   <span className="text-xs font-medium">{employee.name}</span>
                   {teamDraft.memberIds.includes(String(employee.id)) && (
-                    <PulseBadge color="emerald">
-                      Added
-                    </PulseBadge>
+                    <PulseBadge color="emerald">Added</PulseBadge>
                   )}
                 </button>
               ))
@@ -925,7 +929,10 @@ const renderTeamSetup = ({
 )
 
 const renderTeamDirectory = ({ teams, selectedTeamId, onTeamSelect }) => (
-  <AnimatedCard delay={0.15} className="lg:col-span-1 rounded-xl border-0 shadow-sm">
+  <AnimatedCard
+    delay={0.15}
+    className="lg:col-span-1 rounded-xl border-0 shadow-sm"
+  >
     <CardHeader>
       <CardTitle className="text-base">Teams</CardTitle>
       <CardDescription>
@@ -979,7 +986,10 @@ const renderResponsibilityPanel = ({
       ?.name ?? "Not assigned"
 
   return (
-    <AnimatedCard delay={0.2} className="lg:col-span-2 rounded-xl border-0 shadow-sm">
+    <AnimatedCard
+      delay={0.2}
+      className="lg:col-span-2 rounded-xl border-0 shadow-sm"
+    >
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
           <ShieldCheck className="h-4 w-4" />
@@ -994,12 +1004,8 @@ const renderResponsibilityPanel = ({
           <>
             <FadeIn delay={0.1} direction="up">
               <div className="flex flex-wrap items-center gap-2">
-                <PulseBadge color="purple">
-                  {selectedTeam.name}
-                </PulseBadge>
-                <PulseBadge color="blue">
-                  Lead: {leadName}
-                </PulseBadge>
+                <PulseBadge color="purple">{selectedTeam.name}</PulseBadge>
+                <PulseBadge color="blue">Lead: {leadName}</PulseBadge>
                 <PulseBadge color="amber">
                   Members: {selectedTeam.memberIds.length}
                 </PulseBadge>
@@ -1026,7 +1032,7 @@ const renderResponsibilityPanel = ({
                     onTeamResponsibilityChange(
                       selectedTeam.id,
                       module.key,
-                      value
+                      value,
                     )
                   }
                 >
@@ -1048,8 +1054,13 @@ const renderResponsibilityPanel = ({
             ))}
 
             <div className="flex justify-end">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button onClick={onSaveRoles}>Save Team Responsibilities</Button>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button onClick={onSaveRoles}>
+                  Save Team Responsibilities
+                </Button>
               </motion.div>
             </div>
           </>
@@ -1221,23 +1232,38 @@ const ProfileUI = ({
       <FadeIn delay={0.15} direction="up">
         <Tabs defaultValue="profile" className="space-y-4">
           <TabsList className="grid grid-cols-2 sm:grid-cols-5 h-auto gap-1 w-full rounded-lg">
-            <TabsTrigger value="profile" className="gap-2 justify-center py-2 rounded-lg">
+            <TabsTrigger
+              value="profile"
+              className="gap-2 justify-center py-2 rounded-lg"
+            >
               <UserRound className="h-4 w-4" />
               Profile
             </TabsTrigger>
-            <TabsTrigger value="assets" className="gap-2 justify-center py-2 rounded-lg">
+            <TabsTrigger
+              value="assets"
+              className="gap-2 justify-center py-2 rounded-lg"
+            >
               <Briefcase className="h-4 w-4" />
               Assets
             </TabsTrigger>
-            <TabsTrigger value="timeline" className="gap-2 justify-center py-2 rounded-lg">
+            <TabsTrigger
+              value="timeline"
+              className="gap-2 justify-center py-2 rounded-lg"
+            >
               <Calendar className="h-4 w-4" />
               Timeline
             </TabsTrigger>
-            <TabsTrigger value="settings" className="gap-2 justify-center py-2 rounded-lg">
+            <TabsTrigger
+              value="settings"
+              className="gap-2 justify-center py-2 rounded-lg"
+            >
               <Cog className="h-4 w-4" />
               Settings
             </TabsTrigger>
-            <TabsTrigger value="roles" className="gap-2 justify-center py-2 rounded-lg">
+            <TabsTrigger
+              value="roles"
+              className="gap-2 justify-center py-2 rounded-lg"
+            >
               <BriefcaseBusiness className="h-4 w-4" />
               Teams & Roles
             </TabsTrigger>

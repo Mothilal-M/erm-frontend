@@ -6,7 +6,11 @@ import { useNavigate } from "react-router-dom"
 import { z } from "zod"
 
 import { toast } from "@/components/ui/use-toast"
-import { loginWithGoogle, logoutFirebase, signupWithEmail } from "@/lib/firebase"
+import {
+  loginWithGoogle,
+  logoutFirebase,
+  signupWithEmail,
+} from "@/lib/firebase"
 import { getErrorMessage } from "@/lib/utils/auth-errors"
 import ct from "@constants/"
 import api from "@/services/api"
@@ -18,7 +22,9 @@ const FormSchema = z
   .object({
     name: z.string().min(2, { message: "Name must be at least 2 characters." }),
     email: z.string().email({ message: "Please enter a valid email address." }),
-    password: z.string().min(6, { message: "Password must be at least 6 characters." }),
+    password: z
+      .string()
+      .min(6, { message: "Password must be at least 6 characters." }),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -52,7 +58,7 @@ const Signup = () => {
         userEmail: data.email || firebaseUser.email,
         userRole: data.role || "admin",
         uid: data.uid || firebaseUser.uid,
-      })
+      }),
     )
     toast({
       title: "Welcome!",
@@ -76,9 +82,16 @@ const Signup = () => {
         await logoutFirebase()
       }
 
-      const message = getErrorMessage(error, "Unable to create your account. Please try again.")
+      const message = getErrorMessage(
+        error,
+        "Unable to create your account. Please try again.",
+      )
       if (message) {
-        toast({ title: "Sign up failed", description: message, variant: "destructive" })
+        toast({
+          title: "Sign up failed",
+          description: message,
+          variant: "destructive",
+        })
       }
     } finally {
       setLoading(false)
@@ -94,12 +107,19 @@ const Signup = () => {
       const result = await loginWithGoogle()
       await handlePostRegister(
         result.user,
-        result.user.displayName || result.user.email.split("@")[0]
+        result.user.displayName || result.user.email.split("@")[0],
       )
     } catch (error) {
-      const message = getErrorMessage(error, "Google sign-up failed. Please try again.")
+      const message = getErrorMessage(
+        error,
+        "Google sign-up failed. Please try again.",
+      )
       if (message) {
-        toast({ title: "Sign up failed", description: message, variant: "destructive" })
+        toast({
+          title: "Sign up failed",
+          description: message,
+          variant: "destructive",
+        })
       }
     } finally {
       setLoading(false)

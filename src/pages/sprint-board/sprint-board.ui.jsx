@@ -599,7 +599,7 @@ const StandupTab = ({ sprintId }) => {
   const [selectedDateId, setSelectedDateId] = useState(MOCK_STANDUP_DATES[0].id)
 
   const selectedDateData = MOCK_STANDUP_DATES.find(
-    (d) => d.id === selectedDateId
+    (d) => d.id === selectedDateId,
   )
 
   return (

@@ -86,7 +86,10 @@ const DailyStandupPage = () => {
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Standup Input */}
         <FadeIn delay={0.2} direction="right">
-          <AnimatedCard delay={0.25} className="border-0 shadow-sm rounded-xl lg:col-span-1">
+          <AnimatedCard
+            delay={0.25}
+            className="border-0 shadow-sm rounded-xl lg:col-span-1"
+          >
             <CardHeader>
               <CardTitle className="text-lg">Your Standup</CardTitle>
             </CardHeader>
@@ -127,7 +130,11 @@ const DailyStandupPage = () => {
                   <StaggerItem key={update.name}>
                     <motion.div
                       whileHover={{ x: 4 }}
-                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 20,
+                      }}
                       className="border-l-4 border-blue-500 pl-4 py-2 rounded-r-xl"
                     >
                       <div className="flex items-center justify-between mb-2">

@@ -79,7 +79,7 @@ const FlagEntryModal = ({ entry, onClose, onSave, isLoading }) => {
           <DialogDescription>
             {entry
               ? `${entry.employeeName} — ${entry.date}, ${fmtTime(
-                  entry.clockIn
+                  entry.clockIn,
                 )} → ${fmtTime(entry.clockOut)}`
               : ""}
           </DialogDescription>

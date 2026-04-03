@@ -81,7 +81,21 @@ const MetricCard = ({ icon, label, value, sub, accent, delay = 0 }) => (
   <AnimatedCard
     delay={delay}
     className={`overflow-hidden ${accent}`}
-    glowColor={accent.includes("blue") ? "#3b82f6" : accent.includes("red") ? "#ef4444" : accent.includes("emerald") ? "#10b981" : accent.includes("amber") ? "#f59e0b" : accent.includes("cyan") ? "#06b6d4" : accent.includes("yellow") ? "#eab308" : undefined}
+    glowColor={
+      accent.includes("blue")
+        ? "#3b82f6"
+        : accent.includes("red")
+          ? "#ef4444"
+          : accent.includes("emerald")
+            ? "#10b981"
+            : accent.includes("amber")
+              ? "#f59e0b"
+              : accent.includes("cyan")
+                ? "#06b6d4"
+                : accent.includes("yellow")
+                  ? "#eab308"
+                  : undefined
+    }
   >
     <CardContent className="p-5">
       <div className="flex items-start justify-between">
@@ -211,7 +225,9 @@ const LeaveBreakdownAndDeptSection = ({
                       value={pct}
                       max={100}
                       height="h-1.5"
-                      barClassName={LEAVE_BAR_COLOR[item.color] ?? LEAVE_BAR_COLOR.default}
+                      barClassName={
+                        LEAVE_BAR_COLOR[item.color] ?? LEAVE_BAR_COLOR.default
+                      }
                       delay={0.45 + idx * 0.07}
                     />
                   </motion.div>
@@ -290,7 +306,7 @@ LeaveBreakdownAndDeptSection.propTypes = {
       type: PropTypes.string,
       count: PropTypes.number,
       color: PropTypes.string,
-    })
+    }),
   ),
   totalRequests: PropTypes.number.isRequired,
   departmentStats: PropTypes.arrayOf(
@@ -300,7 +316,7 @@ LeaveBreakdownAndDeptSection.propTypes = {
       absent: PropTypes.number,
       present: PropTypes.number,
       wfh: PropTypes.number,
-    })
+    }),
   ),
 }
 
@@ -405,7 +421,7 @@ TopLeaveTakersCard.propTypes = {
       department: PropTypes.string,
       totalDays: PropTypes.number,
       types: PropTypes.arrayOf(PropTypes.string),
-    })
+    }),
   ),
 }
 
@@ -426,9 +442,7 @@ const ApprovalsAndActivitySection = ({
           <CardTitle className="text-base flex items-center gap-2">
             Pending Approvals
             {!isLoading && (
-              <PulseBadge color="amber">
-                {pendingApprovals?.length}
-              </PulseBadge>
+              <PulseBadge color="amber">{pendingApprovals?.length}</PulseBadge>
             )}
           </CardTitle>
         </CardHeader>
@@ -461,7 +475,10 @@ const ApprovalsAndActivitySection = ({
                     >
                       {SUBTYPE_LABEL[item.subType] ?? item.subType}
                     </Badge>
-                    <Badge variant="outline" className="text-xs rounded-xl tabular-nums">
+                    <Badge
+                      variant="outline"
+                      className="text-xs rounded-xl tabular-nums"
+                    >
                       {item.days}d
                     </Badge>
                   </div>
@@ -540,7 +557,7 @@ ApprovalsAndActivitySection.propTypes = {
       from: PropTypes.string,
       to: PropTypes.string,
       days: PropTypes.number,
-    })
+    }),
   ),
   recentActivity: PropTypes.arrayOf(
     PropTypes.shape({
@@ -549,7 +566,7 @@ ApprovalsAndActivitySection.propTypes = {
       action: PropTypes.string,
       type: PropTypes.string,
       date: PropTypes.string,
-    })
+    }),
   ),
 }
 
@@ -709,7 +726,7 @@ AdminDashboardUI.propTypes = {
         type: PropTypes.string,
         count: PropTypes.number,
         color: PropTypes.string,
-      })
+      }),
     ),
     departmentStats: PropTypes.arrayOf(
       PropTypes.shape({
@@ -718,7 +735,7 @@ AdminDashboardUI.propTypes = {
         absent: PropTypes.number,
         present: PropTypes.number,
         wfh: PropTypes.number,
-      })
+      }),
     ),
     topLeaveTakers: PropTypes.arrayOf(
       PropTypes.shape({
@@ -727,7 +744,7 @@ AdminDashboardUI.propTypes = {
         department: PropTypes.string,
         totalDays: PropTypes.number,
         types: PropTypes.arrayOf(PropTypes.string),
-      })
+      }),
     ),
     pendingApprovals: PropTypes.arrayOf(
       PropTypes.shape({
@@ -738,7 +755,7 @@ AdminDashboardUI.propTypes = {
         from: PropTypes.string,
         to: PropTypes.string,
         days: PropTypes.number,
-      })
+      }),
     ),
     recentActivity: PropTypes.arrayOf(
       PropTypes.shape({
@@ -747,7 +764,7 @@ AdminDashboardUI.propTypes = {
         action: PropTypes.string,
         type: PropTypes.string,
         date: PropTypes.string,
-      })
+      }),
     ),
   }),
   isLoading: PropTypes.bool.isRequired,

@@ -116,7 +116,7 @@ LinksList.propTypes = {
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       url: PropTypes.string.isRequired,
-    })
+    }),
   ).isRequired,
   onRemove: PropTypes.func.isRequired,
 }
@@ -159,7 +159,7 @@ FilesList.propTypes = {
       id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
       size: PropTypes.number.isRequired,
-    })
+    }),
   ).isRequired,
   onRemove: PropTypes.func.isRequired,
 }

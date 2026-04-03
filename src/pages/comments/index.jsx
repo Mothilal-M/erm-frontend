@@ -25,7 +25,7 @@ const CommentsPage = () => {
     const startIndex = (currentPage - 1) * commentsPerPage
     const selectedComments = data.slice(
       startIndex,
-      startIndex + commentsPerPage
+      startIndex + commentsPerPage,
     )
 
     return selectedComments.map((comment) => (

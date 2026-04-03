@@ -116,7 +116,7 @@ export const useAbortController = () => {
 export const useCancellableRequest = (
   requestFunction,
   deps = [],
-  options = {}
+  options = {},
 ) => {
   const { debounce = 0, onSuccess, onError } = options
   const controllerReference = useRef(null)

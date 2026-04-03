@@ -46,7 +46,10 @@ import {
   AnimatedProgress,
   PulseBadge,
 } from "@/components/magicui"
-import { StaggerContainer, StaggerItem } from "@/components/magicui/stagger-container"
+import {
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/magicui/stagger-container"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -105,7 +108,15 @@ const EMP_QUICK_LINKS = [
 ]
 
 /* ---- Stat Card ---- */
-const StatCard = ({ label, value, sub, icon: Icon, gradient, to, delay = 0 }) => (
+const StatCard = ({
+  label,
+  value,
+  sub,
+  icon: Icon,
+  gradient,
+  to,
+  delay = 0,
+}) => (
   <AnimatedCard delay={delay} className="overflow-hidden border-0 shadow-sm">
     <CardContent className="pt-5 pb-4 relative">
       <div className="flex items-start justify-between">
@@ -120,9 +131,7 @@ const StatCard = ({ label, value, sub, icon: Icon, gradient, to, delay = 0 }) =>
               value
             )}
           </p>
-          {sub && (
-            <p className="text-xs text-muted-foreground mt-1">{sub}</p>
-          )}
+          {sub && <p className="text-xs text-muted-foreground mt-1">{sub}</p>}
         </div>
         <div
           className={`rounded-xl p-3 bg-gradient-to-br ${gradient} text-white shadow-lg`}
@@ -163,7 +172,7 @@ const getEmployeeStats = (leaveProfile, todayAttendance) => ({
   month: leaveProfile?.thisMonth,
   totalRemaining: (leaveProfile?.leaveBalance ?? []).reduce(
     (sum, b) => sum + (b.remaining ?? 0),
-    0
+    0,
   ),
   todayHours: formatWorkHours(todayAttendance?.totalWorkMinutes ?? 0),
 })
@@ -171,7 +180,7 @@ const getEmployeeStats = (leaveProfile, todayAttendance) => ({
 const EmployeeStatsGrid = ({ leaveProfile, todayAttendance }) => {
   const { month, totalRemaining, todayHours } = getEmployeeStats(
     leaveProfile,
-    todayAttendance
+    todayAttendance,
   )
 
   return (
@@ -251,7 +260,11 @@ const LeaveBalanceChart = ({ leaveProfile }) => {
       <CardContent>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={data} barGap={4}>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke="hsl(var(--border))"
+              opacity={0.5}
+            />
             <XAxis dataKey="type" tick={{ fontSize: 11 }} />
             <YAxis tick={{ fontSize: 11 }} />
             <Tooltip
@@ -288,8 +301,12 @@ const MonthlyAttendanceRadar = ({ leaveProfile }) => {
   return (
     <AnimatedCard delay={0.3} className="border-0 shadow-sm">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold">This Month Summary</CardTitle>
-        <CardDescription>Attendance breakdown for current month</CardDescription>
+        <CardTitle className="text-base font-semibold">
+          This Month Summary
+        </CardTitle>
+        <CardDescription>
+          Attendance breakdown for current month
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={220}>
@@ -326,7 +343,9 @@ const LeaveBalanceTable = ({ leaveProfile }) => {
   return (
     <AnimatedCard delay={0.35} className="border-0 shadow-sm">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold">Leave Entitlement Details</CardTitle>
+        <CardTitle className="text-base font-semibold">
+          Leave Entitlement Details
+        </CardTitle>
         <CardDescription>Annual leave balance breakdown</CardDescription>
       </CardHeader>
       <CardContent className="overflow-x-auto">
@@ -368,7 +387,9 @@ const LeaveBalanceTable = ({ leaveProfile }) => {
                   className="border-b last:border-0 hover:bg-muted/30 transition-colors"
                 >
                   <td className="py-3 font-medium">{row.type}</td>
-                  <td className="py-3 text-right tabular-nums">{row.allocated}</td>
+                  <td className="py-3 text-right tabular-nums">
+                    {row.allocated}
+                  </td>
                   <td className="py-3 text-right text-red-500 tabular-nums font-medium">
                     {row.used}
                   </td>
@@ -393,7 +414,9 @@ const LeaveBalanceTable = ({ leaveProfile }) => {
                         }
                         delay={0.5 + idx * 0.06}
                       />
-                      <span className="text-xs w-8 tabular-nums">{usagePct}%</span>
+                      <span className="text-xs w-8 tabular-nums">
+                        {usagePct}%
+                      </span>
                     </div>
                   </td>
                 </motion.tr>
@@ -514,7 +537,9 @@ const QuickLinks = () => (
   <FadeIn delay={0.4}>
     <Card className="border-0 shadow-sm">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold">Quick Navigation</CardTitle>
+        <CardTitle className="text-base font-semibold">
+          Quick Navigation
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <StaggerContainer className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -531,7 +556,9 @@ const QuickLinks = () => (
                 >
                   <link.icon className="h-4 w-4" />
                 </motion.div>
-                <span className="text-xs font-medium text-center">{link.label}</span>
+                <span className="text-xs font-medium text-center">
+                  {link.label}
+                </span>
               </Link>
             </StaggerItem>
           ))}
@@ -593,10 +620,30 @@ EmployeeHeader.defaultProps = { userName: null }
 
 /* ---- Sprint Task Stats Block ---- */
 const SPRINT_TASK_KEYS = [
-  { key: "completed", label: "Completed", gradient: "from-emerald-500 to-green-600", text: "text-emerald-700" },
-  { key: "inProgress", label: "In Progress", gradient: "from-blue-500 to-indigo-600", text: "text-blue-700" },
-  { key: "pending", label: "Pending", gradient: "from-orange-500 to-amber-500", text: "text-orange-700" },
-  { key: "allocated", label: "Allocated", gradient: "from-indigo-500 to-purple-600", text: "text-indigo-700" },
+  {
+    key: "completed",
+    label: "Completed",
+    gradient: "from-emerald-500 to-green-600",
+    text: "text-emerald-700",
+  },
+  {
+    key: "inProgress",
+    label: "In Progress",
+    gradient: "from-blue-500 to-indigo-600",
+    text: "text-blue-700",
+  },
+  {
+    key: "pending",
+    label: "Pending",
+    gradient: "from-orange-500 to-amber-500",
+    text: "text-orange-700",
+  },
+  {
+    key: "allocated",
+    label: "Allocated",
+    gradient: "from-indigo-500 to-purple-600",
+    text: "text-indigo-700",
+  },
 ]
 
 const SprintTaskStats = ({ currentSprint }) => (
@@ -623,7 +670,11 @@ const SprintHistoryChart = ({ sprintHistory }) => {
   return (
     <ResponsiveContainer width="100%" height={180}>
       <BarChart data={data} barGap={4}>
-        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
+        <CartesianGrid
+          strokeDasharray="3 3"
+          stroke="hsl(var(--border))"
+          opacity={0.5}
+        />
         <XAxis dataKey="sprint" tick={{ fontSize: 11 }} />
         <YAxis tick={{ fontSize: 11 }} />
         <Tooltip
@@ -633,8 +684,18 @@ const SprintHistoryChart = ({ sprintHistory }) => {
           }}
         />
         <Legend />
-        <Bar dataKey="allocated" fill="#c7d2fe" radius={[6, 6, 0, 0]} name="Allocated" />
-        <Bar dataKey="completed" fill="#6366f1" radius={[6, 6, 0, 0]} name="Completed" />
+        <Bar
+          dataKey="allocated"
+          fill="#c7d2fe"
+          radius={[6, 6, 0, 0]}
+          name="Allocated"
+        />
+        <Bar
+          dataKey="completed"
+          fill="#6366f1"
+          radius={[6, 6, 0, 0]}
+          name="Completed"
+        />
       </BarChart>
     </ResponsiveContainer>
   )
@@ -645,13 +706,39 @@ SprintHistoryChart.defaultProps = { sprintHistory: [] }
 
 /* ---- Performance Score Gauges ---- */
 const SCORE_METRICS = [
-  { key: "velocityScore", label: "Velocity", icon: Zap, gradient: "from-blue-500 to-cyan-500" },
-  { key: "qualityScore", label: "Quality", icon: Star, gradient: "from-yellow-500 to-amber-500" },
-  { key: "collaborationScore", label: "Team Play", icon: CheckSquare, gradient: "from-emerald-500 to-green-500" },
-  { key: "overallScore", label: "Overall", icon: Trophy, gradient: "from-purple-500 to-indigo-500" },
+  {
+    key: "velocityScore",
+    label: "Velocity",
+    icon: Zap,
+    gradient: "from-blue-500 to-cyan-500",
+  },
+  {
+    key: "qualityScore",
+    label: "Quality",
+    icon: Star,
+    gradient: "from-yellow-500 to-amber-500",
+  },
+  {
+    key: "collaborationScore",
+    label: "Team Play",
+    icon: CheckSquare,
+    gradient: "from-emerald-500 to-green-500",
+  },
+  {
+    key: "overallScore",
+    label: "Overall",
+    icon: Trophy,
+    gradient: "from-purple-500 to-indigo-500",
+  },
 ]
 
-const PerformanceScoreBar = ({ label, value, icon: Icon, gradient, delay = 0 }) => (
+const PerformanceScoreBar = ({
+  label,
+  value,
+  icon: Icon,
+  gradient,
+  delay = 0,
+}) => (
   <motion.div
     initial={{ opacity: 0, x: -10 }}
     animate={{ opacity: 1, x: 0 }}
@@ -660,13 +747,16 @@ const PerformanceScoreBar = ({ label, value, icon: Icon, gradient, delay = 0 }) 
   >
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-1.5">
-        <div className={`rounded-md p-1 bg-gradient-to-br ${gradient} text-white`}>
+        <div
+          className={`rounded-md p-1 bg-gradient-to-br ${gradient} text-white`}
+        >
           <Icon className="h-3 w-3" />
         </div>
         <span className="text-xs font-medium">{label}</span>
       </div>
       <span className="text-xs font-bold tabular-nums">
-        <NumberTicker value={value ?? 0} delay={delay} />/100
+        <NumberTicker value={value ?? 0} delay={delay} />
+        /100
       </span>
     </div>
     <AnimatedProgress
@@ -761,13 +851,17 @@ const SprintPerformance = ({ performance }) => {
         </div>
 
         <div>
-          <p className="text-xs font-medium text-muted-foreground mb-2">Sprint History</p>
+          <p className="text-xs font-medium text-muted-foreground mb-2">
+            Sprint History
+          </p>
           <SprintHistoryChart sprintHistory={history} />
         </div>
 
         {scores && (
           <div className="space-y-3 pt-1">
-            <p className="text-xs font-medium text-muted-foreground">Performance Scores</p>
+            <p className="text-xs font-medium text-muted-foreground">
+              Performance Scores
+            </p>
             {SCORE_METRICS.map((m, idx) => (
               <PerformanceScoreBar
                 key={m.key}
@@ -817,7 +911,10 @@ const RecognitionCard = ({ item, delay = 0 }) => (
   </motion.div>
 )
 
-RecognitionCard.propTypes = { item: PropTypes.object.isRequired, delay: PropTypes.number }
+RecognitionCard.propTypes = {
+  item: PropTypes.object.isRequired,
+  delay: PropTypes.number,
+}
 RecognitionCard.defaultProps = { delay: 0 }
 
 /* ---- Recognition Wall ---- */

@@ -29,13 +29,9 @@ const AnimatedCard = ({
       "group relative rounded-2xl border bg-card text-card-foreground shadow-sm",
       "transition-shadow duration-300 hover:shadow-lg",
       glowColor && "hover:shadow-xl",
-      className
+      className,
     )}
-    style={
-      glowColor
-        ? { "--glow-color": glowColor }
-        : undefined
-    }
+    style={glowColor ? { "--glow-color": glowColor } : undefined}
     {...props}
   >
     {/* subtle gradient border on hover */}

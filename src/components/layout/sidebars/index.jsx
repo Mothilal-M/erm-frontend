@@ -17,7 +17,7 @@ const Sidebar = () => {
     <aside
       className={cn(
         "fixed top-0 left-0 z-20 h-screen -translate-x-full lg:translate-x-0 transition-[width] ease-in-out duration-300",
-        store.sidebar === false ? "w-[90px]" : "w-72"
+        store.sidebar === false ? "w-[90px]" : "w-72",
       )}
     >
       <SidebarToggle isOpen={store.sidebar} setIsOpen={changeSidebar} />
@@ -25,7 +25,7 @@ const Sidebar = () => {
         <Button
           className={cn(
             "transition-transform ease-in-out duration-300 mb-1",
-            store.sidebar === false ? "translate-x-1" : "translate-x-0"
+            store.sidebar === false ? "translate-x-1" : "translate-x-0",
           )}
           variant="link"
           asChild
@@ -37,7 +37,7 @@ const Sidebar = () => {
                 "font-bold text-lg whitespace-nowrap transition-[transform,opacity,display] ease-in-out duration-300",
                 store.sidebar === false
                   ? "-translate-x-96 opacity-0 hidden"
-                  : "translate-x-0 opacity-100"
+                  : "translate-x-0 opacity-100",
               )}
             >
               Brand

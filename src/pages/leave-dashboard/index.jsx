@@ -20,7 +20,7 @@ const LeaveCalendar = () => {
 
   const { data, isLoading, isError, error } = useFetchMonthlyAttendance(
     year,
-    month
+    month,
   )
 
   const { data: dayDetail, isLoading: isDayLoading } =

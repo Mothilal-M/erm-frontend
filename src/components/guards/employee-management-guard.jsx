@@ -47,13 +47,13 @@ const FUNNY_MESSAGES = [
 const EmployeeManagementGuard = ({ children }) => {
   const navigate = useNavigate()
   const empMgmtRole = useSelector(
-    (s) => s[ct.store.USER_STORE].employee_management_role
+    (s) => s[ct.store.USER_STORE].employee_management_role,
   )
   const hasAccess = empMgmtRole === "admin"
 
   const [countdown, setCountdown] = useState(3)
   const [message] = useState(
-    () => FUNNY_MESSAGES[Math.floor(Math.random() * FUNNY_MESSAGES.length)]
+    () => FUNNY_MESSAGES[Math.floor(Math.random() * FUNNY_MESSAGES.length)],
   )
 
   useEffect(() => {

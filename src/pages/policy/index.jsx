@@ -75,7 +75,7 @@ const PolicyPage = () => {
             variant: "destructive",
           })
         },
-      }
+      },
     )
   }
 

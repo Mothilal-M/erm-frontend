@@ -38,7 +38,8 @@ const ClockOutDialog = ({ open, onClose, onConfirm, isLoading }) => {
             Clock Out
           </DialogTitle>
           <DialogDescription>
-            What did you work on today? This will be saved with your attendance record.
+            What did you work on today? This will be saved with your attendance
+            record.
           </DialogDescription>
         </DialogHeader>
 
@@ -61,7 +62,9 @@ const ClockOutDialog = ({ open, onClose, onConfirm, isLoading }) => {
               className="flex-1 mr-3"
               barClassName={isValid ? "bg-emerald-500" : "bg-amber-500"}
             />
-            <span className={`text-xs tabular-nums ${isValid ? "text-emerald-600 font-medium" : "text-muted-foreground"}`}>
+            <span
+              className={`text-xs tabular-nums ${isValid ? "text-emerald-600 font-medium" : "text-muted-foreground"}`}
+            >
               {summary.trim().length}/{MIN_LENGTH}
             </span>
           </div>
@@ -69,11 +72,19 @@ const ClockOutDialog = ({ open, onClose, onConfirm, isLoading }) => {
 
         <DialogFooter className="gap-2">
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
-            <Button variant="outline" onClick={onClose} disabled={isLoading} className="rounded-xl">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              disabled={isLoading}
+              className="rounded-xl"
+            >
               Cancel
             </Button>
           </motion.div>
-          <motion.div whileHover={isValid ? { scale: 1.02 } : {}} whileTap={isValid ? { scale: 0.97 } : {}}>
+          <motion.div
+            whileHover={isValid ? { scale: 1.02 } : {}}
+            whileTap={isValid ? { scale: 0.97 } : {}}
+          >
             <Button
               variant="destructive"
               onClick={handleConfirm}

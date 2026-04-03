@@ -147,7 +147,7 @@ const DropdownMenuButton = ({ Icon, label, active, submenus, isOpen }) => (
                   <p
                     className={cn(
                       "max-w-[200px] truncate",
-                      isOpen === false ? "opacity-0" : "opacity-100"
+                      isOpen === false ? "opacity-0" : "opacity-100",
                     )}
                   >
                     {label}
@@ -189,7 +189,7 @@ CollapseMenuButton.propTypes = {
       slabel: PropTypes.string,
       sLabel2: PropTypes.string,
       sActive: PropTypes.bool,
-    })
+    }),
   ).isRequired,
   isOpen: PropTypes.bool.isRequired,
 }
@@ -207,7 +207,7 @@ CollapsibleMenuContent.propTypes = {
       href: PropTypes.string.isRequired,
       slabel: PropTypes.string.isRequired,
       sActive: PropTypes.bool,
-    })
+    }),
   ).isRequired,
   toogleClassname: PropTypes.string,
 }
@@ -225,7 +225,7 @@ DropdownMenuButton.propTypes = {
     PropTypes.shape({
       href: PropTypes.string.isRequired,
       sLabel2: PropTypes.string.isRequired,
-    })
+    }),
   ).isRequired,
   isOpen: PropTypes.bool.isRequired,
 }

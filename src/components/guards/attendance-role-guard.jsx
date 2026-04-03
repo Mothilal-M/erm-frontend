@@ -52,13 +52,13 @@ const ROLE_LABELS = {
 const AttendanceRoleGuard = ({ children, allowedRoles }) => {
   const navigate = useNavigate()
   const attendanceRole = useSelector(
-    (s) => s[ct.store.USER_STORE].attendance_management_role
+    (s) => s[ct.store.USER_STORE].attendance_management_role,
   )
   const hasAccess = allowedRoles.includes(attendanceRole)
 
   const [countdown, setCountdown] = useState(3)
   const [message] = useState(
-    () => FUNNY_MESSAGES[Math.floor(Math.random() * FUNNY_MESSAGES.length)]
+    () => FUNNY_MESSAGES[Math.floor(Math.random() * FUNNY_MESSAGES.length)],
   )
 
   useEffect(() => {

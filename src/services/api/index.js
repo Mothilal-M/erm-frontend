@@ -83,7 +83,7 @@ instance.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error)
-  }
+  },
 )
 
 // Response interceptor with error handling and cleanup
@@ -207,7 +207,7 @@ instance.interceptors.response.use(
     if (config.isDevelopment && response.config._startTime) {
       const duration = Date.now() - response.config._startTime
       console.warn(
-        `${response.config.method.toUpperCase()} ${response.config.url} (${duration}ms)`
+        `${response.config.method.toUpperCase()} ${response.config.url} (${duration}ms)`,
       )
     }
 
@@ -244,7 +244,8 @@ instance.interceptors.response.use(
       if (!isAuthPage) {
         toast({
           title: "Connection error",
-          description: "Unable to reach the server. Please check your internet connection.",
+          description:
+            "Unable to reach the server. Please check your internet connection.",
           variant: "destructive",
         })
       }
@@ -254,7 +255,7 @@ instance.interceptors.response.use(
     }
 
     return Promise.reject(error)
-  }
+  },
 )
 
 export default instance

@@ -40,7 +40,10 @@ import {
   PulseBadge,
   ShimmerButton,
 } from "@/components/magicui"
-import { StaggerContainer, StaggerItem } from "@/components/magicui/stagger-container"
+import {
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/magicui/stagger-container"
 import ct from "@constants/"
 
 // ─── Status badge helper ──────────────────────────────────────────────────────
@@ -81,7 +84,14 @@ const statsGradients = {
   invited: "from-amber-500 to-orange-600",
 }
 
-const StatsCard = ({ icon: Icon, label, value, isLoading, variant = "total", delay = 0 }) => (
+const StatsCard = ({
+  icon: Icon,
+  label,
+  value,
+  isLoading,
+  variant = "total",
+  delay = 0,
+}) => (
   <AnimatedCard delay={delay} className="rounded-xl border-0 shadow-sm">
     <CardContent className="flex items-center gap-4 pt-6">
       <div
@@ -206,7 +216,13 @@ EmployeeRow.propTypes = {
  * @param {Array} props.employees - The array of employee objects to display.
  * @param {(id: string) => void} props.onDelete - Callback function to call when an employee is deleted, receives the employee ID as an argument.
  */
-const EmployeeListContent = ({ isLoading, isError, employees, onDelete, onSendInvite }) => {
+const EmployeeListContent = ({
+  isLoading,
+  isError,
+  employees,
+  onDelete,
+  onSendInvite,
+}) => {
   if (isError) {
     return (
       <p className="px-4 py-6 text-sm text-center text-destructive">
@@ -234,7 +250,11 @@ const EmployeeListContent = ({ isLoading, isError, employees, onDelete, onSendIn
     <StaggerContainer>
       {employees?.map((emp) => (
         <StaggerItem key={emp.id}>
-          <EmployeeRow employee={emp} onDelete={onDelete} onSendInvite={onSendInvite} />
+          <EmployeeRow
+            employee={emp}
+            onDelete={onDelete}
+            onSendInvite={onSendInvite}
+          />
         </StaggerItem>
       ))}
     </StaggerContainer>
@@ -282,14 +302,22 @@ const EmployeeListUI = ({
           </div>
           <div className="flex gap-2 flex-wrap">
             <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-              <Button asChild variant="outline" size="sm" className="rounded-xl">
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="rounded-xl"
+              >
                 <Link to={ct.route.employeeManagement.INVITE}>
                   <MailPlus className="mr-1.5 h-4 w-4" />
                   Invite User
                 </Link>
               </Button>
             </motion.div>
-            <ShimmerButton className="h-8 px-3 py-0 text-sm" to={ct.route.employeeManagement.CREATE}>
+            <ShimmerButton
+              className="h-8 px-3 py-0 text-sm"
+              to={ct.route.employeeManagement.CREATE}
+            >
               <Plus className="mr-1.5 h-4 w-4" />
               New Employee
             </ShimmerButton>
@@ -333,7 +361,9 @@ const EmployeeListUI = ({
               <div>
                 <CardTitle className="text-base">All Employees</CardTitle>
                 <CardDescription className="text-xs mt-0.5">
-                  {isLoading ? "Loading\u2026" : `${employees?.length ?? 0} records`}
+                  {isLoading
+                    ? "Loading\u2026"
+                    : `${employees?.length ?? 0} records`}
                 </CardDescription>
               </div>
               <div className="relative w-full sm:w-64">

@@ -119,7 +119,7 @@ const AIRecommendationsPage = () => {
               <p className="text-3xl font-bold text-blue-600">
                 {
                   recommendations.filter(
-                    (item) => item.status === "in-progress"
+                    (item) => item.status === "in-progress",
                   ).length
                 }
               </p>

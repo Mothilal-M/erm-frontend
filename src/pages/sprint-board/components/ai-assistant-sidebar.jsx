@@ -74,7 +74,7 @@ const AIAssistantSidebar = ({ isOpen, onClose, sprintId }) => {
             },
           ])
         },
-      }
+      },
     )
   }
 

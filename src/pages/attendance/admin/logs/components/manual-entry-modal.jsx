@@ -185,7 +185,7 @@ ManualEntryModal.propTypes = {
   onSave: PropTypes.func.isRequired,
   isLoading: PropTypes.bool,
   employees: PropTypes.arrayOf(
-    PropTypes.shape({ id: PropTypes.number, name: PropTypes.string })
+    PropTypes.shape({ id: PropTypes.number, name: PropTypes.string }),
   ),
 }
 

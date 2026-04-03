@@ -92,7 +92,7 @@ const MenuGroup = ({ groupLabel, menus, isOpen }) => (
             isOpen={isOpen}
           />
         </div>
-      )
+      ),
     )}
   </li>
 )
@@ -119,7 +119,7 @@ const MenuItem = ({ href, label, Icon, active, isOpen }) => (
                   "max-w-[200px] truncate mb-0",
                   isOpen === false
                     ? "-translate-x-96 opacity-0"
-                    : "translate-x-0 opacity-100"
+                    : "translate-x-0 opacity-100",
                 )}
               >
                 {label}
@@ -165,7 +165,7 @@ const SignOutButton = ({ isOpen }) => {
               <p
                 className={cn(
                   "whitespace-nowrap",
-                  isOpen === false ? "opacity-0 hidden" : "opacity-100"
+                  isOpen === false ? "opacity-0 hidden" : "opacity-100",
                 )}
               >
                 Sign out
@@ -190,7 +190,7 @@ MenuGroup.propTypes = {
       icon: PropTypes.elementType.isRequired,
       active: PropTypes.bool,
       submenus: PropTypes.array.isRequired,
-    })
+    }),
   ).isRequired,
   isOpen: PropTypes.bool.isRequired,
 }

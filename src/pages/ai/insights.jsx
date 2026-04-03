@@ -97,7 +97,7 @@ const AIInsightsPage = () => {
                       insights.reduce((sum, item) => {
                         const value = Number.parseInt(item.confidence, 10)
                         return sum + (Number.isNaN(value) ? 0 : value)
-                      }, 0) / insights.length
+                      }, 0) / insights.length,
                     )}%`
                   : "0%"}
               </p>

@@ -31,8 +31,10 @@ const AutoExpiryBanner = ({ expiresInSeconds, onClockOut }) => {
         </motion.div>
         <span>
           Session auto-closes in{" "}
-          <strong className="tabular-nums">{formatTime(expiresInSeconds)}</strong>.
-          Please clock out with your work summary.
+          <strong className="tabular-nums">
+            {formatTime(expiresInSeconds)}
+          </strong>
+          . Please clock out with your work summary.
         </span>
       </div>
       <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>

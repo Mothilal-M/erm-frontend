@@ -112,7 +112,7 @@ export const updateWorkflow = async (projectId, workflowId, data) => {
 export const getSprintAnalytics = async (
   projectId,
   sprintId,
-  { signal } = {}
+  { signal } = {},
 ) => {
   const tasks = mockData.tasks[sprintId] || []
   const payload = {

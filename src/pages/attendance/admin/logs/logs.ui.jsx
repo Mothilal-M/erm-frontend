@@ -239,7 +239,7 @@ const AdminLogsUI = ({
                     onClick={() =>
                       exportLogsToCSV(
                         logs,
-                        `attendance-logs-${new Date().toISOString().split("T")[0]}.csv`
+                        `attendance-logs-${new Date().toISOString().split("T")[0]}.csv`,
                       )
                     }
                   >
@@ -254,7 +254,7 @@ const AdminLogsUI = ({
                     onClick={() =>
                       exportLogsToJSON(
                         logs,
-                        `attendance-logs-${new Date().toISOString().split("T")[0]}.json`
+                        `attendance-logs-${new Date().toISOString().split("T")[0]}.json`,
                       )
                     }
                   >

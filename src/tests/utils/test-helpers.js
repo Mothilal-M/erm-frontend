@@ -23,7 +23,7 @@ export async function waitForText(getElement, expectedText, options = {}) {
       const element = getElement()
       expect(element).toHaveTextContent(expectedText)
     },
-    { timeout: 3000, ...options }
+    { timeout: 3000, ...options },
   )
 }
 
@@ -41,7 +41,7 @@ export async function waitForElementToBeRemoved(getElement, options = {}) {
     () => {
       expect(getElement()).not.toBeInTheDocument()
     },
-    { timeout: 3000, ...options }
+    { timeout: 3000, ...options },
   )
 }
 
@@ -373,7 +373,7 @@ export function createMockRef(current = null) {
 export function findByTextContent(container, text) {
   const regex = new RegExp(text, "i")
   return Array.from(container.querySelectorAll("*")).find((element) =>
-    regex.test(element.textContent)
+    regex.test(element.textContent),
   )
 }
 
@@ -389,7 +389,7 @@ export function findByTextContent(container, text) {
 export function getAllByTextContent(container, text) {
   const regex = new RegExp(text, "i")
   return Array.from(container.querySelectorAll("*")).filter((element) =>
-    regex.test(element.textContent)
+    regex.test(element.textContent),
   )
 }
 

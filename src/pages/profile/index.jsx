@@ -65,7 +65,7 @@ const ProfilePage = () => {
   const userName = useSelector((state) => state.user.userName)
   const userRole = useSelector((state) => state.user.userRole)
   const employeeRole = useSelector(
-    (state) => state.user.employee_management_role
+    (state) => state.user.employee_management_role,
   )
 
   // ── Profile state ──────────────────────────────────────────────────────────
@@ -229,7 +229,7 @@ const ProfilePage = () => {
             [moduleKey]: value,
           },
         }
-      })
+      }),
     )
   }
 

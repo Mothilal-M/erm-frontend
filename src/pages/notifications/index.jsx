@@ -42,7 +42,7 @@ const NotificationsPage = () => {
 
   const handleMarkAsRead = (id) => {
     setNotifications((previous) =>
-      previous.map((n) => (n.id === id ? { ...n, read: true } : n))
+      previous.map((n) => (n.id === id ? { ...n, read: true } : n)),
     )
   }
 

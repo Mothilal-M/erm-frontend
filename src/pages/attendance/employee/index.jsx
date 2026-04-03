@@ -50,7 +50,7 @@ const AttendanceClock = () => {
             variant: "destructive",
           })
         },
-      }
+      },
     )
   }
 
@@ -72,7 +72,7 @@ const AttendanceClock = () => {
             variant: "destructive",
           })
         },
-      }
+      },
     )
   }
 

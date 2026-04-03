@@ -226,7 +226,7 @@ const CreateStandupPage = () => {
           return newUpdate
         }
         return update
-      })
+      }),
     )
   }
 
@@ -240,7 +240,7 @@ const CreateStandupPage = () => {
           return { ...update, userStoryIds: newUserStoryIds }
         }
         return update
-      })
+      }),
     )
   }
 
@@ -252,7 +252,7 @@ const CreateStandupPage = () => {
     const isValid = updates.every((u) => u.projectId && u.today)
     if (!isValid) {
       alert(
-        "Please fill in at least the Project and Today's plan for all entries."
+        "Please fill in at least the Project and Today's plan for all entries.",
       )
       setIsSubmitting(false)
       return
@@ -272,13 +272,13 @@ const CreateStandupPage = () => {
           setSubmissionStatus("approved")
           dispatch(setStandupStatus("Done"))
           setAiFeedback(
-            "Your standup is well-structured with clear goals and blockers identified. Keep up the good work!"
+            "Your standup is well-structured with clear goals and blockers identified. Keep up the good work!",
           )
         } else {
           setSubmissionStatus("rejected")
           dispatch(setStandupStatus("Not Submitted"))
           setAiFeedback(
-            "Please provide more details about blockers you're facing. Also, consider breaking down your tasks into smaller milestones."
+            "Please provide more details about blockers you're facing. Also, consider breaking down your tasks into smaller milestones.",
           )
         }
       }, 2000)
@@ -424,7 +424,7 @@ const CreateStandupPage = () => {
                                 {storyId === "other"
                                   ? "Other"
                                   : MOCK_USER_STORIES[update.projectId]?.find(
-                                      (s) => s.id === storyId
+                                      (s) => s.id === storyId,
                                     )?.title || storyId}
                               </Badge>
                             ))}
@@ -449,7 +449,7 @@ const CreateStandupPage = () => {
                             handleUpdateChange(
                               update.id,
                               "yesterday",
-                              e.target.value
+                              e.target.value,
                             )
                           }
                           rows={2}
@@ -471,7 +471,7 @@ const CreateStandupPage = () => {
                             handleUpdateChange(
                               update.id,
                               "today",
-                              e.target.value
+                              e.target.value,
                             )
                           }
                           rows={2}
@@ -492,7 +492,7 @@ const CreateStandupPage = () => {
                             handleUpdateChange(
                               update.id,
                               "blockers",
-                              e.target.value
+                              e.target.value,
                             )
                           }
                           rows={2}

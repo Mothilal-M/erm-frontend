@@ -103,7 +103,7 @@ const LogsTable = ({
   if (isLoading) {
     const skeletonIds = Array.from(
       { length: 8 },
-      (_, index) => `${skeletonIdReference.current}-${index}`
+      (_, index) => `${skeletonIdReference.current}-${index}`,
     )
 
     return (

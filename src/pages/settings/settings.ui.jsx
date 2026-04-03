@@ -49,7 +49,13 @@ ThemeButton.defaultProps = {
 
 // ─── Notification row ─────────────────────────────────────────────────────────
 
-const NotificationRow = ({ label, description, checked, onChange, index = 0 }) => (
+const NotificationRow = ({
+  label,
+  description,
+  checked,
+  onChange,
+  index = 0,
+}) => (
   <motion.div
     initial={{ opacity: 0, x: -12 }}
     animate={{ opacity: 1, x: 0 }}

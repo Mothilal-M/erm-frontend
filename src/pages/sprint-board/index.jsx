@@ -52,7 +52,7 @@ const SprintBoard = () => {
         onSuccess: () => {
           setSelectedTask(null)
         },
-      }
+      },
     )
   }
 

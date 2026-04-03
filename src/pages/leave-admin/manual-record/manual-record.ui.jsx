@@ -337,7 +337,7 @@ ManualRecordUI.propTypes = {
       id: PropTypes.string.isRequired,
       name: PropTypes.string.isRequired,
       department: PropTypes.string.isRequired,
-    })
+    }),
   ).isRequired,
   isLoadingEmps: PropTypes.bool.isRequired,
   isSubmitting: PropTypes.bool.isRequired,

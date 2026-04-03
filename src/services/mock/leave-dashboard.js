@@ -377,7 +377,7 @@ const approveActionMock = http.patch(
       status: body.status,
       message: `Leave request ${body.status} successfully.`,
     })
-  }
+  },
 )
 
 // ─── Manual Record (POST) ─────────────────────────────────────────────────────

@@ -33,7 +33,7 @@ export const NotionEditor = ({
     <div
       className={cn(
         "rounded-md border border-input bg-background overflow-hidden p-4",
-        className
+        className,
       )}
       style={{ minHeight: minHeight || 180 }}
     >
