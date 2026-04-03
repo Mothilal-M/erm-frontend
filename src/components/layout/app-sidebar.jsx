@@ -143,10 +143,10 @@ const CollapsibleNavGroup = ({ title, icon: Icon, items }) => (
             {items.map((item) => (
               <SidebarMenuSubItem key={item.title}>
                 <SidebarMenuSubButton asChild>
-                  <a href={item.url}>
+                  <Link to={item.url}>
                     <item.icon />
                     <span>{item.title}</span>
-                  </a>
+                  </Link>
                 </SidebarMenuSubButton>
               </SidebarMenuSubItem>
             ))}
@@ -183,10 +183,10 @@ const ProjectCollapsibleNavGroup = ({
         {projectItems.map((item) => (
           <SidebarMenuItem key={item.title}>
             <SidebarMenuButton asChild>
-              <a href={item.url}>
+              <Link to={item.url}>
                 <item.icon />
                 <span>{item.title}</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         ))}
@@ -207,10 +207,10 @@ const ProjectCollapsibleNavGroup = ({
             {items.map((item) => (
               <SidebarMenuSubItem key={item.title}>
                 <SidebarMenuSubButton asChild>
-                  <a href={item.url}>
+                  <Link to={item.url}>
                     <item.icon />
                     <span>{item.title}</span>
-                  </a>
+                  </Link>
                 </SidebarMenuSubButton>
               </SidebarMenuSubItem>
             ))}
