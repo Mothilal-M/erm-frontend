@@ -289,11 +289,9 @@ const EmployeeListUI = ({
                 </Link>
               </Button>
             </motion.div>
-            <ShimmerButton className="h-8 px-3 py-0 text-sm" asChild>
-              <Link to={ct.route.employeeManagement.CREATE}>
-                <Plus className="mr-1.5 h-4 w-4" />
-                New Employee
-              </Link>
+            <ShimmerButton className="h-8 px-3 py-0 text-sm" to={ct.route.employeeManagement.CREATE}>
+              <Plus className="mr-1.5 h-4 w-4" />
+              New Employee
             </ShimmerButton>
           </div>
         </div>

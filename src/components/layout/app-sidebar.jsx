@@ -374,7 +374,7 @@ const ModulesNavGroup = ({
   const showAttendance = isAttendanceAdmin || isAttendanceEmployee
 
   const attendanceItems = isAttendanceAdmin
-    ? [...employeeAttendanceItems, ...adminAttendanceItems]
+    ? adminAttendanceItems
     : employeeAttendanceItems
 
   if (!showLeave && !showEmpMgmt && !showAttendance) return null

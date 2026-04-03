@@ -578,11 +578,9 @@ const EmployeeHeader = ({ userName }) => {
           </motion.div>
           <ShimmerButton
             className="h-9 px-4 text-xs rounded-xl"
-            onClick={() => {}}
+            to="/leave/employee/request"
           >
-            <Link to="/leave/employee/request" className="flex items-center gap-1 text-white">
-              <Calendar className="h-4 w-4" /> Request Leave
-            </Link>
+            <Calendar className="h-4 w-4" /> Request Leave
           </ShimmerButton>
         </div>
       </FadeIn>

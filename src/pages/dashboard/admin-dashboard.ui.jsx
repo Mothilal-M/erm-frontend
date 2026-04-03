@@ -529,10 +529,8 @@ const AdminHeader = ({ userName }) => {
               </Link>
             </Button>
           </motion.div>
-          <ShimmerButton className="h-9 px-4 text-xs rounded-xl" onClick={() => {}}>
-            <Link to="/leave/admin/approvals" className="flex items-center gap-1 text-white">
-              <CheckCircle2 className="h-4 w-4" /> Approvals
-            </Link>
+          <ShimmerButton className="h-9 px-4 text-xs rounded-xl" to="/leave/admin/approvals">
+            <CheckCircle2 className="h-4 w-4" /> Approvals
           </ShimmerButton>
         </div>
       </FadeIn>
