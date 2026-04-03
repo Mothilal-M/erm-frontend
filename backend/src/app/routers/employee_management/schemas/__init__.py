@@ -1,3 +1,9 @@
+from .department_schemas import (
+    DepartmentCreateSchema,
+    DepartmentListResponseSchema,
+    DepartmentResponseSchema,
+    DepartmentUpdateSchema,
+)
 from .employee_schemas import (
     DeleteEmployeeResponse,
     EmployeeCreateSchema,
@@ -15,6 +21,10 @@ from .employee_schemas import (
 
 
 __all__ = [
+    "DepartmentCreateSchema",
+    "DepartmentUpdateSchema",
+    "DepartmentResponseSchema",
+    "DepartmentListResponseSchema",
     "EmployeeCreateSchema",
     "EmployeeUpdateSchema",
     "EmployeeResponseSchema",

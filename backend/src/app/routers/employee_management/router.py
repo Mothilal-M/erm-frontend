@@ -6,6 +6,10 @@ from injectq.integrations.fastapi import InjectFastAPI
 from src.app.core.auth.rbac import require_role
 from src.app.routers.employee_management.schemas import (
     DeleteEmployeeResponse,
+    DepartmentCreateSchema,
+    DepartmentListResponseSchema,
+    DepartmentResponseSchema,
+    DepartmentUpdateSchema,
     EmployeeCreateSchema,
     EmployeeListResponseSchema,
     EmployeeResponseSchema,
@@ -13,12 +17,83 @@ from src.app.routers.employee_management.schemas import (
     InviteUserSchema,
     PerformanceResponse,
 )
-from src.app.routers.employee_management.services import EmployeeService
+from src.app.routers.employee_management.services import DepartmentService, EmployeeService
 from src.app.utils import generate_swagger_responses, success_response
 from src.app.utils.schemas import AuthUserSchema
 
 
 router = APIRouter(tags=["Employee Management"])
+
+
+# ─── Department routes (must be before {employee_id} to avoid path conflicts) ─
+
+
+@router.get(
+    "/v1/employee-management/departments",
+    responses=generate_swagger_responses(DepartmentListResponseSchema),
+    summary="List all departments",
+    description="Retrieve all departments with employee counts",
+)
+async def list_departments(
+    request: Request,
+    service: Annotated[DepartmentService, InjectFastAPI(DepartmentService)],
+    user: AuthUserSchema = Depends(require_role("admin", "manager")),
+):
+    result = await service.list_departments()
+    return success_response(result.model_dump(by_alias=True), request)
+
+
+@router.post(
+    "/v1/employee-management/departments",
+    responses=generate_swagger_responses(DepartmentResponseSchema),
+    summary="Create a new department",
+    description="Create a department with name, description, head, and color",
+    status_code=201,
+)
+async def create_department(
+    request: Request,
+    payload: DepartmentCreateSchema,
+    service: Annotated[DepartmentService, InjectFastAPI(DepartmentService)],
+    user: AuthUserSchema = Depends(require_role("admin")),
+):
+    result = await service.create_department(payload)
+    return success_response(result.model_dump(by_alias=True), request, status_code=201)
+
+
+@router.patch(
+    "/v1/employee-management/departments/{department_id}",
+    responses=generate_swagger_responses(DepartmentResponseSchema),
+    summary="Update a department",
+    description="Partially update an existing department",
+)
+async def update_department(
+    request: Request,
+    department_id: int,
+    payload: DepartmentUpdateSchema,
+    service: Annotated[DepartmentService, InjectFastAPI(DepartmentService)],
+    user: AuthUserSchema = Depends(require_role("admin")),
+):
+    result = await service.update_department(department_id, payload)
+    return success_response(result.model_dump(by_alias=True), request)
+
+
+@router.delete(
+    "/v1/employee-management/departments/{department_id}",
+    responses=generate_swagger_responses(DeleteEmployeeResponse),
+    summary="Delete a department",
+    description="Permanently delete a department by ID",
+)
+async def delete_department(
+    request: Request,
+    department_id: int,
+    service: Annotated[DepartmentService, InjectFastAPI(DepartmentService)],
+    user: AuthUserSchema = Depends(require_role("admin")),
+):
+    await service.delete_department(department_id)
+    return success_response({"message": "Department deleted successfully"}, request)
+
+
+# ─── Employee routes ─────────────────────────────────────────────────────────
 
 
 @router.get(

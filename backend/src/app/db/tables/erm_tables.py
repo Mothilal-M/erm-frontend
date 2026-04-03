@@ -8,6 +8,9 @@ from .inheritance_table import CustomManager, TimestampMixin
 class DepartmentTable(TimestampMixin):
     id = fields.IntField(pk=True)
     name = fields.CharField(max_length=100, unique=True)
+    description = fields.CharField(max_length=500, default="")
+    head = fields.CharField(max_length=255, default="")
+    color = fields.CharField(max_length=20, default="slate")
 
     def __str__(self):
         return self.name
