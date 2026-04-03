@@ -1,3 +1,4 @@
+import { motion } from "framer-motion"
 import {
   Building2,
   CalendarDays,
@@ -13,10 +14,11 @@ import {
   Settings,
   UserCircle2,
   Users,
+  Sparkles,
 } from "lucide-react"
 import PropTypes from "prop-types"
 import { useSelector } from "react-redux"
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 
 import {
   Collapsible,
@@ -91,27 +93,73 @@ const listOfProjects = [
   { title: "Settings", url: "/leave/admin/settings", icon: Settings },
 ]
 
+// ─── Animated menu item ─────────────────────────────────────────────────────
+
+const AnimatedMenuItem = ({ item, isActive }) => (
+  <SidebarMenuItem>
+    <SidebarMenuButton
+      asChild
+      className={`
+        group relative rounded-xl transition-all duration-200
+        ${isActive
+          ? "bg-primary/10 text-primary font-medium shadow-sm"
+          : "hover:bg-muted/60"
+        }
+      `}
+    >
+      <Link to={item.url} className="flex items-center gap-2">
+        <motion.div
+          whileHover={{ scale: 1.1, rotate: 5 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
+        >
+          <item.icon className={`h-4 w-4 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
+        </motion.div>
+        <span>{item.title}</span>
+        {isActive && (
+          <motion.div
+            layoutId="sidebar-active-pill"
+            className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-primary"
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          />
+        )}
+      </Link>
+    </SidebarMenuButton>
+  </SidebarMenuItem>
+)
+
+AnimatedMenuItem.propTypes = {
+  item: PropTypes.shape({
+    title: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired,
+    icon: PropTypes.elementType.isRequired,
+  }).isRequired,
+  isActive: PropTypes.bool.isRequired,
+}
+
 // ─── Simple nav group (Application) ──────────────────────────────────────────
 
-const NavGroup = ({ label, items }) => (
-  <SidebarGroup>
-    <SidebarGroupLabel>{label}</SidebarGroupLabel>
-    <SidebarGroupContent>
-      <SidebarMenu>
-        {items.map((item) => (
-          <SidebarMenuItem key={item.title}>
-            <SidebarMenuButton asChild>
-              <Link to={item.url}>
-                <item.icon />
-                <span>{item.title}</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        ))}
-      </SidebarMenu>
-    </SidebarGroupContent>
-  </SidebarGroup>
-)
+const NavGroup = ({ label, items }) => {
+  const location = useLocation()
+  return (
+    <SidebarGroup>
+      <SidebarGroupLabel className="text-[10px] uppercase tracking-widest text-muted-foreground/70 font-semibold px-3">
+        {label}
+      </SidebarGroupLabel>
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {items.map((item) => (
+            <AnimatedMenuItem
+              key={item.title}
+              item={item}
+              isActive={location.pathname === item.url}
+            />
+          ))}
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
+  )
+}
 
 NavGroup.propTypes = {
   label: PropTypes.string.isRequired,
@@ -124,38 +172,85 @@ NavGroup.propTypes = {
   ).isRequired,
 }
 
+// ─── Animated sub-item ──────────────────────────────────────────────────────
+
+const AnimatedSubItem = ({ item, isActive }) => (
+  <SidebarMenuSubItem>
+    <SidebarMenuSubButton
+      asChild
+      className={`
+        rounded-lg transition-all duration-200
+        ${isActive
+          ? "bg-primary/10 text-primary font-medium"
+          : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"
+        }
+      `}
+    >
+      <Link to={item.url} className="flex items-center gap-2">
+        <item.icon className={`h-3.5 w-3.5 ${isActive ? "text-primary" : ""}`} />
+        <span>{item.title}</span>
+      </Link>
+    </SidebarMenuSubButton>
+  </SidebarMenuSubItem>
+)
+
+AnimatedSubItem.propTypes = {
+  item: PropTypes.shape({
+    title: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired,
+    icon: PropTypes.elementType.isRequired,
+  }).isRequired,
+  isActive: PropTypes.bool.isRequired,
+}
+
 // ─── Reusable collapsible module group ───────────────────────────────────────
 
-const CollapsibleNavGroup = ({ title, icon: Icon, items }) => (
-  <SidebarMenu>
-    <Collapsible asChild defaultOpen className="group/collapsible">
-      <SidebarMenuItem>
-        <CollapsibleTrigger asChild>
-          <SidebarMenuButton tooltip={title}>
-            <Icon />
-            <span>{title}</span>
-            <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-          </SidebarMenuButton>
-        </CollapsibleTrigger>
+const CollapsibleNavGroup = ({ title, icon: Icon, items, gradient }) => {
+  const location = useLocation()
+  const isAnyActive = items.some((item) => location.pathname === item.url)
 
-        <CollapsibleContent>
-          <SidebarMenuSub>
-            {items.map((item) => (
-              <SidebarMenuSubItem key={item.title}>
-                <SidebarMenuSubButton asChild>
-                  <Link to={item.url}>
-                    <item.icon />
-                    <span>{item.title}</span>
-                  </Link>
-                </SidebarMenuSubButton>
-              </SidebarMenuSubItem>
-            ))}
-          </SidebarMenuSub>
-        </CollapsibleContent>
-      </SidebarMenuItem>
-    </Collapsible>
-  </SidebarMenu>
-)
+  return (
+    <SidebarMenu>
+      <Collapsible asChild defaultOpen={isAnyActive} className="group/collapsible">
+        <SidebarMenuItem>
+          <CollapsibleTrigger asChild>
+            <SidebarMenuButton
+              tooltip={title}
+              className={`
+                rounded-xl transition-all duration-200
+                ${isAnyActive ? "bg-muted/80 font-medium" : "hover:bg-muted/50"}
+              `}
+            >
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                className={`rounded-lg p-1 ${gradient ? `bg-gradient-to-br ${gradient} text-white` : ""}`}
+              >
+                <Icon className={`h-3.5 w-3.5 ${gradient ? "" : "text-muted-foreground"}`} />
+              </motion.div>
+              <span>{title}</span>
+              {isAnyActive && (
+                <span className="ml-auto mr-1 h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+              )}
+              <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground/50 transition-transform duration-300 group-data-[state=open]/collapsible:rotate-90" />
+            </SidebarMenuButton>
+          </CollapsibleTrigger>
+
+          <CollapsibleContent>
+            <SidebarMenuSub className="ml-3 border-l border-border/40 pl-2">
+              {items.map((item) => (
+                <AnimatedSubItem
+                  key={item.title}
+                  item={item}
+                  isActive={location.pathname === item.url}
+                />
+              ))}
+            </SidebarMenuSub>
+          </CollapsibleContent>
+        </SidebarMenuItem>
+      </Collapsible>
+    </SidebarMenu>
+  )
+}
 
 CollapsibleNavGroup.propTypes = {
   title: PropTypes.string.isRequired,
@@ -167,6 +262,11 @@ CollapsibleNavGroup.propTypes = {
       icon: PropTypes.elementType.isRequired,
     })
   ).isRequired,
+  gradient: PropTypes.string,
+}
+
+CollapsibleNavGroup.defaultProps = {
+  gradient: null,
 }
 
 const ProjectCollapsibleNavGroup = ({
@@ -175,51 +275,63 @@ const ProjectCollapsibleNavGroup = ({
   items,
   projectLabel,
   projectItems,
-}) => (
-  <SidebarMenu>
-    <SidebarGroupLabel>{projectLabel}</SidebarGroupLabel>
-    <SidebarGroupContent>
-      <SidebarMenu>
-        {projectItems.map((item) => (
-          <SidebarMenuItem key={item.title}>
-            <SidebarMenuButton asChild>
-              <Link to={item.url}>
-                <item.icon />
-                <span>{item.title}</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        ))}
-      </SidebarMenu>
-    </SidebarGroupContent>
-    <Collapsible asChild defaultOpen className="group/collapsible">
-      <SidebarMenuItem>
-        <CollapsibleTrigger asChild>
-          <SidebarMenuButton tooltip={title}>
-            <Icon />
-            <span>{title}</span>
-            <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-          </SidebarMenuButton>
-        </CollapsibleTrigger>
+}) => {
+  const location = useLocation()
+  const isSubActive = items.some((item) => location.pathname === item.url)
 
-        <CollapsibleContent>
-          <SidebarMenuSub>
-            {items.map((item) => (
-              <SidebarMenuSubItem key={item.title}>
-                <SidebarMenuSubButton asChild>
-                  <Link to={item.url}>
-                    <item.icon />
-                    <span>{item.title}</span>
-                  </Link>
-                </SidebarMenuSubButton>
-              </SidebarMenuSubItem>
-            ))}
-          </SidebarMenuSub>
-        </CollapsibleContent>
-      </SidebarMenuItem>
-    </Collapsible>
-  </SidebarMenu>
-)
+  return (
+    <SidebarMenu>
+      <SidebarGroupLabel className="text-[10px] uppercase tracking-widest text-muted-foreground/70 font-semibold px-3">
+        {projectLabel}
+      </SidebarGroupLabel>
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {projectItems.map((item) => (
+            <AnimatedMenuItem
+              key={item.title}
+              item={item}
+              isActive={location.pathname === item.url}
+            />
+          ))}
+        </SidebarMenu>
+      </SidebarGroupContent>
+      <Collapsible asChild defaultOpen={isSubActive} className="group/collapsible">
+        <SidebarMenuItem>
+          <CollapsibleTrigger asChild>
+            <SidebarMenuButton
+              tooltip={title}
+              className={`
+                rounded-xl transition-all duration-200
+                ${isSubActive ? "bg-muted/80 font-medium" : "hover:bg-muted/50"}
+              `}
+            >
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                className="rounded-lg p-1 bg-gradient-to-br from-rose-500 to-pink-600 text-white"
+              >
+                <Icon className="h-3.5 w-3.5" />
+              </motion.div>
+              <span>{title}</span>
+              <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground/50 transition-transform duration-300 group-data-[state=open]/collapsible:rotate-90" />
+            </SidebarMenuButton>
+          </CollapsibleTrigger>
+
+          <CollapsibleContent>
+            <SidebarMenuSub className="ml-3 border-l border-border/40 pl-2">
+              {items.map((item) => (
+                <AnimatedSubItem
+                  key={item.title}
+                  item={item}
+                  isActive={location.pathname === item.url}
+                />
+              ))}
+            </SidebarMenuSub>
+          </CollapsibleContent>
+        </SidebarMenuItem>
+      </Collapsible>
+    </SidebarMenu>
+  )
+}
 
 ProjectCollapsibleNavGroup.propTypes = {
   title: PropTypes.string.isRequired,
@@ -261,7 +373,6 @@ const ModulesNavGroup = ({
   const showEmpMgmt = isEmpAdmin
   const showAttendance = isAttendanceAdmin || isAttendanceEmployee
 
-  // Attendance: employee items visible to all with attendance role, admin items only to admins
   const attendanceItems = isAttendanceAdmin
     ? [...employeeAttendanceItems, ...adminAttendanceItems]
     : employeeAttendanceItems
@@ -270,13 +381,16 @@ const ModulesNavGroup = ({
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Modules</SidebarGroupLabel>
-      <SidebarGroupContent>
+      <SidebarGroupLabel className="text-[10px] uppercase tracking-widest text-muted-foreground/70 font-semibold px-3">
+        Modules
+      </SidebarGroupLabel>
+      <SidebarGroupContent className="space-y-1">
         {showLeave && (
           <CollapsibleNavGroup
             title="Leave Management"
             icon={Layers}
             items={leaveItems}
+            gradient="from-indigo-500 to-blue-600"
           />
         )}
         {showAttendance && (
@@ -284,6 +398,7 @@ const ModulesNavGroup = ({
             title="Attendance"
             icon={Clock}
             items={attendanceItems}
+            gradient="from-emerald-500 to-teal-600"
           />
         )}
         {showEmpMgmt && (
@@ -291,6 +406,7 @@ const ModulesNavGroup = ({
             title="Employee Management"
             icon={Users}
             items={employeeManagementItems}
+            gradient="from-purple-500 to-violet-600"
           />
         )}
       </SidebarGroupContent>
@@ -306,12 +422,8 @@ ModulesNavGroup.propTypes = {
   isAttendanceEmployee: PropTypes.bool.isRequired,
 }
 
-// ─── AppSidebar ───────────────────────────────────────────────────────────────
+// ─── AppSidebar ───────────────────────────────────────────────────────────
 
-/**
- * AppSidebar renders a collapsible sidebar.
- * Each module collapses independently and shows role-specific items.
- */
 const AppSidebar = () => {
   const leaveRole = useSelector(
     (s) => s[ct.store.USER_STORE].leave_management_role
@@ -323,11 +435,26 @@ const AppSidebar = () => {
     (s) => s[ct.store.USER_STORE].attendance_management_role
   )
 
-  const leaveItems = [...leaveSharedItems]
-
   return (
     <Sidebar collapsible="icon">
-      <SidebarContent>
+      <SidebarContent className="py-2 gap-1">
+        {/* Brand */}
+        <div className="px-4 py-3 mb-1">
+          <div className="flex items-center gap-2.5">
+            <motion.div
+              whileHover={{ rotate: 180, scale: 1.1 }}
+              transition={{ duration: 0.4 }}
+              className="rounded-xl p-2 bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/20"
+            >
+              <Sparkles className="h-4 w-4" />
+            </motion.div>
+            <div className="group-data-[collapsible=icon]:hidden">
+              <p className="text-sm font-bold tracking-tight">ERM Platform</p>
+              <p className="text-[10px] text-muted-foreground">Management Suite</p>
+            </div>
+          </div>
+        </div>
+
         <NavGroup label="Application" items={mainItems} />
         <ModulesNavGroup
           isLeaveAdmin={leaveRole === "admin"}
