@@ -22,7 +22,7 @@ const RewardsPage = () => {
   const isAdmin = employeeManagementRole === "admin" || userRole === "admin"
 
   const { data: rewardsData, isLoading, isError } = useFetchRewards()
-  const { data: employeesData } = useFetchEmployees()
+  const { data: employeesData } = useFetchEmployees({ enabled: isAdmin })
   const { mutate: grantReward, isPending: isGranting } = useGrantReward()
 
   const rewards = rewardsData?.rewards ?? []

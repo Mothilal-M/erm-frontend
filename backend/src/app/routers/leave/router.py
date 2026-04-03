@@ -42,7 +42,7 @@ router = APIRouter(tags=["Leave Management"])
 async def monthly_attendance(
     request: Request,
     service: Annotated[LeaveService, InjectFastAPI(LeaveService)],
-    user: AuthUserSchema = Depends(require_role("admin", "manager")),
+    user: AuthUserSchema = Depends(get_current_user),
     year: int = Query(...),
     month: int = Query(...),
 ):

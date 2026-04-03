@@ -20,7 +20,7 @@ const QUERY_KEY_EMPLOYEE_360 = "employee-360-profile"
  * React Query hook for fetching the full employee list.
  * @returns {import("@tanstack/react-query").UseQueryResult} The query result with the employee list
  */
-export const useFetchEmployees = () => {
+export const useFetchEmployees = ({ enabled = true } = {}) => {
   return useQuery({
     queryKey: [QUERY_KEY_EMPLOYEES],
     queryFn: async ({ signal }) => {
@@ -29,6 +29,7 @@ export const useFetchEmployees = () => {
     },
     staleTime: 5 * 60 * 1000,
     retry: 2,
+    enabled,
   })
 }
 
@@ -117,7 +118,7 @@ export const useInviteUser = () => {
  * React Query hook for fetching the current employee's performance data.
  * @returns {import("@tanstack/react-query").UseQueryResult} Sprint tasks, performance & recognition
  */
-export const useFetchEmployeePerformance = () => {
+export const useFetchEmployeePerformance = ({ enabled = true } = {}) => {
   return useQuery({
     queryKey: [QUERY_KEY_EMPLOYEE_PERFORMANCE],
     queryFn: async ({ signal }) => {
@@ -126,6 +127,7 @@ export const useFetchEmployeePerformance = () => {
     },
     staleTime: 5 * 60 * 1000,
     retry: 2,
+    enabled,
   })
 }
 

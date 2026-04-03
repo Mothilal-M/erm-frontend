@@ -40,7 +40,7 @@ export const useFetchMonthlyAttendance = (year, month) => {
  * React Query hook for fetching the admin leave dashboard summary.
  * @returns {import("@tanstack/react-query").UseQueryResult} The query result with admin leave summary
  */
-export const useFetchAdminLeaveSummary = () => {
+export const useFetchAdminLeaveSummary = ({ enabled = true } = {}) => {
   return useQuery({
     queryKey: [QUERY_KEY_ADMIN_SUMMARY],
     queryFn: async ({ signal }) => {
@@ -49,6 +49,7 @@ export const useFetchAdminLeaveSummary = () => {
     },
     staleTime: 5 * 60 * 1000,
     retry: 2,
+    enabled,
   })
 }
 
@@ -56,7 +57,7 @@ export const useFetchAdminLeaveSummary = () => {
  * React Query hook for fetching the current employee's leave profile.
  * @returns {import("@tanstack/react-query").UseQueryResult} The query result with the employee leave profile
  */
-export const useFetchEmployeeLeaveProfile = () => {
+export const useFetchEmployeeLeaveProfile = ({ enabled = true } = {}) => {
   return useQuery({
     queryKey: [QUERY_KEY_EMPLOYEE_PROFILE],
     queryFn: async ({ signal }) => {
@@ -65,6 +66,7 @@ export const useFetchEmployeeLeaveProfile = () => {
     },
     staleTime: 5 * 60 * 1000,
     retry: 2,
+    enabled,
   })
 }
 

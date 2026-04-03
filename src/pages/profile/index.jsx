@@ -132,7 +132,7 @@ const ProfilePage = () => {
   const currentLanguage = i18n.language?.startsWith("hi") ? "hi" : "en"
   const isAdmin = employeeRole === "admin" || userRole === "admin"
 
-  const { data: employeesData } = useFetchEmployees()
+  const { data: employeesData } = useFetchEmployees({ enabled: isAdmin })
   const employees = employeesData?.employees ?? []
 
   const handleThemeChange = (newTheme) => {
