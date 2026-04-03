@@ -1,25 +1,14 @@
+import { motion } from "framer-motion"
+import { Clock } from "lucide-react"
 import PropTypes from "prop-types"
+
+import { BlurText, FadeIn } from "@/components/magicui"
 
 import AutoExpiryBanner from "./components/auto-expiry-banner"
 import ClockCard from "./components/clock-card"
 import ClockOutDialog from "./components/clock-out-dialog"
 import SessionTable from "./components/session-table"
 
-/**
-/**
- * ClockUI — Presenter layer for the employee attendance clock page.
- * @param {object} props - Component props.
- * @param {object} [props.status] - Current attendance status object.
- * @param {boolean} props.statusLoading - Whether status is loading.
- * @param {object} [props.todayData] - Today's attendance data.
- * @param {boolean} props.todayLoading - Whether today's data is loading.
- * @param {boolean} props.clockOutDialogOpen - Whether the clock out dialog is open.
- * @param {boolean} props.isMutating - Whether a clock in/out operation is in progress.
- * @param {() => void} props.onClockIn - Callback to clock in.
- * @param {() => void} props.onOpenClockOutDialog - Callback to open clock out dialog.
- * @param {() => void} props.onCloseClockOutDialog - Callback to close clock out dialog.
- * @param {(summary: string) => void} props.onClockOutConfirm - Callback to confirm clock out with summary.
- */
 const ClockUI = ({
   status,
   statusLoading,
@@ -33,10 +22,26 @@ const ClockUI = ({
   onClockOutConfirm,
 }) => {
   return (
-    <div className="max-w-2xl mx-auto flex flex-col gap-4 p-4 md:p-6">
-      <h1 className="text-2xl font-bold">Attendance</h1>
+    <div className="max-w-2xl mx-auto flex flex-col gap-5 p-4 md:p-6">
+      <FadeIn>
+        <div className="flex items-center gap-3">
+          <motion.div
+            initial={{ rotate: -180, opacity: 0 }}
+            animate={{ rotate: 0, opacity: 1 }}
+            transition={{ duration: 0.6, type: "spring" }}
+            className="rounded-xl p-2.5 bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg"
+          >
+            <Clock className="h-5 w-5" />
+          </motion.div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">
+              <BlurText text="Attendance" />
+            </h1>
+            <p className="text-sm text-muted-foreground">Track your work sessions</p>
+          </div>
+        </div>
+      </FadeIn>
 
-      {/* Auto-expiry warning banner */}
       {status?.isClocked && status?.willAutoExpire && (
         <AutoExpiryBanner
           expiresInSeconds={status.expiresInSeconds}
@@ -44,7 +49,6 @@ const ClockUI = ({
         />
       )}
 
-      {/* Primary clock card */}
       <ClockCard
         status={status}
         isLoading={statusLoading}
@@ -53,10 +57,8 @@ const ClockUI = ({
         isMutating={isMutating}
       />
 
-      {/* Today's sessions */}
       <SessionTable todayData={todayData} isLoading={todayLoading} />
 
-      {/* Clock-out dialog with work summary */}
       <ClockOutDialog
         open={clockOutDialogOpen}
         onClose={onCloseClockOutDialog}
@@ -79,10 +81,6 @@ ClockUI.propTypes = {
   onCloseClockOutDialog: PropTypes.func.isRequired,
   onClockOutConfirm: PropTypes.func.isRequired,
 }
-
-ClockUI.defaultProps = {
-  status: null,
-  todayData: null,
-}
+ClockUI.defaultProps = { status: null, todayData: null }
 
 export default ClockUI

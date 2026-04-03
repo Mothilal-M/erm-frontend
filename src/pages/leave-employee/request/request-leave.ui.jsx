@@ -1,9 +1,16 @@
+import { motion, AnimatePresence } from "framer-motion"
+import { FileText, CalendarDays, AlertTriangle, Send, BarChart3 } from "lucide-react"
 import PropTypes from "prop-types"
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import {
-  Card,
+  AnimatedCard,
+  BlurText,
+  FadeIn,
+  ShimmerButton,
+  PulseBadge,
+} from "@/components/magicui"
+import { Badge } from "@/components/ui/badge"
+import {
   CardContent,
   CardDescription,
   CardHeader,
@@ -29,14 +36,10 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+/* eslint-disable max-lines-per-function */
 
 const LEAVE_TYPES = [
-  {
-    value: "Annual Leave",
-    icon: "🏖️",
-    desc: "Planned vacation / personal time",
-  },
+  { value: "Annual Leave", icon: "🏖️", desc: "Planned vacation / personal time" },
   { value: "Sick Leave", icon: "🤒", desc: "Illness or medical needs" },
   { value: "Casual Leave", icon: "🎲", desc: "Short unplanned leave" },
   { value: "Compensatory", icon: "⚖️", desc: "In lieu of overtime worked" },
@@ -45,74 +48,55 @@ const LEAVE_TYPES = [
 ]
 
 const SUB_TYPES = [
-  {
-    value: "full",
-    icon: "📅",
-    label: "Full Day(s)",
-    desc: "One or more full working days",
-  },
-  {
-    value: "halfday",
-    icon: "🌗",
-    label: "Half Day",
-    desc: "Morning or afternoon only",
-  },
-  {
-    value: "wfh",
-    icon: "🏠",
-    label: "Work From Home",
-    desc: "Working remotely (requires approval)",
-  },
+  { value: "full", icon: "📅", label: "Full Day(s)", desc: "One or more full working days" },
+  { value: "halfday", icon: "🌗", label: "Half Day", desc: "Morning or afternoon only" },
+  { value: "wfh", icon: "🏠", label: "Work From Home", desc: "Working remotely (requires approval)" },
 ]
 
 const HALF_DAY_SLOTS = [
-  { value: "morning", label: "🌅 Morning (until 1 PM)" },
-  { value: "afternoon", label: "🌇 Afternoon (from 1 PM)" },
+  { value: "morning", label: "Morning", desc: "Until 1 PM", icon: "🌅" },
+  { value: "afternoon", label: "Afternoon", desc: "From 1 PM", icon: "🌇" },
 ]
 
 const [TODAY] = new Date().toISOString().split("T")
 
-// ─── Main UI ──────────────────────────────────────────────────────────────────
-const MUTED_TEXT_CLASS = "text-muted-foreground"
-
-const PRIMARY_BORDER = "border-primary"
-const BASE_BUTTON_CLASS = "p-3 rounded-xl border-2 text-left transition-all"
-const ACTIVE_BUTTON_CLASS = `${PRIMARY_BORDER} bg-primary/5`
-const INACTIVE_BUTTON_CLASS = `border-border hover:${PRIMARY_BORDER}/40`
-
-// eslint-disable-next-line max-lines-per-function
-const RequestLeaveUI = ({
-  form,
-  subType,
-  estimatedDays,
-  isSubmitting,
-  onSubmit,
-}) => {
-  const handleSubmit = onSubmit
+const RequestLeaveUI = ({ form, subType, estimatedDays, isSubmitting, onSubmit }) => {
   return (
     <div className="p-4 md:p-6 max-w-2xl mx-auto space-y-5">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Request Leave</h1>
-        <p className="text-muted-foreground text-sm mt-0.5">
-          Submit a leave, WFH, or half-day request for your manager&apos;s
-          approval.
-        </p>
-      </div>
+      <FadeIn>
+        <div className="flex items-center gap-3">
+          <motion.div
+            initial={{ rotate: -180, opacity: 0 }}
+            animate={{ rotate: 0, opacity: 1 }}
+            transition={{ duration: 0.6, type: "spring" }}
+            className="rounded-xl p-2.5 bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-lg"
+          >
+            <FileText className="h-5 w-5" />
+          </motion.div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">
+              <BlurText text="Request Leave" />
+            </h1>
+            <p className="text-muted-foreground text-sm mt-0.5">
+              Submit a leave, WFH, or half-day request for approval.
+            </p>
+          </div>
+        </div>
+      </FadeIn>
 
-      <Card className="shadow-sm">
+      <AnimatedCard delay={0.1} className="border-0 shadow-sm">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Leave Request Form</CardTitle>
+          <CardTitle className="text-base font-semibold">Leave Request Form</CardTitle>
           <CardDescription className="text-xs">
-            Fields marked with * are required. Requests are usually reviewed
-            within 1–2 business days.
+            Fields marked with * are required. Requests are usually reviewed within 1-2 business days.
           </CardDescription>
         </CardHeader>
 
         <CardContent>
           <Form {...form}>
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Request type (Full / Half / WFH) */}
+            <form onSubmit={onSubmit} className="space-y-6">
+              {/* Request type */}
               <FormField
                 control={form.control}
                 name="subType"
@@ -120,25 +104,26 @@ const RequestLeaveUI = ({
                   <FormItem>
                     <FormLabel>Request Type *</FormLabel>
                     <div className="grid grid-cols-3 gap-2">
-                      {SUB_TYPES.map((st) => (
-                        <button
+                      {SUB_TYPES.map((st, idx) => (
+                        <motion.button
                           key={st.value}
                           type="button"
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.15 + idx * 0.06 }}
+                          whileHover={{ scale: 1.02, y: -2 }}
+                          whileTap={{ scale: 0.97 }}
                           onClick={() => field.onChange(st.value)}
-                          className={`${BASE_BUTTON_CLASS} ${
+                          className={`p-3 rounded-xl border-2 text-left transition-all ${
                             field.value === st.value
-                              ? ACTIVE_BUTTON_CLASS
-                              : INACTIVE_BUTTON_CLASS
+                              ? "border-primary bg-primary/5 shadow-md shadow-primary/10"
+                              : "border-border hover:border-primary/40"
                           }`}
                         >
                           <div className="text-xl">{st.icon}</div>
-                          <p className="text-sm font-semibold mt-1">
-                            {st.label}
-                          </p>
-                          <p className="text-[11px] text-muted-foreground mt-0.5">
-                            {st.desc}
-                          </p>
-                        </button>
+                          <p className="text-sm font-semibold mt-1">{st.label}</p>
+                          <p className="text-[11px] text-muted-foreground mt-0.5">{st.desc}</p>
+                        </motion.button>
                       ))}
                     </div>
                     <FormMessage />
@@ -147,204 +132,232 @@ const RequestLeaveUI = ({
               />
 
               {/* Leave category */}
-              <FormField
-                control={form.control}
-                name="leaveType"
-                render={({ field }) => {
-                  const handleLeaveTypeChange = field.onChange
-                  return (
+              <FadeIn delay={0.2}>
+                <FormField
+                  control={form.control}
+                  name="leaveType"
+                  render={({ field }) => (
                     <FormItem>
                       <FormLabel>Leave Category *</FormLabel>
-                      <Select
-                        onValueChange={handleLeaveTypeChange}
-                        value={field.value}
-                      >
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select leave category…" />
+                          <SelectTrigger className="rounded-xl">
+                            <SelectValue placeholder="Select leave category..." />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
                           {LEAVE_TYPES.map((lt) => (
                             <SelectItem key={lt.value} value={lt.value}>
-                              {lt.icon} {lt.value} —{" "}
-                              <span className={MUTED_TEXT_CLASS}>
-                                {lt.desc}
-                              </span>
+                              {lt.icon} {lt.value} — <span className="text-muted-foreground">{lt.desc}</span>
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                       <FormMessage />
                     </FormItem>
-                  )
-                }}
-              />
-
-              {/* Date range */}
-              <div className="grid grid-cols-2 gap-3">
-                <FormField
-                  control={form.control}
-                  name="fromDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>From Date *</FormLabel>
-                      <FormControl>
-                        <Input type="date" min={TODAY} {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
                   )}
                 />
+              </FadeIn>
+
+              {/* Date range */}
+              <FadeIn delay={0.25}>
+                <div className="grid grid-cols-2 gap-3">
+                  <FormField
+                    control={form.control}
+                    name="fromDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>From Date *</FormLabel>
+                        <FormControl>
+                          <Input type="date" min={TODAY} className="rounded-xl" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="toDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>To Date *</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="date"
+                            min={form.watch("fromDate") || TODAY}
+                            disabled={subType === "wfh" || subType === "halfday"}
+                            className="rounded-xl"
+                            {...field}
+                          />
+                        </FormControl>
+                        {(subType === "wfh" || subType === "halfday") && (
+                          <FormDescription className="text-xs">Auto-set to same day</FormDescription>
+                        )}
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </FadeIn>
+
+              {/* Half day slot */}
+              <AnimatePresence>
+                {subType === "halfday" && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <FormField
+                      control={form.control}
+                      name="halfDaySlot"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Half Day Slot *</FormLabel>
+                          <div className="grid grid-cols-2 gap-2">
+                            {HALF_DAY_SLOTS.map((slot) => (
+                              <motion.button
+                                key={slot.value}
+                                type="button"
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.97 }}
+                                onClick={() => field.onChange(slot.value)}
+                                className={`p-3 rounded-xl border-2 text-center transition-all ${
+                                  field.value === slot.value
+                                    ? "border-primary bg-primary/5 shadow-md shadow-primary/10"
+                                    : "border-border hover:border-primary/40"
+                                }`}
+                              >
+                                <span className="text-xl">{slot.icon}</span>
+                                <p className="text-sm font-medium mt-1">{slot.label}</p>
+                                <p className="text-[11px] text-muted-foreground">{slot.desc}</p>
+                              </motion.button>
+                            ))}
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Estimated days */}
+              <AnimatePresence>
+                {estimatedDays > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="flex items-center gap-2 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20"
+                  >
+                    <BarChart3 className="h-4 w-4 text-emerald-600 shrink-0" />
+                    <span className="text-emerald-700 dark:text-emerald-400 font-medium text-sm">Estimated:</span>
+                    <PulseBadge color="emerald">
+                      {estimatedDays} working {estimatedDays === 1 ? "day" : "days"}
+                    </PulseBadge>
+                    <span className="text-xs text-muted-foreground ml-auto">(weekends excluded)</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <motion.div
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                style={{ transformOrigin: "left" }}
+              >
+                <Separator />
+              </motion.div>
+
+              {/* Reason */}
+              <FadeIn delay={0.3}>
                 <FormField
                   control={form.control}
-                  name="toDate"
+                  name="reason"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>To Date *</FormLabel>
+                      <FormLabel>Reason *</FormLabel>
                       <FormControl>
-                        <Input
-                          type="date"
-                          min={form.watch("fromDate") || TODAY}
-                          disabled={subType === "wfh" || subType === "halfday"}
+                        <Textarea
+                          placeholder="Briefly explain your reason for this leave request..."
+                          className="resize-none rounded-xl"
+                          rows={4}
                           {...field}
                         />
                       </FormControl>
-                      {(subType === "wfh" || subType === "halfday") && (
-                        <FormDescription className="text-xs">
-                          Auto-set to same day
-                        </FormDescription>
-                      )}
+                      <FormDescription className="text-xs tabular-nums">
+                        {field.value?.length ?? 0}/500 characters
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              </div>
-
-              {/* Half day slot */}
-              {subType === "halfday" && (
-                <FormField
-                  control={form.control}
-                  name="halfDaySlot"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Half Day Slot *</FormLabel>
-                      <div className="grid grid-cols-2 gap-2">
-                        {HALF_DAY_SLOTS.map((slot) => (
-                          <button
-                            key={slot.value}
-                            type="button"
-                            onClick={() => field.onChange(slot.value)}
-                            className={`p-3 rounded-xl border-2 text-center text-sm font-medium transition-all ${
-                              field.value === slot.value
-                                ? "border-primary bg-primary/5"
-                                : "border-border hover:border-primary/40"
-                            }`}
-                          >
-                            {slot.label}
-                          </button>
-                        ))}
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-
-              {/* Estimated days chip */}
-              {estimatedDays > 0 && (
-                <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-                  <span className="text-emerald-600 font-semibold text-sm">
-                    📊 Estimated:
-                  </span>
-                  <Badge className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-emerald-500/30">
-                    {estimatedDays} working{" "}
-                    {estimatedDays === 1 ? "day" : "days"}
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">
-                    (weekends excluded)
-                  </span>
-                </div>
-              )}
-
-              <Separator />
-
-              {/* Reason */}
-              <FormField
-                control={form.control}
-                name="reason"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Reason *</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Briefly explain your reason for this leave request…"
-                        className="resize-none"
-                        rows={4}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription className="text-xs">
-                      {field.value?.length ?? 0}/500 characters
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              </FadeIn>
 
               {/* Optional fields */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="handoverTo"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Handover To</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Colleague's name…" {...field} />
-                      </FormControl>
-                      <FormDescription className="text-xs">
-                        Who covers your work?
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="contactDuringLeave"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Emergency Contact</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Phone or email…" {...field} />
-                      </FormControl>
-                      <FormDescription className="text-xs">
-                        If urgent contact needed
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              <FadeIn delay={0.35}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="handoverTo"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Handover To</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Colleague's name..." className="rounded-xl" {...field} />
+                        </FormControl>
+                        <FormDescription className="text-xs">Who covers your work?</FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="contactDuringLeave"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Emergency Contact</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Phone or email..." className="rounded-xl" {...field} />
+                        </FormControl>
+                        <FormDescription className="text-xs">If urgent contact needed</FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </FadeIn>
 
               {/* Policy reminder */}
-              <div className="flex gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-sm text-amber-700 dark:text-amber-400">
-                <span className="shrink-0">⚠️</span>
-                <p>
-                  Requests must be submitted at least{" "}
-                  <strong>2 working days</strong> in advance (except sick
-                  leave). WFH requests require manager approval.
-                </p>
-              </div>
+              <FadeIn delay={0.4}>
+                <motion.div
+                  whileHover={{ scale: 1.01 }}
+                  className="flex gap-2.5 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-sm text-amber-700 dark:text-amber-400"
+                >
+                  <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+                  <p>
+                    Requests must be submitted at least <strong>2 working days</strong> in advance
+                    (except sick leave). WFH requests require manager approval.
+                  </p>
+                </motion.div>
+              </FadeIn>
 
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? "Submitting…" : "Submit Request"}
-              </Button>
+              <FadeIn delay={0.45}>
+                <ShimmerButton
+                  className="w-full h-11 rounded-xl text-sm"
+                  onClick={onSubmit}
+                  disabled={isSubmitting}
+                >
+                  <Send className="h-4 w-4" />
+                  {isSubmitting ? "Submitting..." : "Submit Request"}
+                </ShimmerButton>
+              </FadeIn>
             </form>
           </Form>
         </CardContent>
-      </Card>
+      </AnimatedCard>
     </div>
   )
 }

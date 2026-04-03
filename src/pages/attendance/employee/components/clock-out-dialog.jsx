@@ -1,6 +1,9 @@
+import { motion } from "framer-motion"
+import { LogOut, FileText } from "lucide-react"
 import PropTypes from "prop-types"
 import { useState } from "react"
 
+import { AnimatedProgress } from "@/components/magicui"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -14,69 +17,72 @@ import { Textarea } from "@/components/ui/textarea"
 
 const MIN_LENGTH = 10
 
-/**
- * ClockOutDialog — shown when the employee clicks "Clock Out".
- * Requires them to write a work summary (min 10 chars) before confirming.
- * @param {object} props - Component props.
- * @param {boolean} props.open - Whether the dialog is open.
- * @param {() => void} props.onClose - Callback when dialog is closed.
- * @param {(data: {workSummary: string}) => void} props.onConfirm - Called with { workSummary }.
- * @param {boolean} props.isLoading - Whether the clock-out operation is in progress.
- */
 const ClockOutDialog = ({ open, onClose, onConfirm, isLoading }) => {
   const [summary, setSummary] = useState("")
+  const progress = Math.min(summary.trim().length / MIN_LENGTH, 1)
+  const isValid = summary.trim().length >= MIN_LENGTH
 
   const handleConfirm = () => {
-    if (summary.trim().length < MIN_LENGTH) return
+    if (!isValid) return
     onConfirm({ workSummary: summary.trim() })
   }
 
-  const handleOpenChange = (v) => {
-    if (!v) onClose()
-  }
-
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-md">
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="sm:max-w-md rounded-2xl">
         <DialogHeader>
-          <DialogTitle>Clock Out</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <div className="rounded-lg p-1.5 bg-gradient-to-br from-red-500 to-rose-600 text-white">
+              <LogOut className="h-3.5 w-3.5" />
+            </div>
+            Clock Out
+          </DialogTitle>
           <DialogDescription>
-            What did you work on today? This will be saved with your attendance
-            record.
+            What did you work on today? This will be saved with your attendance record.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-1.5 py-2">
-          <Textarea
-            placeholder="e.g. Reviewed pull requests, fixed login bug, attended sprint planning…"
-            rows={4}
-            value={summary}
-            onChange={(event) => setSummary(event.target.value)}
-            disabled={isLoading}
-            className="resize-none"
-          />
-          <p
-            className={`text-xs ${
-              summary.trim().length < MIN_LENGTH
-                ? "text-muted-foreground"
-                : "text-emerald-600"
-            }`}
-          >
-            {summary.trim().length}/{MIN_LENGTH} min characters
-          </p>
+        <div className="flex flex-col gap-2 py-2">
+          <div className="relative">
+            <FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground/50" />
+            <Textarea
+              placeholder="e.g. Reviewed pull requests, fixed login bug, attended sprint planning..."
+              rows={4}
+              value={summary}
+              onChange={(e) => setSummary(e.target.value)}
+              disabled={isLoading}
+              className="resize-none pl-9 rounded-xl"
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <AnimatedProgress
+              value={progress * 100}
+              height="h-1"
+              className="flex-1 mr-3"
+              barClassName={isValid ? "bg-emerald-500" : "bg-amber-500"}
+            />
+            <span className={`text-xs tabular-nums ${isValid ? "text-emerald-600 font-medium" : "text-muted-foreground"}`}>
+              {summary.trim().length}/{MIN_LENGTH}
+            </span>
+          </div>
         </div>
 
         <DialogFooter className="gap-2">
-          <Button variant="outline" onClick={onClose} disabled={isLoading}>
-            Cancel
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={handleConfirm}
-            disabled={summary.trim().length < MIN_LENGTH || isLoading}
-          >
-            {isLoading ? "Clocking out…" : "Confirm Clock Out"}
-          </Button>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+            <Button variant="outline" onClick={onClose} disabled={isLoading} className="rounded-xl">
+              Cancel
+            </Button>
+          </motion.div>
+          <motion.div whileHover={isValid ? { scale: 1.02 } : {}} whileTap={isValid ? { scale: 0.97 } : {}}>
+            <Button
+              variant="destructive"
+              onClick={handleConfirm}
+              disabled={!isValid || isLoading}
+              className="rounded-xl shadow-lg shadow-red-500/20"
+            >
+              {isLoading ? "Clocking out..." : "Confirm Clock Out"}
+            </Button>
+          </motion.div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -89,9 +95,6 @@ ClockOutDialog.propTypes = {
   onConfirm: PropTypes.func.isRequired,
   isLoading: PropTypes.bool,
 }
-
-ClockOutDialog.defaultProps = {
-  isLoading: false,
-}
+ClockOutDialog.defaultProps = { isLoading: false }
 
 export default ClockOutDialog

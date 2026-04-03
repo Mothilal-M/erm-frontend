@@ -1,19 +1,15 @@
+import { motion, AnimatePresence } from "framer-motion"
+import { Timer, LogIn, LogOut, Zap } from "lucide-react"
 import PropTypes from "prop-types"
 
+import { PulseBadge, ShimmerButton } from "@/components/magicui"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 const pad = (n) => String(n).padStart(2, "0")
 
-/**
- * Formats elapsed seconds as "Xh Ym" or "Ym".
- * @param {number} seconds - Total seconds elapsed.
- * @returns {string} Human-readable duration.
- */
 const formatElapsed = (seconds) => {
   if (!seconds || seconds <= 0) return "0m"
   const h = Math.floor(seconds / 3600)
@@ -22,11 +18,6 @@ const formatElapsed = (seconds) => {
   return `${m}m`
 }
 
-/**
- * Formats total minutes as "Xh Ym".
- * @param {number} minutes - Total minutes worked.
- * @returns {string} Human-readable duration.
- */
 const formatMinutes = (minutes) => {
   if (!minutes || minutes <= 0) return "0m"
   const h = Math.floor(minutes / 60)
@@ -35,46 +26,123 @@ const formatMinutes = (minutes) => {
   return `${m}m`
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
+/* ---- Animated Clock Ring ---- */
+const ClockRing = ({ progress, isActive }) => {
+  const r = 70
+  const circumference = 2 * Math.PI * r
+  const filled = Math.min(progress, 1) * circumference
 
-/** @param {{ elapsed: number, clockedInAt: string|null, willAutoExpire: boolean, isMutating: boolean, onClockOut: () => void }} props - Sub-component props. */
-const ClockedInBody = ({
-  elapsed,
-  clockedInAt,
-  willAutoExpire,
-  isMutating,
-  onClockOut,
-}) => {
-  const handleClockOut = () => onClockOut()
   return (
-    <>
-      <div className="flex items-center gap-2">
-        <span className="w-3 h-3 rounded-full shrink-0 bg-emerald-500 animate-pulse" />
-        <span className="text-sm font-semibold text-muted-foreground uppercase tracking-widest">
-          {clockedInAt ? `Clocked in since ${clockedInAt}` : "Clocked In"}
+    <div className="relative flex items-center justify-center w-44 h-44">
+      <svg className="-rotate-90" width="176" height="176">
+        <circle
+          cx="88" cy="88" r={r}
+          stroke="currentColor" strokeWidth="6" fill="none"
+          className="text-muted/20"
+        />
+        <motion.circle
+          cx="88" cy="88" r={r}
+          stroke="currentColor" strokeWidth="6" fill="none"
+          strokeDasharray={circumference}
+          strokeLinecap="round"
+          className={isActive ? "text-emerald-500" : "text-muted-foreground/30"}
+          initial={{ strokeDashoffset: circumference }}
+          animate={{ strokeDashoffset: circumference - filled }}
+          transition={{ duration: 1.2, ease: [0.25, 0.4, 0.25, 1] }}
+        />
+      </svg>
+      {/* Inner glow when active */}
+      {isActive && (
+        <motion.div
+          className="absolute inset-6 rounded-full bg-emerald-500/5"
+          animate={{ scale: [1, 1.05, 1], opacity: [0.5, 0.8, 0.5] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+        />
+      )}
+      <div className="absolute flex flex-col items-center">
+        <Timer className={`h-5 w-5 mb-1 ${isActive ? "text-emerald-500" : "text-muted-foreground"}`} />
+        <span className="text-3xl font-bold tabular-nums tracking-tight">
+          {isActive ? formatElapsed(progress * 8 * 3600) : "—"}
         </span>
+      </div>
+    </div>
+  )
+}
+
+ClockRing.propTypes = {
+  progress: PropTypes.number.isRequired,
+  isActive: PropTypes.bool.isRequired,
+}
+
+/* ---- Clocked In Body ---- */
+const ClockedInBody = ({ elapsed, clockedInAt, willAutoExpire, isMutating, onClockOut }) => {
+  const progress = Math.min(elapsed / (8 * 3600), 1) // 8h workday
+  const r = 70
+  const circumference = 2 * Math.PI * r
+  const filled = progress * circumference
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="flex flex-col items-center gap-5"
+    >
+      {/* Animated ring */}
+      <div className="relative flex items-center justify-center w-44 h-44">
+        <svg className="-rotate-90" width="176" height="176">
+          <circle
+            cx="88" cy="88" r={r}
+            stroke="currentColor" strokeWidth="6" fill="none"
+            className="text-muted/20"
+          />
+          <motion.circle
+            cx="88" cy="88" r={r}
+            stroke="currentColor" strokeWidth="6" fill="none"
+            strokeDasharray={circumference}
+            strokeLinecap="round"
+            className="text-emerald-500"
+            initial={{ strokeDashoffset: circumference }}
+            animate={{ strokeDashoffset: circumference - filled }}
+            transition={{ duration: 1.2, ease: [0.25, 0.4, 0.25, 1] }}
+          />
+        </svg>
+        <motion.div
+          className="absolute inset-6 rounded-full bg-emerald-500/5"
+          animate={{ scale: [1, 1.05, 1], opacity: [0.5, 0.8, 0.5] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <div className="absolute flex flex-col items-center">
+          <Timer className="h-5 w-5 mb-1 text-emerald-500" />
+          <span className="text-3xl font-bold tabular-nums tracking-tight">
+            {formatElapsed(elapsed)}
+          </span>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <PulseBadge color="emerald">
+          {clockedInAt ? `Since ${clockedInAt}` : "Clocked In"}
+        </PulseBadge>
         {willAutoExpire && (
-          <Badge className="ml-auto bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30">
-            Expiring soon
-          </Badge>
+          <PulseBadge color="amber">
+            <Zap className="h-3 w-3" /> Expiring soon
+          </PulseBadge>
         )}
       </div>
-      <div className="flex items-baseline gap-2">
-        <span className="text-4xl font-extrabold tabular-nums">
-          {formatElapsed(elapsed)}
-        </span>
-        <span className="text-sm text-muted-foreground">elapsed today</span>
-      </div>
-      <Button
-        variant="destructive"
-        size="lg"
-        className="w-full text-base"
-        onClick={handleClockOut}
-        disabled={isMutating}
-      >
-        {isMutating ? "Clocking out…" : "🔴  Clock Out"}
-      </Button>
-    </>
+
+      <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} className="w-full">
+        <Button
+          variant="destructive"
+          size="lg"
+          className="w-full text-base rounded-xl shadow-lg shadow-red-500/20 hover:shadow-xl hover:shadow-red-500/30 transition-shadow"
+          onClick={onClockOut}
+          disabled={isMutating}
+        >
+          <LogOut className="h-4 w-4 mr-2" />
+          {isMutating ? "Clocking out..." : "Clock Out"}
+        </Button>
+      </motion.div>
+    </motion.div>
   )
 }
 
@@ -85,42 +153,47 @@ ClockedInBody.propTypes = {
   isMutating: PropTypes.bool.isRequired,
   onClockOut: PropTypes.func.isRequired,
 }
+ClockedInBody.defaultProps = { clockedInAt: null, willAutoExpire: false }
 
-ClockedInBody.defaultProps = {
-  clockedInAt: null,
-  willAutoExpire: false,
-}
-
-/** @param {{ todayMinutes: number, isMutating: boolean, onClockIn: () => void }} props - Sub-component props. */
-const ClockedOutBody = ({ todayMinutes, isMutating, onClockIn }) => {
-  const handleClockIn = () => onClockIn()
-  return (
-    <>
-      <div className="flex items-center gap-2">
-        <span className="w-3 h-3 rounded-full shrink-0 bg-muted-foreground/40" />
-        <span className="text-sm font-semibold text-muted-foreground uppercase tracking-widest">
-          Not Clocked In
-        </span>
-      </div>
-      <div className="flex items-baseline gap-2">
-        <span className="text-4xl font-extrabold tabular-nums">
+/* ---- Clocked Out Body ---- */
+const ClockedOutBody = ({ todayMinutes, isMutating, onClockIn }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 12 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="flex flex-col items-center gap-5"
+  >
+    {/* Idle ring */}
+    <div className="relative flex items-center justify-center w-44 h-44">
+      <svg className="-rotate-90" width="176" height="176">
+        <circle
+          cx="88" cy="88" r="70"
+          stroke="currentColor" strokeWidth="6" fill="none"
+          className="text-muted/20"
+        />
+      </svg>
+      <div className="absolute flex flex-col items-center">
+        <Timer className="h-5 w-5 mb-1 text-muted-foreground/50" />
+        <span className="text-3xl font-bold tabular-nums tracking-tight text-muted-foreground">
           {formatMinutes(todayMinutes)}
         </span>
-        <span className="text-sm text-muted-foreground">
-          {todayMinutes > 0 ? "worked today" : "no sessions today"}
+        <span className="text-xs text-muted-foreground mt-1">
+          {todayMinutes > 0 ? "worked today" : "no sessions"}
         </span>
       </div>
-      <Button
-        size="lg"
-        className="w-full text-base bg-emerald-600 hover:bg-emerald-700"
-        onClick={handleClockIn}
-        disabled={isMutating}
-      >
-        {isMutating ? "Clocking in…" : "🟢  Clock In"}
-      </Button>
-    </>
-  )
-}
+    </div>
+
+    <PulseBadge color="blue">Not Clocked In</PulseBadge>
+
+    <ShimmerButton
+      className="w-full h-12 text-base rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500"
+      onClick={onClockIn}
+      disabled={isMutating}
+    >
+      <LogIn className="h-4 w-4" />
+      {isMutating ? "Clocking in..." : "Clock In"}
+    </ShimmerButton>
+  </motion.div>
+)
 
 ClockedOutBody.propTypes = {
   todayMinutes: PropTypes.number.isRequired,
@@ -128,29 +201,13 @@ ClockedOutBody.propTypes = {
   onClockIn: PropTypes.func.isRequired,
 }
 
-/**
- * Derives display state from raw status data object.
- * @param {object|null} status - Raw status from useAttendanceStatus().
- * @returns {{ isClocked: boolean, elapsed: number, todayMinutes: number, clockedInAt: string|null, willAutoExpire: boolean }} Derived state.
- */
 const deriveState = (status) => {
   if (!status) {
-    return {
-      isClocked: false,
-      elapsed: 0,
-      todayMinutes: 0,
-      clockedInAt: null,
-      willAutoExpire: false,
-    }
+    return { isClocked: false, elapsed: 0, todayMinutes: 0, clockedInAt: null, willAutoExpire: false }
   }
-
   const clockedInAt = status.clockedInAt
-    ? new Date(status.clockedInAt).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      })
+    ? new Date(status.clockedInAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
     : null
-
   return {
     isClocked: status.isClocked ?? false,
     elapsed: status.elapsedSeconds ?? 0,
@@ -160,59 +217,55 @@ const deriveState = (status) => {
   }
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
-/**
- * ClockCard — the primary clock-in/out widget for the employee attendance page.
- * @param {{ status: object, isLoading: boolean, onClockIn: () => void, onClockOut: () => void, isMutating: boolean }} props - Component props.
- */
-const ClockCard = ({
-  status,
-  isLoading,
-  onClockIn,
-  onClockOut,
-  isMutating,
-}) => {
-  const handleClockIn = () => onClockIn()
-  const handleClockOut = () => onClockOut()
-
+const ClockCard = ({ status, isLoading, onClockIn, onClockOut, isMutating }) => {
   if (isLoading) {
     return (
-      <Card className="w-full">
-        <CardContent className="p-6 flex flex-col gap-4">
+      <Card className="border-0 shadow-sm">
+        <CardContent className="p-8 flex flex-col items-center gap-4">
+          <Skeleton className="h-44 w-44 rounded-full" />
           <Skeleton className="h-5 w-36" />
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-12 w-full rounded-xl" />
         </CardContent>
       </Card>
     )
   }
 
-  const { isClocked, elapsed, todayMinutes, clockedInAt, willAutoExpire } =
-    deriveState(status)
+  const { isClocked, elapsed, todayMinutes, clockedInAt, willAutoExpire } = deriveState(status)
 
   return (
-    <Card className="w-full">
-      <CardContent className="p-6">
-        <div className="flex flex-col gap-4">
-          {isClocked ? (
-            <ClockedInBody
-              elapsed={elapsed}
-              clockedInAt={clockedInAt}
-              willAutoExpire={willAutoExpire}
-              isMutating={isMutating}
-              onClockOut={handleClockOut}
-            />
-          ) : (
-            <ClockedOutBody
-              todayMinutes={todayMinutes}
-              isMutating={isMutating}
-              onClockIn={handleClockIn}
-            />
-          )}
-        </div>
-      </CardContent>
-    </Card>
+    <motion.div
+      initial={{ opacity: 0, y: 20, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.5, ease: [0.25, 0.4, 0.25, 1] }}
+    >
+      <Card className={`border-0 shadow-sm overflow-hidden ${
+        isClocked
+          ? "bg-gradient-to-b from-emerald-500/5 to-transparent"
+          : ""
+      }`}>
+        <CardContent className="p-8">
+          <AnimatePresence mode="wait">
+            {isClocked ? (
+              <ClockedInBody
+                key="clocked-in"
+                elapsed={elapsed}
+                clockedInAt={clockedInAt}
+                willAutoExpire={willAutoExpire}
+                isMutating={isMutating}
+                onClockOut={onClockOut}
+              />
+            ) : (
+              <ClockedOutBody
+                key="clocked-out"
+                todayMinutes={todayMinutes}
+                isMutating={isMutating}
+                onClockIn={onClockIn}
+              />
+            )}
+          </AnimatePresence>
+        </CardContent>
+      </Card>
+    </motion.div>
   )
 }
 
@@ -230,10 +283,6 @@ ClockCard.propTypes = {
   onClockOut: PropTypes.func.isRequired,
   isMutating: PropTypes.bool,
 }
-
-ClockCard.defaultProps = {
-  status: null,
-  isMutating: false,
-}
+ClockCard.defaultProps = { status: null, isMutating: false }
 
 export default ClockCard
