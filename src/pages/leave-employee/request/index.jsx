@@ -16,7 +16,10 @@ const schema = z
     subType: z.enum(["full", "wfh", "halfday"], {
       required_error: "Select a request type",
     }),
-    halfDaySlot: z.enum(["morning", "afternoon"]).optional(),
+    halfDaySlot: z
+      .enum(["morning", "afternoon", ""])
+      .optional()
+      .transform((v) => (v === "" ? undefined : v)),
     fromDate: z.string().min(1, "Start date is required"),
     toDate: z.string().min(1, "End date is required"),
     reason: z

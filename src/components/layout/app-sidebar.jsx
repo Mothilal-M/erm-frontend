@@ -16,6 +16,7 @@ import {
 } from "lucide-react"
 import PropTypes from "prop-types"
 import { useSelector } from "react-redux"
+import { Link } from "react-router-dom"
 
 import {
   Collapsible,
@@ -100,10 +101,10 @@ const NavGroup = ({ label, items }) => (
         {items.map((item) => (
           <SidebarMenuItem key={item.title}>
             <SidebarMenuButton asChild>
-              <a href={item.url}>
+              <Link to={item.url}>
                 <item.icon />
                 <span>{item.title}</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         ))}
