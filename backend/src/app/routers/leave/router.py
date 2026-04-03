@@ -241,7 +241,7 @@ async def update_settings(
 async def attendance_day_detail(
     request: Request,
     service: Annotated[LeaveService, InjectFastAPI(LeaveService)],
-    user: AuthUserSchema = Depends(require_role("admin", "manager")),
+    user: AuthUserSchema = Depends(get_current_user),
     date: str = Query(...),
 ):
     result = await service.get_day_detail(date)
