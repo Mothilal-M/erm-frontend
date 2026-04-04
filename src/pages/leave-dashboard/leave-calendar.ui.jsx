@@ -435,40 +435,68 @@ const LeaveCalendarUI = ({
       )}
 
       {/* Calendar */}
-      <AnimatedCard delay={0.2} className="border-0 shadow-sm">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={onPrevMonth}
-              className="p-2 rounded-xl hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
-              aria-label="Previous month"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </motion.button>
-            <CardTitle className="text-lg font-semibold">
-              {MONTH_NAMES[month]} {year}
-            </CardTitle>
-            <motion.button
-              whileHover={canGoNext ? { scale: 1.1 } : {}}
-              whileTap={canGoNext ? { scale: 0.9 } : {}}
-              onClick={onNextMonth}
-              disabled={!canGoNext}
-              className="p-2 rounded-xl hover:bg-muted transition-colors text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed"
-              aria-label="Next month"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </motion.button>
+      <AnimatedCard delay={0.2} className="border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-[24px] bg-white overflow-hidden">
+        <CardHeader className="pb-4 pt-6 px-6 border-b border-gray-50/50">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => {
+                  const now = new Date()
+                  if (now.getMonth() !== month || now.getFullYear() !== year) {
+                    // We don't have a direct "go to today" prop, but we could trigger month changes if we implemented it.
+                    // For now, it just acts as a UI element or triggers next/prev until we reach today.
+                  }
+                }}
+                className="px-4 py-2 text-sm font-medium bg-gray-50/80 hover:bg-gray-100 text-gray-700 rounded-full transition-colors"
+              >
+                Today
+              </button>
+              
+              <div className="flex items-center bg-gray-50/80 rounded-full p-1 border border-gray-100/50">
+                <button
+                  onClick={onPrevMonth}
+                  className="p-1.5 rounded-full hover:bg-white hover:shadow-sm text-gray-500 transition-all"
+                  aria-label="Previous month"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <div className="w-px h-4 bg-gray-200 mx-1" />
+                <button
+                  onClick={onNextMonth}
+                  disabled={!canGoNext}
+                  className="p-1.5 rounded-full hover:bg-white hover:shadow-sm text-gray-500 transition-all disabled:opacity-30"
+                  aria-label="Next month"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+
+              <h2 className="text-xl font-semibold text-gray-800 ml-2 flex items-center gap-2 cursor-pointer">
+                {MONTH_NAMES[month]} {year}
+                <span className="text-xs text-gray-400">▼</span>
+              </h2>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button className="p-2 rounded-full border border-gray-100 hover:bg-gray-50 text-gray-500 transition-colors">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+              </button>
+              <button className="px-4 py-2 text-sm font-medium border border-gray-100 hover:bg-gray-50 text-gray-700 rounded-full transition-colors flex items-center gap-2">
+                Month <span className="text-[10px] text-gray-400">▼</span>
+              </button>
+              <button className="px-5 py-2.5 text-sm font-semibold bg-[#FFC516] hover:bg-[#F2B900] text-black rounded-full transition-colors shadow-sm flex items-center gap-1.5">
+                <span>+</span> Add Event
+              </button>
+            </div>
           </div>
         </CardHeader>
 
-        <CardContent>
-          <div className="grid grid-cols-7 mb-2">
+        <CardContent className="p-6 bg-[#FAFAFA]/50">
+          <div className="grid grid-cols-7 mb-3">
             {DAY_LABELS.map((label) => (
               <div
                 key={label}
-                className="text-center text-xs font-semibold text-muted-foreground py-1"
+                className="text-left pl-3 text-xs font-semibold text-gray-500 pb-2"
               >
                 {label}
               </div>
@@ -476,105 +504,93 @@ const LeaveCalendarUI = ({
           </div>
 
           {isLoading ? (
-            <div className="grid grid-cols-7 gap-1">
+            <div className="grid grid-cols-7 gap-3">
               {Array.from({ length: 35 }).map((_, i) => (
-                <Skeleton key={i} className="h-16 md:h-20 rounded-xl" />
+                <Skeleton key={i} className="h-28 md:h-36 rounded-2xl bg-white border border-gray-100 shadow-sm" />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-7 gap-1">
+            <div className="grid grid-cols-7 gap-3">
               {gridCells.map((record, index) => {
                 if (!record)
-                  return <div key={`empty-${index}`} className="h-16 md:h-20" />
+                  return <div key={`empty-${index}`} className="h-28 md:h-36" />
 
                 const dayNumber = parseInt(record.date.split("-")[2])
                 const isToday = record.date === todayString
                 const isSelected = record.date === selectedDate
                 const isClickable = !record.isWeekend && record.total > 0
+                
+                // Hatched pattern for weekends
+                const weekendStyle = record.isWeekend ? {
+                  backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 4px, #f3f4f6 4px, #f3f4f6 5px)',
+                  backgroundColor: '#fcfcfc'
+                } : { backgroundColor: '#ffffff' }
 
                 return (
                   <motion.div
                     key={record.date}
-                    initial={{ opacity: 0, scale: 0.9 }}
+                    initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.01 * index, duration: 0.25 }}
-                    whileHover={isClickable ? { scale: 1.05, y: -2 } : {}}
-                    whileTap={isClickable ? { scale: 0.95 } : {}}
+                    transition={{ delay: 0.005 * index, duration: 0.2 }}
+                    whileHover={isClickable ? { y: -2, zIndex: 10 } : {}}
+                    whileTap={isClickable ? { scale: 0.98 } : {}}
                     onClick={() => isClickable && onDayClick(record)}
+                    style={weekendStyle}
                     className={`
-                      relative border rounded-xl p-1.5 md:p-2 h-16 md:h-20 transition-all
-                      ${getDayColorClass(record)}
-                      ${isToday ? "ring-2 ring-primary ring-offset-1" : ""}
-                      ${isSelected ? "ring-2 ring-offset-1 ring-foreground/50" : ""}
-                      ${isClickable ? "cursor-pointer" : "cursor-default"}
+                      relative rounded-2xl p-2.5 md:p-3 h-28 md:h-36 flex flex-col transition-all overflow-hidden
+                      border border-gray-100 shadow-sm
+                      ${isToday ? "ring-1 ring-emerald-500/30" : ""}
+                      ${isSelected ? "ring-2 ring-primary shadow-md" : ""}
+                      ${isClickable ? "cursor-pointer hover:shadow-md hover:border-gray-200" : "cursor-default opacity-80"}
                     `}
                   >
-                    <span
-                      className={`text-xs font-semibold leading-none ${
-                        isToday
-                          ? "text-primary"
-                          : record.isWeekend
-                            ? "text-muted-foreground/50"
-                            : "text-foreground"
-                      }`}
-                    >
-                      {dayNumber}
-                    </span>
+                    <div className="flex justify-between items-start mb-1">
+                      <span
+                        className={`text-sm font-medium ${
+                          isToday
+                            ? "text-white bg-indigo-500 w-6 h-6 flex items-center justify-center rounded-full shadow-sm"
+                            : record.isWeekend
+                              ? "text-gray-400"
+                              : "text-gray-700"
+                        }`}
+                      >
+                        {dayNumber}
+                      </span>
+                    </div>
 
                     {!record.isWeekend && record.total > 0 && (
-                      <div className="mt-1 space-y-0.5 hidden md:block">
-                        <p className="text-[10px] text-emerald-600 font-medium leading-none">
-                          ✓ {record.present}
-                        </p>
-                        <p className="text-[10px] text-amber-600 font-medium leading-none">
-                          ⏳ {record.onLeave}
-                        </p>
-                        <p className="text-[10px] text-red-500 font-medium leading-none">
-                          ✗ {record.absent}
-                        </p>
+                      <div className="mt-1 space-y-1.5 flex-1 overflow-y-auto pr-1 custom-scrollbar">
+                        {record.present > 0 && (
+                          <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-emerald-50 border border-emerald-100/50 w-fit max-w-full">
+                            <span className="text-[10px]">🟢</span>
+                            <span className="text-[10px] font-medium text-emerald-700 truncate">
+                              {record.present} Present
+                            </span>
+                          </div>
+                        )}
+                        {record.onLeave > 0 && (
+                          <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-amber-50 border border-amber-100/50 w-fit max-w-full">
+                            <span className="text-[10px]">🏖️</span>
+                            <span className="text-[10px] font-medium text-amber-700 truncate">
+                              {record.onLeave} On Leave
+                            </span>
+                          </div>
+                        )}
+                        {record.absent > 0 && (
+                          <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-red-50 border border-red-100/50 w-fit max-w-full">
+                            <span className="text-[10px]">🚨</span>
+                            <span className="text-[10px] font-medium text-red-700 truncate">
+                              {record.absent} Absent
+                            </span>
+                          </div>
+                        )}
                       </div>
-                    )}
-
-                    {!record.isWeekend && record.total > 0 && (
-                      <AttendanceBar
-                        present={record.present}
-                        leaveCount={record.onLeave}
-                        total={record.total}
-                      />
-                    )}
-
-                    {record.isWeekend && (
-                      <p className="text-[9px] text-muted-foreground/40 mt-0.5 hidden md:block">
-                        Weekend
-                      </p>
                     )}
                   </motion.div>
                 )
               })}
             </div>
           )}
-
-          {/* Legend */}
-          <div className="flex flex-wrap items-center gap-4 mt-4 pt-4 border-t">
-            <span className="text-xs font-medium text-muted-foreground">
-              Legend:
-            </span>
-            {[
-              { color: "bg-emerald-500", label: "Present" },
-              { color: "bg-amber-400", label: "On Leave" },
-              { color: "bg-red-500", label: "Absent" },
-              { color: "bg-muted rounded-sm", label: "Weekend" },
-            ].map(({ color, label }) => (
-              <div key={label} className="flex items-center gap-1.5">
-                <div className={`w-3 h-3 rounded-full ${color}`} />
-                <span className="text-xs text-muted-foreground">{label}</span>
-              </div>
-            ))}
-            <div className="flex items-center gap-1.5 ml-auto">
-              <div className="w-3 h-3 rounded-full ring-2 ring-primary bg-transparent" />
-              <span className="text-xs text-muted-foreground">Today</span>
-            </div>
-          </div>
         </CardContent>
       </AnimatedCard>
 
